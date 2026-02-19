@@ -1,0 +1,35 @@
+import { Link } from "wouter";
+import { DollarSign, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+export function Header() {
+  return (
+    <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <Link href="/">
+          <div className="flex items-center gap-2 cursor-pointer group">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
+              <DollarSign className="w-5 h-5 font-bold" />
+            </div>
+            <span className="text-xl font-bold font-display text-slate-900 tracking-tight">PennyFloat</span>
+          </div>
+        </Link>
+
+        <nav className="hidden md:flex items-center gap-8">
+          <a href="#how-it-works" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">How it Works</a>
+          <a href="#benefits" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Benefits</a>
+          <a href="#faq" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">FAQ</a>
+        </nav>
+
+        <div className="flex items-center gap-4">
+          <a href="#apply" className="hidden sm:block">
+            <Button className="font-semibold shadow-md shadow-primary/20">Check Your Rate</Button>
+          </a>
+          <button className="md:hidden p-2 text-slate-600">
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}

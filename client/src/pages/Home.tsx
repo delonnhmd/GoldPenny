@@ -1,0 +1,512 @@
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  ArrowRight, 
+  CheckCircle2, 
+  DollarSign, 
+  Clock, 
+  ShieldCheck, 
+  TrendingUp, 
+  Banknote,
+  Percent,
+  ChevronRight,
+  ChevronLeft,
+  Loader2
+} from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Card } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { StepIndicator } from "@/components/StepIndicator";
+import { useCreateLead } from "@/hooks/use-leads";
+import { insertLeadSchema, creditScoreRanges, employmentStatuses, loanPurposes } from "@shared/schema";
+
+// Form schemas for each step
+const step1Schema = z.object({
+  loanAmount: z.number().min(1000).max(50000),
+  loanPurpose: z.enum(loanPurposes),
+});
+
+const step2Schema = z.object({
+  creditScoreRange: z.enum(creditScoreRanges),
+  employmentStatus: z.enum(employmentStatuses),
+});
+
+const step3Schema = z.object({
+  zipCode: z.string().min(5).max(10).regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code"),
+  email: z.string().email(),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+});
+
+// Combined schema type
+type FormValues = z.infer<typeof insertLeadSchema>;
+
+export default function Home() {
+  const [step, setStep] = useState(1);
+  const { mutate: createLead, isPending } = useCreateLead();
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(insertLeadSchema),
+    defaultValues: {
+      loanAmount: 5000,
+      loanPurpose: "Debt Consolidation",
+      creditScoreRange: "650-719",
+      employmentStatus: "Employed",
+      zipCode: "",
+      email: "",
+      phone: "",
+    },
+    mode: "onChange",
+  });
+
+  const validateStep = async (currentStep: number) => {
+    let isValid = false;
+    if (currentStep === 1) {
+      isValid = await form.trigger(["loanAmount", "loanPurpose"]);
+    } else if (currentStep === 2) {
+      isValid = await form.trigger(["creditScoreRange", "employmentStatus"]);
+    } else {
+      isValid = await form.trigger(["zipCode", "email", "phone"]);
+    }
+    
+    if (isValid) {
+      setStep(prev => prev + 1);
+    }
+  };
+
+  const onSubmit = (data: FormValues) => {
+    createLead(data);
+  };
+
+  const nextStep = () => validateStep(step);
+  const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans">
+      <Header />
+
+      {/* Hero Section */}
+      <section className="relative pt-12 pb-24 lg:pt-20 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-white opacity-80" />
+          {/* Abstract background blobs */}
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-blue-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-100/40 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
+        </div>
+
+        <div className="container relative z-10 mx-auto px-4 max-w-7xl">
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+            
+            {/* Hero Text */}
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold mb-6 border border-emerald-100 shadow-sm">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>No Impact on Your Credit Score</span>
+              </div>
+              
+              <h1 className="text-4xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight font-display">
+                Check Personal Loan <br />
+                Offers in <span className="text-primary relative inline-block">
+                  Minutes
+                  <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow-400 opacity-50" viewBox="0 0 100 10" preserveAspectRatio="none">
+                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
+                  </svg>
+                </span>
+              </h1>
+              
+              <p className="text-lg lg:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                Compare offers from our network of trusted lenders. Whether for debt consolidation, home improvement, or emergencies—we make it fast, simple, and free.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <ShieldCheck className="w-5 h-5 text-primary" />
+                  <span>256-bit Secure</span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <Clock className="w-5 h-5 text-primary" />
+                  <span>2 Minute Process</span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                  <Banknote className="w-5 h-5 text-primary" />
+                  <span>Funding as fast as 24h</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Application Form Card */}
+            <div id="apply" className="flex-1 w-full max-w-md lg:max-w-lg">
+              <Card className="p-6 md:p-8 shadow-2xl border-slate-100 bg-white/90 backdrop-blur rounded-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-blue-400" />
+                
+                <h3 className="text-2xl font-bold text-center mb-6 font-display text-slate-800">Check Your Rate</h3>
+                
+                <StepIndicator currentStep={step} totalSteps={3} />
+
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <AnimatePresence mode="wait">
+                      
+                      {step === 1 && (
+                        <motion.div
+                          key="step1"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.3 }}
+                          className="space-y-6"
+                        >
+                          <FormField
+                            control={form.control}
+                            name="loanAmount"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-base font-semibold text-slate-700">How much do you need?</FormLabel>
+                                <div className="pt-2 pb-6">
+                                  <div className="flex items-center justify-between mb-4">
+                                    <span className="text-3xl font-bold text-primary">${field.value.toLocaleString()}</span>
+                                    <span className="text-sm text-slate-500">Min: $1,000 — Max: $50,000</span>
+                                  </div>
+                                  <Slider
+                                    min={1000}
+                                    max={50000}
+                                    step={100}
+                                    value={[field.value]}
+                                    onValueChange={(val) => field.onChange(val[0])}
+                                    className="py-4"
+                                  />
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="loanPurpose"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-base font-semibold text-slate-700">What is this loan for?</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="h-12 text-base">
+                                      <SelectValue placeholder="Select a purpose" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {loanPurposes.map((p) => (
+                                      <SelectItem key={p} value={p}>{p}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <Button type="button" onClick={nextStep} className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+                            Next Step <ChevronRight className="ml-2 w-5 h-5" />
+                          </Button>
+                        </motion.div>
+                      )}
+
+                      {step === 2 && (
+                        <motion.div
+                          key="step2"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.3 }}
+                          className="space-y-6"
+                        >
+                          <FormField
+                            control={form.control}
+                            name="creditScoreRange"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-base font-semibold text-slate-700">Estimated Credit Score</FormLabel>
+                                <div className="grid grid-cols-2 gap-3 mt-2">
+                                  {creditScoreRanges.map((range) => (
+                                    <div
+                                      key={range}
+                                      onClick={() => field.onChange(range)}
+                                      className={`
+                                        cursor-pointer p-4 rounded-xl border-2 text-center transition-all duration-200
+                                        ${field.value === range 
+                                          ? "border-primary bg-primary/5 text-primary font-bold shadow-sm" 
+                                          : "border-slate-200 hover:border-slate-300 text-slate-600 hover:bg-slate-50"}
+                                      `}
+                                    >
+                                      {range}
+                                    </div>
+                                  ))}
+                                </div>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="employmentStatus"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-base font-semibold text-slate-700">Employment Status</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger className="h-12 text-base">
+                                      <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {employmentStatuses.map((s) => (
+                                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <div className="flex gap-3">
+                            <Button type="button" variant="outline" onClick={prevStep} className="flex-1 h-12">
+                              <ChevronLeft className="mr-2 w-4 h-4" /> Back
+                            </Button>
+                            <Button type="button" onClick={nextStep} className="flex-[2] h-12 text-lg font-semibold bg-primary hover:bg-primary/90">
+                              Next Step <ChevronRight className="ml-2 w-5 h-5" />
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {step === 3 && (
+                        <motion.div
+                          key="step3"
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -20 }}
+                          transition={{ duration: 0.3 }}
+                          className="space-y-4"
+                        >
+                          <FormField
+                            control={form.control}
+                            name="zipCode"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-700 font-semibold">ZIP Code</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="12345" {...field} className="h-12 text-lg" maxLength={10} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-700 font-semibold">Email Address</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="you@example.com" type="email" {...field} className="h-12 text-lg" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-700 font-semibold">Phone Number</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="(555) 123-4567" type="tel" {...field} className="h-12 text-lg" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <p className="text-xs text-slate-500 mt-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            By clicking "See My Offers", you agree to our Terms of Use and Privacy Policy. You consent to receive phone calls and SMS messages from us and our partners to provide updates on your loan request.
+                          </p>
+
+                          <div className="flex gap-3 pt-2">
+                            <Button type="button" variant="outline" onClick={prevStep} disabled={isPending} className="flex-1 h-12">
+                              <ChevronLeft className="mr-2 w-4 h-4" /> Back
+                            </Button>
+                            <Button type="submit" disabled={isPending} className="flex-[2] h-12 text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20">
+                              {isPending ? (
+                                <>
+                                  <Loader2 className="mr-2 h-5 w-5 animate-spin" /> 
+                                  Processing...
+                                </>
+                              ) : (
+                                <>
+                                  See My Offers <ArrowRight className="ml-2 w-5 h-5" />
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </form>
+                </Form>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="how-it-works" className="py-20 bg-white border-t border-slate-100">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold font-display text-slate-900 mb-4">How PennyFloat Works</h2>
+            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Get the funds you need in three simple steps. We've streamlined the process to make borrowing easy and transparent.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {[
+              { 
+                icon: <DollarSign className="w-8 h-8 text-primary" />, 
+                title: "Check Your Rate", 
+                desc: "Fill out our simple online form to see your personalized loan offers without affecting your credit score." 
+              },
+              { 
+                icon: <TrendingUp className="w-8 h-8 text-primary" />, 
+                title: "Choose Your Loan", 
+                desc: "Compare rates, terms, and payments from our network of trusted lenders and pick the best option for you." 
+              },
+              { 
+                icon: <Banknote className="w-8 h-8 text-primary" />, 
+                title: "Get Funded Fast", 
+                desc: "Once approved, funds are typically deposited directly into your bank account as soon as the next business day." 
+              }
+            ].map((feature, i) => (
+              <div key={i} className="group p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                <div className="w-16 h-16 rounded-xl bg-white shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-slate-100">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
+                <p className="text-slate-600 leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust/Benefits Section */}
+      <section id="benefits" className="py-20 bg-slate-900 text-white relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(#4b5563 1px, transparent 1px)", backgroundSize: "32px 32px" }}></div>
+        
+        <div className="container mx-auto px-4 max-w-7xl relative z-10">
+          <div className="flex flex-col md:flex-row items-center gap-16">
+            <div className="flex-1">
+              <h2 className="text-3xl md:text-4xl font-bold font-display mb-6">Why Choose PennyFloat?</h2>
+              <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                We believe financial freedom should be accessible to everyone. Our platform connects you with lenders who look beyond just your credit score.
+              </p>
+              
+              <ul className="space-y-4">
+                {[
+                  "Competitive rates from 5.99% APR",
+                  "Loan amounts up to $50,000",
+                  "No prepayment penalties",
+                  "Secure & confidential process"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                      <Check className="w-4 h-4" />
+                    </div>
+                    <span className="font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              <div className="mt-10">
+                <Button 
+                  size="lg" 
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-6 text-lg rounded-xl shadow-lg shadow-emerald-500/20"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                >
+                  Get Started Now
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex-1 w-full">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 transform translate-y-8">
+                  <div className="text-4xl font-bold text-emerald-400 mb-1">2M+</div>
+                  <div className="text-sm text-slate-400">Customers Helped</div>
+                </div>
+                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                  <div className="text-4xl font-bold text-blue-400 mb-1">$500M</div>
+                  <div className="text-sm text-slate-400">Loans Funded</div>
+                </div>
+                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 transform translate-y-8">
+                  <div className="text-4xl font-bold text-purple-400 mb-1">98%</div>
+                  <div className="text-sm text-slate-400">Satisfaction Rate</div>
+                </div>
+                <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                  <div className="text-4xl font-bold text-yellow-400 mb-1">24h</div>
+                  <div className="text-sm text-slate-400">Avg. Funding Time</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 bg-slate-50">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <h2 className="text-3xl font-bold font-display text-center mb-12 text-slate-900">Frequently Asked Questions</h2>
+          
+          <div className="space-y-4">
+            {[
+              { q: "Will checking my rate affect my credit score?", a: "No. Checking your rate with PennyFloat triggers a 'soft inquiry' on your credit report, which is visible only to you and does not affect your credit score." },
+              { q: "How fast can I get the money?", a: "Once you accept a loan offer and complete the lender's verification process, funds are typically deposited into your bank account as soon as the next business day." },
+              { q: "What can I use a personal loan for?", a: "You can use a personal loan for almost anything, including debt consolidation, home improvements, medical expenses, weddings, or vacations." },
+              { q: "Is my personal information secure?", a: "Yes. We use industry-standard 256-bit SSL encryption to protect your personal information. We treat your data with the highest level of security and privacy." }
+            ].map((item, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 border border-slate-200 hover:border-primary/30 transition-colors shadow-sm">
+                <h3 className="text-lg font-bold text-slate-900 mb-2 flex items-start gap-3">
+                  <span className="text-primary mt-1"><Percent className="w-4 h-4" /></span>
+                  {item.q}
+                </h3>
+                <p className="text-slate-600 pl-7">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}
+
+// Helper icons
+function Check(props: any) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}

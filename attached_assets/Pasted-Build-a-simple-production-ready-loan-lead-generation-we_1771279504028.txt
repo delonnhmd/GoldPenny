@@ -1,0 +1,182 @@
+Build a simple, production-ready loan lead generation website called “PennyFloat” using:
+
+PHP (no frameworks)
+
+MySQL
+
+Vanilla JavaScript
+
+Clean modern CSS (no external heavy libraries)
+
+Multi-step form (3 steps)
+
+Responsive design
+
+Secure coding practices
+
+The goal:
+Users answer questions and are redirected to an affiliate lender link based on credit score range. Leads must be saved to database before redirect.
+
+PROJECT STRUCTURE
+
+/public_html
+
+index.php
+
+process.php
+
+config.php (database connection)
+
+/assets/style.css
+
+/assets/script.js
+
+privacy-policy.php
+
+terms.php
+
+.htaccess
+
+LANDING PAGE REQUIREMENTS (index.php)
+
+Hero section:
+Headline:
+“Check Personal Loan Offers in Minutes — No Impact on Your Credit Score”
+
+Subtext:
+“Compare offers from our network of trusted lenders. Fast, simple, and free.”
+
+CTA button: “Check My Offers”
+
+Then display a 3-step multi-step form with progress indicator.
+
+FORM STRUCTURE
+
+Step 1:
+
+Loan Amount (dropdown: 1000–50000)
+
+Loan Purpose (Debt Consolidation, Emergency, Medical, Other)
+
+Step 2:
+
+Credit Score Range (Below 580, 580–649, 650–719, 720+)
+
+Employment Status (Employed, Self-Employed, Unemployed)
+
+Step 3:
+
+ZIP Code
+
+Email
+
+Phone
+
+Form should:
+
+Use client-side validation
+
+Use JavaScript to move between steps
+
+Display progress bar (Step 1 of 3, etc.)
+
+DO NOT collect SSN.
+
+DATABASE
+
+Create MySQL table:
+
+Table name: leads
+
+Fields:
+
+id (auto increment primary key)
+
+loan_amount
+
+loan_purpose
+
+credit_score_range
+
+employment_status
+
+zip_code
+
+email
+
+phone
+
+ip_address
+
+created_at (timestamp)
+
+Use prepared statements to prevent SQL injection.
+
+PROCESS LOGIC (process.php)
+
+Validate inputs (server-side).
+
+Sanitize inputs.
+
+Save lead into database.
+
+Store user IP.
+
+Redirect based on credit score:
+
+If Below 580 → redirect to:
+https://subprime-affiliate-link.com
+
+If 580–649 → redirect to:
+https://midprime-affiliate-link.com
+
+If 650+ → redirect to:
+https://prime-affiliate-link.com
+
+Use header("Location: ..."); and exit();
+
+SECURITY REQUIREMENTS
+
+Use PDO with prepared statements
+
+Escape all output
+
+Enable basic .htaccess to disable directory browsing
+
+Add basic CSRF token
+
+Add simple Google reCAPTCHA placeholder
+
+Force HTTPS redirect
+
+DESIGN REQUIREMENTS
+
+Clean financial style
+
+Navy blue primary color
+
+Strong CTA button color
+
+Mobile responsive
+
+No stock images
+
+Professional typography
+
+Clean layout
+
+FOOTER
+
+Include disclaimer:
+
+“PennyFloat is not a lender and does not make credit decisions. We connect users with independent third-party lenders.”
+
+Add links to:
+
+Privacy Policy
+
+Terms of Service
+
+Generate full working code for all files.
+
+Keep it simple and readable.
