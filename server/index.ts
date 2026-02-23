@@ -1,4 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 import { db } from "./db";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
@@ -6,6 +8,53 @@ import { createServer } from "http";
 
 const app = express();
 const httpServer = createServer(app);
+
+app.disable("x-powered-by");
+
+// If you're behind Render/Proxy, trust proxy so rate-limit uses real IP
+app.set("trust proxy", 1);
+
+// Basic security headers
+app.use(helmet());
+
+// Block common secret-probing paths (they should NEVER exist)
+const blocked = [
+  "/api/.env",
+  "/api/env",
+  "/api/actuator/env",
+  "/api/config",
+  "/api/settings",
+  "/api/keys",
+  "/api/v1/config",
+  "/api/stripe/config",
+  "/api/payment/config",
+  "/api/v1/namespaces/default/secrets",
+];
+
+app.use((req, res, next) => {
+  if (blocked.includes(req.path)) return res.status(404).send("Not found");
+  next();
+});
+
+// Rate limit ALL /api calls
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 200, // 200 requests per IP per 15 min
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use("/api", apiLimiter);
+
+// Extra tight limit for lead submissions (prevents spam)
+const submitLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 min
+  max: 20, // 20 submits per IP per 10 min
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.post("/api", submitLimiter);
 
 declare module "http" {
   interface IncomingMessage {
