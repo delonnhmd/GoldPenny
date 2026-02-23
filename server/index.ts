@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import { db } from "./db";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
@@ -18,6 +19,65 @@ app.use(
       req.rawBody = buf;
     },
   }),
+);
+
+function requireAdminKey(req: Request, res: Response, next: NextFunction) {
+  const key = String(req.query.key ?? "");
+  if (!process.env.ADMIN_KEY) return res.status(500).send("ADMIN_KEY not set");
+  if (key !== process.env.ADMIN_KEY) return res.status(401).send("Unauthorized");
+  next();
+}
+
+app.get("/admin/leads", requireAdminKey, async (req: Request, res: Response) => {
+  try {
+    const result: any = await db.execute(
+      `select * from leads order by created_at desc limit 100`
+    );
+    const rows = result?.rows ?? result;
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+app.get(
+  "/admin/leads.csv",
+  requireAdminKey,
+  async (req: Request, res: Response) => {
+    try {
+      const result: any = await db.execute(
+        `select * from leads order by created_at desc limit 100`
+      );
+      const rows: any[] = result?.rows ?? result ?? [];
+
+      const headers = rows.length
+        ? Object.keys(rows[0])
+        : [
+            "id",
+            "loan_amount",
+            "loan_purpose",
+            "credit_score_range",
+            "employment_status",
+            "zip_code",
+            "email",
+            "phone",
+            "ip_address",
+            "created_at",
+          ];
+
+      const escape = (v: any) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const csv = [
+        headers.join(","),
+        ...rows.map((r) => headers.map((h) => escape(r[h])).join(",")),
+      ].join("\n");
+
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", "attachment; filename=leads.csv");
+      res.send(csv);
+    } catch (e) {
+      res.status(500).json({ error: String(e) });
+    }
+  }
 );
 
 app.use(express.urlencoded({ extended: false }));
