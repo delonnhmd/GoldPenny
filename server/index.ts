@@ -107,6 +107,7 @@ app.get(
             "loan_purpose",
             "credit_score_range",
             "employment_status",
+            "full_name",
             "zip_code",
             "email",
             "phone",

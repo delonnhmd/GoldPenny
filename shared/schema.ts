@@ -9,6 +9,7 @@ export const leads = pgTable("leads", {
   loanPurpose: text("loan_purpose").notNull(),
   creditScoreRange: text("credit_score_range").notNull(),
   employmentStatus: text("employment_status").notNull(),
+  fullName: text("full_name").notNull(),
   zipCode: varchar("zip_code", { length: 10 }).notNull(),
   email: text("email").notNull(),
   phone: text("phone").notNull(),

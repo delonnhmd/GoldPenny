@@ -41,6 +41,7 @@ const step2Schema = z.object({
 });
 
 const step3Schema = z.object({
+  fullName: z.string().min(2, "Full name is required"),
   zipCode: z.string().min(5).max(10).regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code"),
   email: z.string().email(),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
@@ -60,6 +61,7 @@ export default function Home() {
       loanPurpose: "Debt Consolidation",
       creditScoreRange: "650-719",
       employmentStatus: "Employed",
+      fullName: "",
       zipCode: "",
       email: "",
       phone: "",
@@ -74,7 +76,7 @@ export default function Home() {
     } else if (currentStep === 2) {
       isValid = await form.trigger(["creditScoreRange", "employmentStatus"]);
     } else {
-      isValid = await form.trigger(["zipCode", "email", "phone"]);
+      isValid = await form.trigger(["fullName", "zipCode", "email", "phone"]);
     }
     
     if (isValid) {
@@ -297,6 +299,20 @@ export default function Home() {
                           transition={{ duration: 0.3 }}
                           className="space-y-4"
                         >
+                          <FormField
+                            control={form.control}
+                            name="fullName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-700 font-semibold">Full Name</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="John Doe" {...field} className="h-12 text-lg" />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
                           <FormField
                             control={form.control}
                             name="zipCode"
