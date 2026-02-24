@@ -109,6 +109,17 @@ export default function Home() {
             
             {/* Hero Text */}
             <div className="flex-1 text-center lg:text-left">
+              <div className="flex justify-center lg:justify-start mb-6">
+                <img
+                  src="/logo.png"
+                  alt="PennyFloat logo"
+                  className="w-40 h-40 md:w-48 md:h-48 object-contain"
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = "/favicon.png";
+                  }}
+                />
+              </div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold mb-6 border border-emerald-100 shadow-sm">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>No Impact on Your Credit Score</span>

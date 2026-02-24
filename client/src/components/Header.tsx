@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { DollarSign, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Header() {
@@ -8,9 +8,15 @@ export function Header() {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
-              <DollarSign className="w-5 h-5 font-bold" />
-            </div>
+            <img
+              src="/logo.png"
+              alt="PennyFloat logo"
+              className="w-8 h-8 rounded-lg object-cover shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = "/favicon.png";
+              }}
+            />
             <span className="text-xl font-bold font-display text-slate-900 tracking-tight">PennyFloat</span>
           </div>
         </Link>

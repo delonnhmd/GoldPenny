@@ -6,7 +6,18 @@ export function Footer() {
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl text-white mb-4 font-display">PennyFloat</h3>
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="/logo.png"
+                alt="PennyFloat logo"
+                className="w-10 h-10 rounded-lg object-cover"
+                onError={(event) => {
+                  event.currentTarget.onerror = null;
+                  event.currentTarget.src = "/favicon.png";
+                }}
+              />
+              <h3 className="text-2xl text-white font-display">PennyFloat</h3>
+            </div>
             <p className="text-sm leading-relaxed max-w-md text-slate-400">
               We connect you with a network of trusted lenders to find the best personal loan rates. 
               Our service is free, secure, and won't impact your credit score to check rates.
