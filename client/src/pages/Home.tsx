@@ -138,6 +138,9 @@ export default function Home() {
               <p className="text-lg lg:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                 Compare offers from our network of trusted lenders. Whether for debt consolidation, home improvement, or emergencies—we make it fast, simple, and free.
               </p>
+              <p className="text-sm text-slate-500 mb-8 max-w-2xl mx-auto lg:mx-0">
+                Impact-Site-Verification: 60e7108b-a262-4838-b750-2bda07b40c9d
+              </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <div className="flex items-center gap-2 text-slate-500 text-sm">
