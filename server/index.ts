@@ -78,6 +78,10 @@ function requireAdminKey(req: Request, res: Response, next: NextFunction) {
 }
 
 app.get("/admin/leads", requireAdminKey, async (req: Request, res: Response) => {
+  if (!db) {
+    return res.status(503).json({ error: "Database not configured" });
+  }
+
   try {
     const result: any = await db.execute(
       `select * from leads order by created_at desc limit 100`
@@ -93,6 +97,10 @@ app.get(
   "/admin/leads.csv",
   requireAdminKey,
   async (req: Request, res: Response) => {
+    if (!db) {
+      return res.status(503).json({ error: "Database not configured" });
+    }
+
     try {
       const result: any = await db.execute(
         `select * from leads order by created_at desc limit 100`
