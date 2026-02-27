@@ -43,5 +43,7 @@ export const loanPurposes = [
   "Debt Consolidation",
   "Emergency",
   "Medical",
-  "Other"
+  "Other",
+  "Car Buying",
+  "Car Refinance"
 ] as const;

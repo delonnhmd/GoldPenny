@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -50,15 +51,39 @@ const step3Schema = z.object({
 // Combined schema type
 type FormValues = z.infer<typeof insertLeadSchema>;
 
+const personalLoanPurposes = [
+  "Debt Consolidation",
+  "Emergency",
+  "Medical",
+  "Other",
+] as const;
+
 export default function Home() {
   const [step, setStep] = useState(1);
+  const [carStep, setCarStep] = useState(1);
   const { mutate: createLead, isPending } = useCreateLead();
+  const { mutate: createCarLead, isPending: isCarPending } = useCreateLead();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(insertLeadSchema),
     defaultValues: {
       loanAmount: 5000,
       loanPurpose: "Debt Consolidation",
+      creditScoreRange: "650-719",
+      employmentStatus: "Employed",
+      fullName: "",
+      zipCode: "",
+      email: "",
+      phone: "",
+    },
+    mode: "onChange",
+  });
+
+  const carForm = useForm<FormValues>({
+    resolver: zodResolver(insertLeadSchema),
+    defaultValues: {
+      loanAmount: 15000,
+      loanPurpose: "Car Buying",
       creditScoreRange: "650-719",
       employmentStatus: "Employed",
       fullName: "",
@@ -88,8 +113,29 @@ export default function Home() {
     createLead(data);
   };
 
+  const validateCarStep = async (currentStep: number) => {
+    let isValid = false;
+    if (currentStep === 1) {
+      isValid = await carForm.trigger(["loanAmount", "loanPurpose"]);
+    } else if (currentStep === 2) {
+      isValid = await carForm.trigger(["creditScoreRange", "employmentStatus"]);
+    } else {
+      isValid = await carForm.trigger(["fullName", "zipCode", "email", "phone"]);
+    }
+
+    if (isValid) {
+      setCarStep((prev) => prev + 1);
+    }
+  };
+
+  const onCarSubmit = (data: FormValues) => {
+    createCarLead(data);
+  };
+
   const nextStep = () => validateStep(step);
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
+  const nextCarStep = () => validateCarStep(carStep);
+  const prevCarStep = () => setCarStep((prev) => Math.max(prev - 1, 1));
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -143,6 +189,14 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="border-primary/30 text-primary hover:bg-primary/5"
+                  onClick={() => document.getElementById("car-loan")?.scrollIntoView({ behavior: "smooth" })}
+                >
+                  Explore Car Loan Options
+                </Button>
                 <div className="flex items-center gap-2 text-slate-500 text-sm">
                   <ShieldCheck className="w-5 h-5 text-primary" />
                   <span>256-bit Secure</span>
@@ -218,7 +272,7 @@ export default function Home() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    {loanPurposes.map((p) => (
+                                    {personalLoanPurposes.map((p) => (
                                       <SelectItem key={p} value={p}>{p}</SelectItem>
                                     ))}
                                   </SelectContent>
@@ -397,6 +451,252 @@ export default function Home() {
                 </Form>
               </Card>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Car Loan Form Section */}
+      <section id="car-loan" className="py-20 bg-white border-t border-slate-100">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold font-display text-slate-900 mb-4">Car Loan & Car Refinance</h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+              Apply for a car loan or refinance your current auto loan with the same fast, secure process.
+            </p>
+          </div>
+
+          <div className="max-w-lg mx-auto">
+            <Card className="p-6 md:p-8 shadow-2xl border-slate-100 bg-white rounded-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-blue-400" />
+
+              <h3 className="text-2xl font-bold text-center mb-6 font-display text-slate-800">Check Your Car Loan Rate</h3>
+
+              <StepIndicator currentStep={carStep} totalSteps={3} />
+
+              <Form {...carForm}>
+                <form onSubmit={carForm.handleSubmit(onCarSubmit)} className="space-y-6">
+                  <AnimatePresence mode="wait">
+                    {carStep === 1 && (
+                      <motion.div
+                        key="car-step1"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-6"
+                      >
+                        <FormField
+                          control={carForm.control}
+                          name="loanPurpose"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-base font-semibold text-slate-700">Loan Type</FormLabel>
+                              <FormControl>
+                                <Tabs value={field.value} onValueChange={field.onChange} className="w-full">
+                                  <TabsList className="grid w-full grid-cols-2 h-12">
+                                    <TabsTrigger value="Car Buying" className="text-base">Buying</TabsTrigger>
+                                    <TabsTrigger value="Car Refinance" className="text-base">Refinance</TabsTrigger>
+                                  </TabsList>
+                                </Tabs>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={carForm.control}
+                          name="loanAmount"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-base font-semibold text-slate-700">How much do you need?</FormLabel>
+                              <div className="pt-2 pb-6">
+                                <div className="flex items-center justify-between mb-4">
+                                  <span className="text-3xl font-bold text-primary">${field.value.toLocaleString()}</span>
+                                  <span className="text-sm text-slate-500">Min: $1,000 — Max: $50,000</span>
+                                </div>
+                                <Slider
+                                  min={1000}
+                                  max={50000}
+                                  step={100}
+                                  value={[field.value]}
+                                  onValueChange={(val) => field.onChange(val[0])}
+                                  className="py-4"
+                                />
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <Button type="button" onClick={nextCarStep} className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+                          Next Step <ChevronRight className="ml-2 w-5 h-5" />
+                        </Button>
+                      </motion.div>
+                    )}
+
+                    {carStep === 2 && (
+                      <motion.div
+                        key="car-step2"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-6"
+                      >
+                        <FormField
+                          control={carForm.control}
+                          name="creditScoreRange"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-base font-semibold text-slate-700">Estimated Credit Score</FormLabel>
+                              <div className="grid grid-cols-2 gap-3 mt-2">
+                                {creditScoreRanges.map((range) => (
+                                  <div
+                                    key={range}
+                                    onClick={() => field.onChange(range)}
+                                    className={`
+                                      cursor-pointer p-4 rounded-xl border-2 text-center transition-all duration-200
+                                      ${field.value === range
+                                        ? "border-primary bg-primary/5 text-primary font-bold shadow-sm"
+                                        : "border-slate-200 hover:border-slate-300 text-slate-600 hover:bg-slate-50"}
+                                    `}
+                                  >
+                                    {range}
+                                  </div>
+                                ))}
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={carForm.control}
+                          name="employmentStatus"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-base font-semibold text-slate-700">Employment Status</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="h-12 text-base">
+                                    <SelectValue placeholder="Select status" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {employmentStatuses.map((s) => (
+                                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <div className="flex gap-3">
+                          <Button type="button" variant="outline" onClick={prevCarStep} className="flex-1 h-12">
+                            <ChevronLeft className="mr-2 w-4 h-4" /> Back
+                          </Button>
+                          <Button type="button" onClick={nextCarStep} className="flex-[2] h-12 text-lg font-semibold bg-primary hover:bg-primary/90">
+                            Next Step <ChevronRight className="ml-2 w-5 h-5" />
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {carStep === 3 && (
+                      <motion.div
+                        key="car-step3"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-4"
+                      >
+                        <FormField
+                          control={carForm.control}
+                          name="fullName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-700 font-semibold">Full Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="John Doe" {...field} className="h-12 text-lg" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={carForm.control}
+                          name="zipCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-700 font-semibold">ZIP Code</FormLabel>
+                              <FormControl>
+                                <Input placeholder="12345" {...field} className="h-12 text-lg" maxLength={10} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={carForm.control}
+                          name="email"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-700 font-semibold">Email Address</FormLabel>
+                              <FormControl>
+                                <Input placeholder="you@example.com" type="email" {...field} className="h-12 text-lg" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={carForm.control}
+                          name="phone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-700 font-semibold">Phone Number</FormLabel>
+                              <FormControl>
+                                <Input placeholder="(555) 123-4567" type="tel" {...field} className="h-12 text-lg" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <p className="text-xs text-slate-500 mt-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                          By clicking "See My Offers", you agree to our Terms of Use and Privacy Policy. You consent to receive phone calls and SMS messages from us and our partners to provide updates on your loan request.
+                        </p>
+
+                        <div className="flex gap-3 pt-2">
+                          <Button type="button" variant="outline" onClick={prevCarStep} disabled={isCarPending} className="flex-1 h-12">
+                            <ChevronLeft className="mr-2 w-4 h-4" /> Back
+                          </Button>
+                          <Button type="submit" disabled={isCarPending} className="flex-[2] h-12 text-lg font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20">
+                            {isCarPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                Processing...
+                              </>
+                            ) : (
+                              <>
+                                See My Offers <ArrowRight className="ml-2 w-5 h-5" />
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </form>
+              </Form>
+            </Card>
           </div>
         </div>
       </section>
