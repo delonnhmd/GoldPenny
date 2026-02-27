@@ -25,22 +25,14 @@ export async function registerRoutes(
         ipAddress: String(ipAddress) // Ensure it's a string
       });
 
-      // Determine redirect URL based on credit score
-      let redirectUrl = "";
-      switch (leadData.creditScoreRange) {
-        case "Below 580":
-          redirectUrl = "https://subprime-affiliate-link.com";
-          break;
-        case "580-649":
-          redirectUrl = "https://midprime-affiliate-link.com";
-          break;
-        case "650-719":
-        case "720+":
-          redirectUrl = "https://prime-affiliate-link.com";
-          break;
-        default:
-          redirectUrl = "/"; // Fallback
-      }
+      const searchParams = new URLSearchParams({
+        name: leadData.fullName,
+        purpose: leadData.loanPurpose,
+        amount: String(leadData.loanAmount),
+        score: leadData.creditScoreRange,
+      });
+
+      const redirectUrl = `/offers?${searchParams.toString()}`;
 
       res.status(201).json({ redirectUrl });
     } catch (err) {
