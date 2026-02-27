@@ -701,6 +701,14 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="pb-8 bg-white">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <p className="text-lg text-slate-600 max-w-3xl mx-auto text-center leading-relaxed">
+            Compare auto loan offers from our network of trusted partners. Whether you’re refinancing, buying a new car, or buying used—we make it fast, simple, and free.
+          </p>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="how-it-works" className="py-20 bg-white border-t border-slate-100">
         <div className="container mx-auto px-4 max-w-7xl">
