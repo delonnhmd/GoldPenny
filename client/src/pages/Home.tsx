@@ -790,12 +790,12 @@ export default function Home() {
             <div className="flex-1 w-full">
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 transform translate-y-8">
-                  <div className="text-4xl font-bold text-emerald-400 mb-1">2M+</div>
-                  <div className="text-sm text-slate-400">Customers Helped</div>
+                  <div className="text-4xl font-bold text-emerald-400 mb-1">200+</div>
+                  <div className="text-sm text-slate-400">Trusted Lending Partners</div>
                 </div>
                 <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                  <div className="text-4xl font-bold text-blue-400 mb-1">$500M</div>
-                  <div className="text-sm text-slate-400">Loans Funded</div>
+                  <div className="text-4xl font-bold text-blue-400 mb-1">Up to $200K</div>
+                  <div className="text-sm text-slate-400">Auto Loan Amounts Available</div>
                 </div>
                 <div className="bg-slate-800 p-6 rounded-2xl border border-slate-700 transform translate-y-8">
                   <div className="text-4xl font-bold text-purple-400 mb-1">98%</div>
