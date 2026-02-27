@@ -835,6 +835,175 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="about-us" className="py-16 bg-white border-t border-slate-100">
+        <div className="container mx-auto px-4 max-w-4xl space-y-12">
+          <div>
+            <h2 className="text-3xl font-bold font-display text-slate-900 mb-4">About Us</h2>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              PennyFloat helps you compare personal loan and auto loan options in one place. Answer a few quick questions, then we will show partners you can check rates with. Free to use.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              We built PennyFloat to keep it simple.
+            </p>
+            <p className="text-slate-700 leading-relaxed">
+              Money stuff is already stressful. PennyFloat is here to make the first step easy, without confusing forms.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">What you can do here</h3>
+            <ul className="list-disc pl-6 space-y-2 text-slate-700">
+              <li>Explore personal loan options (debt consolidation, home repairs, emergencies, and more)</li>
+              <li>Explore auto loan options (refinance, or finance a new/used car)</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">What PennyFloat is (and is not)</h3>
+            <p className="text-slate-700 leading-relaxed mb-2">PennyFloat is a referral and comparison website.</p>
+            <p className="text-slate-700 leading-relaxed">
+              We are not a lender, and we do not make lending decisions. Your final approval, rate, and terms come from the partner you choose.
+            </p>
+          </div>
+
+          <div id="how-it-works-info">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">How It Works</h3>
+            <ol className="list-decimal pl-6 space-y-3 text-slate-700">
+              <li>
+                <span className="font-semibold text-slate-900">Tell us what you need:</span> Pick personal loan or auto loan and answer a few quick questions.
+              </li>
+              <li>
+                <span className="font-semibold text-slate-900">See your options:</span> We will show offers and partners that may match your situation.
+              </li>
+              <li>
+                <span className="font-semibold text-slate-900">Finish with the partner:</span> When you click an offer, you will go to the partner website to review details and apply.
+              </li>
+            </ol>
+            <p className="text-slate-600 mt-4">
+              Heads up: Rates and approvals depend on your credit, income, state, and the lender rules.
+            </p>
+          </div>
+
+          <div id="lender-network">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Lender Network</h3>
+            <p className="text-slate-700 leading-relaxed mb-3">
+              We work with a group of trusted partners, including lenders, lending platforms, and financial services, so you can compare options without starting from scratch.
+            </p>
+            <ul className="list-disc pl-6 space-y-2 text-slate-700">
+              <li>Some partners focus on personal loans</li>
+              <li>Some focus on auto refinance or car purchase</li>
+              <li>Some may offer other financial tools</li>
+            </ul>
+            <p className="text-slate-600 mt-4">
+              Not every option is available everywhere. Offers can change by state and your personal profile.
+            </p>
+          </div>
+
+          <div id="contact">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Contact</h3>
+            <p className="text-slate-700 mb-3">Need help or have a question? We are here.</p>
+            <div className="space-y-1 text-slate-700">
+              <p>Phone: (346) 291-7636</p>
+              <p>Email: support@pennyfloat.com</p>
+              <p>Hours: Mon-Fri, 9am-5pm CT</p>
+            </div>
+            <div className="mt-4">
+              <p className="text-slate-700 mb-2">If something looks wrong on the site, tell us:</p>
+              <ul className="list-disc pl-6 space-y-1 text-slate-700">
+                <li>what page you were on</li>
+                <li>what happened</li>
+                <li>a screenshot if you can</li>
+              </ul>
+            </div>
+          </div>
+
+          <div id="privacy-policy">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Privacy Policy (Friendly Draft)</h3>
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">What we collect</h4>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
+              <li>what type of loan you want (personal or auto)</li>
+              <li>amount and purpose (optional)</li>
+              <li>income type (optional)</li>
+              <li>ZIP code/location</li>
+              <li>your email/phone (only if you choose to enter it)</li>
+            </ul>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              We may also collect basic website info (like device type, IP address, and cookies) to help prevent spam and improve the site.
+            </p>
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">How we use it</h4>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
+              <li>show relevant options</li>
+              <li>connect you to partners you choose</li>
+              <li>improve the site</li>
+              <li>stop fraud and bots</li>
+              <li>understand what is working (analytics)</li>
+            </ul>
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">Who we share it with</h4>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              We may share the information you submit with partners so you can see offers or apply. Partners may also use your info based on their own privacy policies.
+            </p>
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">Your choices</h4>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
+              <li>You can skip optional questions.</li>
+              <li>You can ask us to delete submitted info by contacting us.</li>
+            </ul>
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">Keeping your info safe</h4>
+            <p className="text-slate-700 leading-relaxed">
+              We use reasonable security measures, but no website can guarantee 100% protection.
+            </p>
+          </div>
+
+          <div id="terms-of-service">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Terms of Service (Friendly Draft)</h3>
+            <p className="text-slate-700 leading-relaxed mb-3">By using PennyFloat, you agree to these basics:</p>
+            <ul className="list-disc pl-6 space-y-2 text-slate-700">
+              <li><span className="font-semibold text-slate-900">What PennyFloat does:</span> We help you compare options and connect to third-party partners.</li>
+              <li><span className="font-semibold text-slate-900">No promises:</span> We cannot promise approval, rates, or specific offers.</li>
+              <li><span className="font-semibold text-slate-900">Third-party partners:</span> When you click out to a partner site, their terms and privacy policy apply. PennyFloat is not responsible for their products or decisions.</li>
+              <li><span className="font-semibold text-slate-900">Use the site fairly:</span> Please do not misuse the site (spam, hacking, scraping, fraud).</li>
+              <li><span className="font-semibold text-slate-900">Limits:</span> To the extent allowed by law, PennyFloat is not liable for losses related to your use of partner products or the site.</li>
+              <li><span className="font-semibold text-slate-900">Updates:</span> We may update these terms by posting a new version on this page.</li>
+            </ul>
+          </div>
+
+          <div id="e-consent">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">E-Consent (Friendly Draft)</h3>
+            <ul className="list-disc pl-6 space-y-2 text-slate-700">
+              <li>By using PennyFloat and submitting information, you agree that notices and disclosures may be provided electronically.</li>
+              <li>You can print or save anything you receive online.</li>
+              <li>If you want paper copies, the lender/provider you apply with can provide them.</li>
+              <li>You can stop using the site at any time.</li>
+            </ul>
+          </div>
+
+          <div id="ad-disclosure">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Ad Disclosure (Friendly Draft)</h3>
+            <p className="text-slate-700 leading-relaxed mb-3">
+              PennyFloat is free because we may earn money from advertising.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-3">That means we might get paid when you:</p>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-3">
+              <li>click a link</li>
+              <li>submit a request</li>
+              <li>or apply with a partner</li>
+            </ul>
+            <p className="text-slate-700 leading-relaxed">
+              This may affect which offers show up and how they are ordered. We still try to keep things simple and helpful.
+            </p>
+          </div>
+
+          <div id="apr-disclosure">
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">APR Disclosure</h3>
+            <p className="text-slate-700 leading-relaxed mb-3">
+              APR (interest rate) and terms depend on the lender and your personal situation (credit, income, and state rules). PennyFloat does not set rates or approve loans.
+            </p>
+            <p className="text-slate-700 leading-relaxed">
+              PennyFloat is not a lender, loan broker, or agent for any lender or broker. We are an advertising referral service that connects users to participating lenders and financial service providers. Final approval and loan terms come from the provider you choose.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
