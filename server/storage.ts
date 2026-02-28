@@ -1,5 +1,5 @@
 
-import { and, desc, eq, gte, lt } from "drizzle-orm";
+import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "./db";
 import {
   leads,
@@ -35,6 +35,19 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  private async ensureMarketPostsTable(): Promise<void> {
+    await db!.execute(sql`
+      CREATE TABLE IF NOT EXISTS market_posts (
+        id serial PRIMARY KEY,
+        page varchar(32) NOT NULL,
+        title text NOT NULL,
+        content text NOT NULL,
+        created_at timestamp NOT NULL DEFAULT now(),
+        updated_at timestamp NOT NULL DEFAULT now()
+      )
+    `);
+  }
+
   async createLead(insertLead: InsertLeadWithIp): Promise<Lead> {
     const [lead] = await db!.insert(leads).values(insertLead).returning();
     return lead;
@@ -125,6 +138,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async listMarketPosts(page: MarketPage, limit = 50): Promise<MarketPost[]> {
+    await this.ensureMarketPostsTable();
+
     return db!
       .select()
       .from(marketPosts)
@@ -134,6 +149,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createMarketPost(payload: CreateMarketPostInput): Promise<MarketPost> {
+    await this.ensureMarketPostsTable();
+
     const [post] = await db!
       .insert(marketPosts)
       .values({

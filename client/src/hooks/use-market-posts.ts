@@ -8,7 +8,8 @@ export function useMarketPosts(page: "rates" | "market") {
     queryFn: async () => {
       const res = await fetch(`${api.marketPosts.listByPage.path}?page=${page}`);
       if (!res.ok) {
-        throw new Error("Failed to load posts");
+        const text = await res.text();
+        throw new Error(text || "Failed to load posts");
       }
       return (await res.json()) as MarketPostResponse;
     },
@@ -31,7 +32,8 @@ export function useCreateMarketPost(adminKey: string) {
         if (res.status === 401) {
           throw new Error("Unauthorized admin key");
         }
-        throw new Error("Failed to publish post");
+        const text = await res.text();
+        throw new Error(text || "Failed to publish post");
       }
 
       return res.json();
