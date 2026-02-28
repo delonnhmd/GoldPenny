@@ -58,11 +58,60 @@ const personalLoanPurposes = [
   "Other",
 ] as const;
 
+const businessLoanSchema = z.object({
+  amountRange: z.string().min(1, "This field is required."),
+  purpose: z.string().min(1, "This field is required."),
+  term: z.string().min(1, "This field is required."),
+});
+
+type BusinessLoanFormValues = z.infer<typeof businessLoanSchema>;
+
+const businessAmountOptions = [
+  { label: "Under $10,000", value: 9000 },
+  { label: "$10,000 - $25,000", value: 20000 },
+  { label: "$25,000 - $75,000", value: 50000 },
+  { label: "$75,000 - $250,000", value: 150000 },
+  { label: "$250,000 - $500,000", value: 350000 },
+  { label: "$500,000 - $1,000,000", value: 750000 },
+  { label: "$1,000,000+", value: 1000000 },
+] as const;
+
+const businessPurposeOptions = [
+  "Buy Inventory",
+  "Buy Equipment",
+  "Expansion",
+  "Cover Payroll",
+  "Real Estate",
+  "Acquire a Business",
+  "Working Capital",
+  "Start a Business",
+  "Other",
+] as const;
+
+const businessTermOptions = [
+  "3 Months",
+  "6 Months",
+  "12 Months",
+  "24 Months",
+  "48 Months",
+  "More than 48 Months",
+] as const;
+
 export default function Home() {
   const [step, setStep] = useState(1);
   const [carStep, setCarStep] = useState(1);
   const { mutate: createLead, isPending } = useCreateLead();
   const { mutate: createCarLead, isPending: isCarPending } = useCreateLead();
+
+  const businessForm = useForm<BusinessLoanFormValues>({
+    resolver: zodResolver(businessLoanSchema),
+    defaultValues: {
+      amountRange: "",
+      purpose: "",
+      term: "",
+    },
+    mode: "onTouched",
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(insertLeadSchema),
@@ -130,6 +179,19 @@ export default function Home() {
 
   const onCarSubmit = (data: FormValues) => {
     createCarLead(data);
+  };
+
+  const onBusinessSubmit = (data: BusinessLoanFormValues) => {
+    const matchedAmount = businessAmountOptions.find((option) => option.label === data.amountRange);
+    const amount = matchedAmount?.value ?? 50000;
+    const searchParams = new URLSearchParams({
+      name: "Business Owner",
+      purpose: data.purpose,
+      amount: String(amount),
+      score: "650-719",
+    });
+
+    window.location.href = `/offers?${searchParams.toString()}`;
   };
 
   const nextStep = () => validateStep(step);
@@ -709,6 +771,102 @@ export default function Home() {
         </div>
       </section>
 
+      <section id="business-loan" className="py-20 bg-slate-50 border-t border-slate-100">
+        <div className="container mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold font-display text-slate-900 mb-4">Business Loan Solutions</h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+              Get pre-qualified in seconds and review business funding options tailored to your goals.
+            </p>
+          </div>
+
+          <div className="max-w-lg mx-auto">
+            <Card className="p-6 md:p-8 shadow-2xl border-slate-100 bg-white rounded-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-blue-400" />
+
+              <h3 className="text-2xl font-bold text-center mb-6 font-display text-slate-800">Get Qualified</h3>
+
+              <Form {...businessForm}>
+                <form onSubmit={businessForm.handleSubmit(onBusinessSubmit)} className="space-y-5">
+                  <FormField
+                    control={businessForm.control}
+                    name="amountRange"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold text-slate-700">How much does your business need?</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 text-base">
+                              <SelectValue placeholder="Amount" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {businessAmountOptions.map((option) => (
+                              <SelectItem key={option.label} value={option.label}>{option.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={businessForm.control}
+                    name="purpose"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold text-slate-700">What do you need funds for?</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 text-base">
+                              <SelectValue placeholder="Purpose" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {businessPurposeOptions.map((option) => (
+                              <SelectItem key={option} value={option}>{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={businessForm.control}
+                    name="term"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold text-slate-700">About how long do you need funds?</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 text-base">
+                              <SelectValue placeholder="Length" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {businessTermOptions.map((option) => (
+                              <SelectItem key={option} value={option}>{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+                    Get Qualified
+                  </Button>
+                </form>
+              </Form>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="how-it-works" className="py-20 bg-white border-t border-slate-100">
         <div className="container mx-auto px-4 max-w-7xl">
@@ -904,7 +1062,7 @@ export default function Home() {
             <p className="text-slate-700 mb-3">Need help or have a question? We are here.</p>
             <div className="space-y-1 text-slate-700">
               <p>Phone: (346) 291-7636</p>
-              <p>Email: support@pennyfloat.com</p>
+              <p>Email: admin@pennyfloat.com</p>
               <p>Hours: Mon-Fri, 9am-5pm CT</p>
             </div>
             <div className="mt-4">

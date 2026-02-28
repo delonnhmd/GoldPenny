@@ -1,10 +1,22 @@
 
 import type { Express } from "express";
+import type { Request } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes"; // Only import api
 import { z } from "zod";
-import { insertLeadSchema } from "@shared/schema"; // Import schema directly
+import { insertLeadSchema, marketPageSchema, upsertMarketUpdateSchema } from "@shared/schema"; // Import schema directly
+
+function validateAdminRequest(req: Request) {
+  const configuredKey = process.env.ADMIN_DASHBOARD_KEY || process.env.ADMIN_KEY || "pennyfloat-admin";
+  const requestKey = req.headers["x-admin-key"];
+
+  if (!requestKey || Array.isArray(requestKey)) {
+    return false;
+  }
+
+  return requestKey === configuredKey;
+}
 
 export async function registerRoutes(
   httpServer: Server,
@@ -45,6 +57,130 @@ export async function registerRoutes(
       }
       console.error("Error creating lead:", err);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get(api.marketUpdates.getByPage.path, async (req, res) => {
+    try {
+      const parsed = z
+        .object({ page: marketPageSchema })
+        .parse({ page: req.query.page });
+
+      const update = await storage.getMarketUpdate(parsed.page);
+
+      if (!update) {
+        return res.status(200).json({
+          page: parsed.page,
+          title: parsed.page === "rates" ? "Rates Update" : "Market Update",
+          summary: "No update published yet.",
+          bullets: [],
+          tips: [],
+          updatedAt: new Date().toISOString(),
+        });
+      }
+
+      return res.status(200).json({
+        page: update.page,
+        title: update.title,
+        summary: update.summary,
+        bullets: update.bullets ?? [],
+        tips: update.tips ?? [],
+        updatedAt: update.updatedAt ? new Date(update.updatedAt).toISOString() : new Date().toISOString(),
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error getting market update:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put(api.marketUpdates.upsert.path, async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const payload = upsertMarketUpdateSchema.parse(req.body);
+      await storage.upsertMarketUpdate(payload);
+
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error upserting market update:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get(api.admin.leads.path, async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const parsed = z
+        .object({
+          limit: z.coerce.number().min(1).max(500).optional(),
+        })
+        .parse(req.query);
+
+      const rows = await storage.listLeads(parsed.limit ?? 100);
+      return res.status(200).json(
+        rows.map((lead) => ({
+          ...lead,
+          createdAt: lead.createdAt ? new Date(lead.createdAt).toISOString() : new Date().toISOString(),
+        }))
+      );
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error listing leads:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get(api.admin.report.path, async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const parsed = z
+        .object({ period: z.enum(["day", "week"]) })
+        .parse({ period: req.query.period });
+
+      const report = await storage.getLeadReport(parsed.period);
+      return res.status(200).json(report);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error generating report:", err);
+      return res.status(500).json({ message: "Internal server error" });
     }
   });
 

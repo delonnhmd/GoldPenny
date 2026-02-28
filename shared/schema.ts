@@ -1,5 +1,5 @@
 
-import { pgTable, text, serial, integer, timestamp, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, varchar, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -17,14 +17,37 @@ export const leads = pgTable("leads", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const marketUpdates = pgTable("market_updates", {
+  id: serial("id").primaryKey(),
+  page: varchar("page", { length: 32 }).notNull().unique(),
+  title: text("title").notNull(),
+  summary: text("summary").notNull(),
+  bullets: jsonb("bullets").$type<string[]>().notNull().default([]),
+  tips: jsonb("tips").$type<string[]>().notNull().default([]),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertLeadSchema = createInsertSchema(leads).omit({ 
   id: true, 
   createdAt: true,
   ipAddress: true // server-side only
 });
 
+export const marketPageSchema = z.enum(["rates", "market"]);
+
+export const upsertMarketUpdateSchema = z.object({
+  page: marketPageSchema,
+  title: z.string().min(3, "Headline is required"),
+  summary: z.string().min(10, "Weekly summary is required"),
+  bullets: z.array(z.string().min(1)).default([]),
+  tips: z.array(z.string().min(1)).default([]),
+});
+
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 export type Lead = typeof leads.$inferSelect;
+export type MarketPage = z.infer<typeof marketPageSchema>;
+export type UpsertMarketUpdateInput = z.infer<typeof upsertMarketUpdateSchema>;
+export type MarketUpdate = typeof marketUpdates.$inferSelect;
 
 export const creditScoreRanges = [
   "Below 580",
@@ -45,5 +68,13 @@ export const loanPurposes = [
   "Medical",
   "Other",
   "Car Buying",
-  "Car Refinance"
+  "Car Refinance",
+  "Buy Inventory",
+  "Buy Equipment",
+  "Expansion",
+  "Cover Payroll",
+  "Real Estate",
+  "Acquire a Business",
+  "Working Capital",
+  "Start a Business"
 ] as const;
