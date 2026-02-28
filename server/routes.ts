@@ -5,7 +5,7 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes"; // Only import api
 import { z } from "zod";
-import { insertLeadSchema, marketPageSchema, upsertMarketUpdateSchema } from "@shared/schema"; // Import schema directly
+import { createMarketPostSchema, insertLeadSchema, marketPageSchema, upsertMarketUpdateSchema } from "@shared/schema"; // Import schema directly
 
 function validateAdminRequest(req: Request) {
   const configuredKey = process.env.ADMIN_DASHBOARD_KEY || process.env.ADMIN_KEY || "pennyfloat-admin";
@@ -97,6 +97,65 @@ export async function registerRoutes(
       }
 
       console.error("Error getting market update:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get(api.marketPosts.listByPage.path, async (req, res) => {
+    try {
+      const parsed = z
+        .object({
+          page: marketPageSchema,
+          limit: z.coerce.number().min(1).max(200).optional(),
+        })
+        .parse(req.query);
+
+      const posts = await storage.listMarketPosts(parsed.page, parsed.limit ?? 50);
+      return res.status(200).json(
+        posts.map((post) => ({
+          ...post,
+          createdAt: post.createdAt ? new Date(post.createdAt).toISOString() : new Date().toISOString(),
+          updatedAt: post.updatedAt ? new Date(post.updatedAt).toISOString() : new Date().toISOString(),
+        }))
+      );
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error listing market posts:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post(api.marketPosts.create.path, async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const payload = createMarketPostSchema.parse(req.body);
+      const post = await storage.createMarketPost(payload);
+
+      return res.status(201).json({
+        ...post,
+        createdAt: post.createdAt ? new Date(post.createdAt).toISOString() : new Date().toISOString(),
+        updatedAt: post.updatedAt ? new Date(post.updatedAt).toISOString() : new Date().toISOString(),
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error creating market post:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
   });

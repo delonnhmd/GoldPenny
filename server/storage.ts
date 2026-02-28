@@ -3,10 +3,13 @@ import { and, desc, eq, gte, lt } from "drizzle-orm";
 import { db } from "./db";
 import {
   leads,
+  marketPosts,
   marketUpdates,
+  type CreateMarketPostInput,
   type InsertLead,
   type Lead,
   type MarketPage,
+  type MarketPost,
   type MarketUpdate,
   type UpsertMarketUpdateInput,
 } from "@shared/schema";
@@ -27,6 +30,8 @@ export interface IStorage {
   upsertMarketUpdate(payload: UpsertMarketUpdateInput): Promise<MarketUpdate>;
   listLeads(limit?: number): Promise<Lead[]>;
   getLeadReport(period: ReportPeriod): Promise<LeadReport>;
+  listMarketPosts(page: MarketPage, limit?: number): Promise<MarketPost[]>;
+  createMarketPost(payload: CreateMarketPostInput): Promise<MarketPost>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -118,10 +123,52 @@ export class DatabaseStorage implements IStorage {
       topPurposes,
     };
   }
+
+  async listMarketPosts(page: MarketPage, limit = 50): Promise<MarketPost[]> {
+    return db!
+      .select()
+      .from(marketPosts)
+      .where(eq(marketPosts.page, page))
+      .orderBy(desc(marketPosts.createdAt))
+      .limit(limit);
+  }
+
+  async createMarketPost(payload: CreateMarketPostInput): Promise<MarketPost> {
+    const [post] = await db!
+      .insert(marketPosts)
+      .values({
+        page: payload.page,
+        title: payload.title,
+        content: payload.content,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    return post;
+  }
 }
 
 export class InMemoryStorage implements IStorage {
   private leads: Lead[] = [];
+  private marketPosts: MarketPost[] = [
+    {
+      id: 1,
+      page: "rates",
+      title: "Weekly Rates Outlook",
+      content: "Rates were mostly stable this week. Lenders are still prioritizing cash-flow strength and operating history. Review total repayment cost before selecting a term.",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 2,
+      page: "market",
+      title: "Small Business Lending Pulse",
+      content: "Working capital demand remains strong. Inventory and equipment use-cases are seeing solid lender interest, while risk reviews are slightly tighter in seasonal industries.",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
   private marketUpdates: MarketUpdate[] = [
     {
       id: 1,
@@ -157,6 +204,7 @@ export class InMemoryStorage implements IStorage {
     },
   ];
   private nextId = 1;
+  private nextPostId = 3;
   private nextMarketUpdateId = 3;
 
   async createLead(insertLead: InsertLeadWithIp): Promise<Lead> {
@@ -257,6 +305,31 @@ export class InMemoryStorage implements IStorage {
       avgLoanAmount,
       topPurposes,
     };
+  }
+
+  async listMarketPosts(page: MarketPage, limit = 50): Promise<MarketPost[]> {
+    return this.marketPosts
+      .filter((post) => post.page === page)
+      .sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
+      })
+      .slice(0, limit);
+  }
+
+  async createMarketPost(payload: CreateMarketPostInput): Promise<MarketPost> {
+    const post: MarketPost = {
+      id: this.nextPostId++,
+      page: payload.page,
+      title: payload.title,
+      content: payload.content,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.marketPosts.push(post);
+    return post;
   }
 }
 

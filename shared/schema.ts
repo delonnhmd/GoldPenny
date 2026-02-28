@@ -27,6 +27,15 @@ export const marketUpdates = pgTable("market_updates", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const marketPosts = pgTable("market_posts", {
+  id: serial("id").primaryKey(),
+  page: varchar("page", { length: 32 }).notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const insertLeadSchema = createInsertSchema(leads).omit({ 
   id: true, 
   createdAt: true,
@@ -43,11 +52,19 @@ export const upsertMarketUpdateSchema = z.object({
   tips: z.array(z.string().min(1)).default([]),
 });
 
+export const createMarketPostSchema = z.object({
+  page: marketPageSchema,
+  title: z.string().min(3, "Post title is required"),
+  content: z.string().min(20, "Post content is required"),
+});
+
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 export type Lead = typeof leads.$inferSelect;
 export type MarketPage = z.infer<typeof marketPageSchema>;
 export type UpsertMarketUpdateInput = z.infer<typeof upsertMarketUpdateSchema>;
 export type MarketUpdate = typeof marketUpdates.$inferSelect;
+export type CreateMarketPostInput = z.infer<typeof createMarketPostSchema>;
+export type MarketPost = typeof marketPosts.$inferSelect;
 
 export const creditScoreRanges = [
   "Below 580",

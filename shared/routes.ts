@@ -1,6 +1,6 @@
 
 import { z } from 'zod';
-import { insertLeadSchema, marketPageSchema, upsertMarketUpdateSchema } from './schema';
+import { createMarketPostSchema, insertLeadSchema, marketPageSchema, upsertMarketUpdateSchema } from './schema';
 
 const reportPeriodSchema = z.enum(['day', 'week']);
 
@@ -27,6 +27,15 @@ const adminReportSchema = z.object({
       count: z.number(),
     })
   ),
+});
+
+const marketPostSchema = z.object({
+  id: z.number(),
+  page: marketPageSchema,
+  title: z.string(),
+  content: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export const errorSchemas = {
@@ -80,6 +89,26 @@ export const api = {
       },
     },
   },
+  marketPosts: {
+    listByPage: {
+      method: 'GET' as const,
+      path: '/api/market-posts' as const,
+      input: z.object({ page: marketPageSchema, limit: z.number().optional() }),
+      responses: {
+        200: z.array(marketPostSchema),
+      },
+    },
+    create: {
+      method: 'POST' as const,
+      path: '/api/admin/market-posts' as const,
+      input: createMarketPostSchema,
+      responses: {
+        201: marketPostSchema,
+        401: errorSchemas.validation,
+        400: errorSchemas.validation,
+      },
+    },
+  },
   admin: {
     leads: {
       method: 'GET' as const,
@@ -106,5 +135,7 @@ export type LeadInput = z.infer<typeof api.leads.create.input>;
 export type LeadResponse = z.infer<typeof api.leads.create.responses[201]>;
 export type MarketUpdateResponse = z.infer<typeof api.marketUpdates.getByPage.responses[200]>;
 export type UpsertMarketUpdateRequest = z.infer<typeof api.marketUpdates.upsert.input>;
+export type MarketPostResponse = z.infer<typeof api.marketPosts.listByPage.responses[200]>;
+export type CreateMarketPostRequest = z.infer<typeof api.marketPosts.create.input>;
 export type AdminLeadResponse = z.infer<typeof api.admin.leads.responses[200]>;
 export type AdminReportResponse = z.infer<typeof api.admin.report.responses[200]>;

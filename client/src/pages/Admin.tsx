@@ -1,27 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useMarketUpdate, useUpsertMarketUpdate } from "@/hooks/use-market-updates";
+import { useCreateMarketPost, useMarketPosts } from "@/hooks/use-market-posts";
 import { useAdminLeads, useAdminReport } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type MarketPage = "rates" | "market";
-
-function toLines(lines: string[]) {
-  return lines.join("\n");
-}
-
-function fromLines(raw: string) {
-  return raw
-    .split("\n")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
 
 function escapeCsv(value: string | number) {
   const str = String(value ?? "");
@@ -35,27 +24,15 @@ export default function Admin() {
   const { toast } = useToast();
   const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem("adminKey") || "");
   const [page, setPage] = useState<MarketPage>("rates");
-
-  const { data, isLoading } = useMarketUpdate(page);
-  const saveMutation = useUpsertMarketUpdate(adminKey);
-
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
-  const [bulletsText, setBulletsText] = useState("");
-  const [tipsText, setTipsText] = useState("");
+  const [postTitle, setPostTitle] = useState("");
+  const [postContent, setPostContent] = useState("");
   const [reportPeriod, setReportPeriod] = useState<"day" | "week">("day");
-
-  useEffect(() => {
-    if (!data) return;
-    setTitle(data.title);
-    setSummary(data.summary);
-    setBulletsText(toLines(data.bullets));
-    setTipsText(toLines(data.tips));
-  }, [data]);
 
   const isProtected = useMemo(() => adminKey.trim().length > 0, [adminKey]);
   const isUnlocked = isProtected;
 
+  const postsQuery = useMarketPosts(page);
+  const createPostMutation = useCreateMarketPost(adminKey);
   const leadsQuery = useAdminLeads(adminKey, 100, isUnlocked);
   const reportQuery = useAdminReport(adminKey, reportPeriod, isUnlocked);
 
@@ -68,23 +45,32 @@ export default function Admin() {
     toast({ title: "Admin unlocked", description: "You can now publish updates." });
   };
 
-  const handleSave = async () => {
+  const handlePublishPost = async () => {
+    if (!postTitle.trim() || !postContent.trim()) {
+      toast({
+        title: "Title and content required",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      await saveMutation.mutateAsync({
+      await createPostMutation.mutateAsync({
         page,
-        title,
-        summary,
-        bullets: fromLines(bulletsText),
-        tips: fromLines(tipsText),
+        title: postTitle.trim(),
+        content: postContent.trim(),
       });
 
+      setPostTitle("");
+      setPostContent("");
+
       toast({
-        title: "Update published",
-        description: `${page === "rates" ? "Rates" : "Market"} page updated instantly.`,
+        title: "Post published",
+        description: `${page === "rates" ? "Rates" : "Market"} post is now live.`,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to save update";
-      toast({ title: "Save failed", description: message, variant: "destructive" });
+      const message = error instanceof Error ? error.message : "Failed to publish post";
+      toast({ title: "Publish failed", description: message, variant: "destructive" });
     }
   };
 
@@ -142,7 +128,7 @@ export default function Admin() {
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-4xl space-y-6">
           <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Content Admin</h1>
-          <p className="text-slate-600">Edit headline, weekly summary, bullet points, and what-it-means tips. Changes are live immediately.</p>
+          <p className="text-slate-600">Publish blog-style news posts for Rates and Market pages. Changes are live immediately.</p>
 
           <Card className="p-6 border-slate-200 bg-white space-y-4">
             <label className="text-sm font-semibold text-slate-700">Admin Key</label>
@@ -166,37 +152,42 @@ export default function Admin() {
                   <Button type="button" variant={page === "market" ? "default" : "outline"} onClick={() => setPage("market")}>Market Page</Button>
                 </div>
 
-                {isLoading ? (
-                  <p className="text-slate-500">Loading content…</p>
-                ) : (
-                  <>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Headline</label>
-                      <Input value={title} onChange={(event) => setTitle(event.target.value)} className="h-11" />
-                    </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700">Post Title</label>
+                  <Input value={postTitle} onChange={(event) => setPostTitle(event.target.value)} className="h-11" placeholder="Enter headline" />
+                </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Weekly Summary</label>
-                      <Textarea value={summary} onChange={(event) => setSummary(event.target.value)} rows={4} />
-                    </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700">Post Content</label>
+                  <Textarea value={postContent} onChange={(event) => setPostContent(event.target.value)} rows={8} placeholder="Write your market or rates update..." />
+                </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">Bullet Points (one per line)</label>
-                      <Textarea value={bulletsText} onChange={(event) => setBulletsText(event.target.value)} rows={6} />
-                    </div>
+                <div className="flex justify-end">
+                  <Button type="button" onClick={handlePublishPost} disabled={createPostMutation.isPending}>
+                    {createPostMutation.isPending ? "Publishing..." : "Publish Post"}
+                  </Button>
+                </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-700">What It Means Tips (one per line)</label>
-                      <Textarea value={tipsText} onChange={(event) => setTipsText(event.target.value)} rows={6} />
+                <div className="pt-4 border-t border-slate-200">
+                  <h3 className="text-sm font-semibold text-slate-700 mb-3">Published Posts</h3>
+                  {postsQuery.isLoading ? (
+                    <p className="text-slate-500">Loading posts…</p>
+                  ) : postsQuery.error ? (
+                    <p className="text-red-600 text-sm">{postsQuery.error.message}</p>
+                  ) : (postsQuery.data ?? []).length === 0 ? (
+                    <p className="text-slate-500">No posts published yet for this page.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {(postsQuery.data ?? []).map((post) => (
+                        <div key={post.id} className="rounded-lg border border-slate-200 p-3 bg-slate-50">
+                          <p className="font-semibold text-slate-900">{post.title}</p>
+                          <p className="text-xs text-slate-500 mb-2">{new Date(post.createdAt).toLocaleString()}</p>
+                          <p className="text-sm text-slate-700 line-clamp-3 whitespace-pre-line">{post.content}</p>
+                        </div>
+                      ))}
                     </div>
-
-                    <div className="flex justify-end">
-                      <Button type="button" onClick={handleSave} disabled={saveMutation.isPending}>
-                        {saveMutation.isPending ? "Saving..." : "Publish Update"}
-                      </Button>
-                    </div>
-                  </>
-                )}
+                  )}
+                </div>
               </Card>
 
               <Card className="p-6 border-slate-200 bg-white space-y-5">
