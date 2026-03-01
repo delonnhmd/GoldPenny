@@ -43,3 +43,62 @@ export function useCreateMarketPost(adminKey: string) {
     },
   });
 }
+
+export function useUpdateMarketPost(adminKey: string) {
+  return useMutation({
+    mutationFn: async (payload: { id: number; page: "rates" | "market"; title: string; content: string }) => {
+      const path = api.marketPosts.update.path.replace(":id", String(payload.id));
+      const res = await fetch(path, {
+        method: api.marketPosts.update.method,
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-key": adminKey,
+        },
+        body: JSON.stringify({
+          title: payload.title,
+          content: payload.content,
+        }),
+      });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Unauthorized admin key");
+        }
+        const text = await res.text();
+        throw new Error(text || "Failed to update post");
+      }
+
+      return res.json();
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: [api.marketPosts.listByPage.path, variables.page] });
+    },
+  });
+}
+
+export function useDeleteMarketPost(adminKey: string) {
+  return useMutation({
+    mutationFn: async (payload: { id: number; page: "rates" | "market" }) => {
+      const path = api.marketPosts.delete.path.replace(":id", String(payload.id));
+      const res = await fetch(path, {
+        method: api.marketPosts.delete.method,
+        headers: {
+          "x-admin-key": adminKey,
+        },
+      });
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error("Unauthorized admin key");
+        }
+        const text = await res.text();
+        throw new Error(text || "Failed to delete post");
+      }
+
+      return res.json();
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: [api.marketPosts.listByPage.path, variables.page] });
+    },
+  });
+}

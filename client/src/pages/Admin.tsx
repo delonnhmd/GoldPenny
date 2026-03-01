@@ -5,10 +5,13 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useCreateMarketPost, useMarketPosts } from "@/hooks/use-market-posts";
+import { useCreateMarketPost, useDeleteMarketPost, useMarketPosts, useUpdateMarketPost } from "@/hooks/use-market-posts";
 import { useAdminLeads, useAdminReport } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Bold, Code2, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, Pencil, Quote, Strikethrough, Trash2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 type MarketPage = "rates" | "market";
 
@@ -26,6 +29,7 @@ export default function Admin() {
   const [page, setPage] = useState<MarketPage>("rates");
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
+  const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [reportPeriod, setReportPeriod] = useState<"day" | "week">("day");
   const postContentRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -34,8 +38,12 @@ export default function Admin() {
 
   const postsQuery = useMarketPosts(page);
   const createPostMutation = useCreateMarketPost(adminKey);
+  const updatePostMutation = useUpdateMarketPost(adminKey);
+  const deletePostMutation = useDeleteMarketPost(adminKey);
   const leadsQuery = useAdminLeads(adminKey, 100, isUnlocked);
   const reportQuery = useAdminReport(adminKey, reportPeriod, isUnlocked);
+
+  const isEditingPost = editingPostId !== null;
 
   const handleUnlock = () => {
     if (!adminKey.trim()) {
@@ -44,6 +52,12 @@ export default function Admin() {
     }
     sessionStorage.setItem("adminKey", adminKey.trim());
     toast({ title: "Admin unlocked", description: "You can now publish updates." });
+  };
+
+  const resetPostEditor = () => {
+    setPostTitle("");
+    setPostContent("");
+    setEditingPostId(null);
   };
 
   const handlePublishPost = async () => {
@@ -56,22 +70,61 @@ export default function Admin() {
     }
 
     try {
-      await createPostMutation.mutateAsync({
-        page,
-        title: postTitle.trim(),
-        content: postContent.trim(),
-      });
+      if (editingPostId !== null) {
+        await updatePostMutation.mutateAsync({
+          id: editingPostId,
+          page,
+          title: postTitle.trim(),
+          content: postContent.trim(),
+        });
 
-      setPostTitle("");
-      setPostContent("");
+        toast({
+          title: "Post updated",
+          description: "Your changes are now live.",
+        });
+      } else {
+        await createPostMutation.mutateAsync({
+          page,
+          title: postTitle.trim(),
+          content: postContent.trim(),
+        });
 
-      toast({
-        title: "Post published",
-        description: `${page === "rates" ? "News" : "Market"} post is now live.`,
-      });
+        toast({
+          title: "Post published",
+          description: `${page === "rates" ? "News" : "Market"} post is now live.`,
+        });
+      }
+
+      resetPostEditor();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to publish post";
-      toast({ title: "Publish failed", description: message, variant: "destructive" });
+      const message = error instanceof Error ? error.message : "Failed to save post";
+      toast({ title: "Save failed", description: message, variant: "destructive" });
+    }
+  };
+
+  const handleStartEdit = (post: { id: number; title: string; content: string }) => {
+    setEditingPostId(post.id);
+    setPostTitle(post.title);
+    setPostContent(post.content);
+  };
+
+  const handleDeletePost = async (post: { id: number; page: MarketPage }) => {
+    const confirmed = window.confirm("Delete this post? This cannot be undone.");
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deletePostMutation.mutateAsync(post);
+
+      if (editingPostId === post.id) {
+        resetPostEditor();
+      }
+
+      toast({ title: "Post deleted" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to delete post";
+      toast({ title: "Delete failed", description: message, variant: "destructive" });
     }
   };
 
@@ -95,6 +148,55 @@ export default function Admin() {
       const nextEnd = nextStart + selected.length;
       textarea.focus();
       textarea.setSelectionRange(nextStart, nextEnd);
+    });
+  };
+
+  const applyLinePrefix = (prefix: string) => {
+    const textarea = postContentRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = postContent.slice(start, end) || "item";
+    const transformed = selected
+      .split("\n")
+      .map((line) => `${prefix}${line || "item"}`)
+      .join("\n");
+
+    const before = postContent.slice(0, start);
+    const after = postContent.slice(end);
+    const nextValue = `${before}${transformed}${after}`;
+    setPostContent(nextValue);
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + transformed.length);
+    });
+  };
+
+  const insertLinkMarkdown = () => {
+    const textarea = postContentRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = postContent.slice(start, end) || "link text";
+    const url = window.prompt("Link URL", "https://");
+    if (!url || !url.trim()) {
+      return;
+    }
+
+    const markdown = `[${selected}](${url.trim()})`;
+    const nextValue = `${postContent.slice(0, start)}${markdown}${postContent.slice(end)}`;
+    setPostContent(nextValue);
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + markdown.length);
     });
   };
 
@@ -210,11 +312,42 @@ export default function Admin() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700">Post Content</label>
-                  <div className="flex flex-wrap gap-2">
-                    <Button type="button" variant="outline" size="sm" onClick={() => wrapSelectedText("**")}>Bold</Button>
-                    <Button type="button" variant="outline" size="sm" onClick={() => wrapSelectedText("*")}>Italic</Button>
-                    <Button type="button" variant="outline" size="sm" onClick={() => insertImageMarkdown("left")}>Insert Left Image</Button>
-                    <Button type="button" variant="outline" size="sm" onClick={() => insertImageMarkdown("right")}>Insert Right Image</Button>
+                  <div className="rounded-md border border-slate-200 p-1 flex flex-wrap items-center gap-1 bg-slate-50">
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => wrapSelectedText("**")} title="Bold">
+                      <Bold className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => wrapSelectedText("*")} title="Italic">
+                      <Italic className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => wrapSelectedText("~~")} title="Strikethrough">
+                      <Strikethrough className="h-4 w-4" />
+                    </Button>
+                    <span className="mx-1 h-5 w-px bg-slate-300" aria-hidden="true" />
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => wrapSelectedText("## ", "")} title="Heading">
+                      <Heading2 className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => applyLinePrefix("- ")} title="Bullet list">
+                      <List className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => applyLinePrefix("1. ")} title="Numbered list">
+                      <ListOrdered className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => applyLinePrefix("> ")} title="Quote">
+                      <Quote className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => wrapSelectedText("`", "`")} title="Inline code">
+                      <Code2 className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={insertLinkMarkdown} title="Insert link">
+                      <Link2 className="h-4 w-4" />
+                    </Button>
+                    <span className="mx-1 h-5 w-px bg-slate-300" aria-hidden="true" />
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => insertImageMarkdown("left")} title="Insert left image">
+                      <ImagePlus className="h-4 w-4" />
+                    </Button>
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => insertImageMarkdown("right")} title="Insert right image">
+                      <ImagePlus className="h-4 w-4 -scale-x-100" />
+                    </Button>
                   </div>
                   <Textarea
                     ref={postContentRef}
@@ -223,12 +356,57 @@ export default function Admin() {
                     rows={8}
                     placeholder="Write your market or news update..."
                   />
-                  <p className="text-xs text-slate-500">Formatting uses Markdown (Bold, Italic, Image). Use left/right image buttons for corner placement with wrapped text.</p>
+                  <p className="text-xs text-slate-500">Markdown toolbar: bold, italic, strike, heading, lists, quote, link, code, and left/right article images.</p>
+
+                  <div className="rounded-md border border-slate-200 bg-white p-4 space-y-3">
+                    <h3 className="text-sm font-semibold text-slate-700">Live Preview</h3>
+                    {postContent.trim().length === 0 ? (
+                      <p className="text-sm text-slate-500">Start typing to preview formatted content.</p>
+                    ) : (
+                      <div className="prose prose-slate max-w-none prose-p:leading-relaxed">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            img: ({ node: _node, ...props }) => {
+                              const align = (props.title ?? "").toLowerCase().trim();
+                              const floatClass = align === "left"
+                                ? "md:float-left md:mr-4"
+                                : "md:float-right md:ml-4";
+
+                              return (
+                                <img
+                                  {...props}
+                                  className={`not-prose ${floatClass} md:mb-3 md:mt-1 rounded-md max-w-full h-auto md:w-[220px]`}
+                                  loading="lazy"
+                                />
+                              );
+                            },
+                          }}
+                        >
+                          {postContent}
+                        </ReactMarkdown>
+                        <div className="clear-both" />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex justify-end">
-                  <Button type="button" onClick={handlePublishPost} disabled={createPostMutation.isPending}>
-                    {createPostMutation.isPending ? "Publishing..." : "Publish Post"}
+                <div className="flex flex-wrap justify-end gap-2">
+                  {isEditingPost ? (
+                    <Button type="button" variant="outline" onClick={resetPostEditor}>
+                      Cancel Edit
+                    </Button>
+                  ) : null}
+                  <Button
+                    type="button"
+                    onClick={handlePublishPost}
+                    disabled={createPostMutation.isPending || updatePostMutation.isPending}
+                  >
+                    {createPostMutation.isPending || updatePostMutation.isPending
+                      ? "Saving..."
+                      : isEditingPost
+                        ? "Save Changes"
+                        : "Publish Post"}
                   </Button>
                 </div>
 
@@ -244,9 +422,31 @@ export default function Admin() {
                     <div className="space-y-3">
                       {(postsQuery.data ?? []).map((post) => (
                         <div key={post.id} className="rounded-lg border border-slate-200 p-3 bg-slate-50">
-                          <p className="font-semibold text-slate-900">{post.title}</p>
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <p className="font-semibold text-slate-900">{post.title}</p>
+                            <div className="flex gap-2">
+                              <Button type="button" variant="outline" size="sm" onClick={() => handleStartEdit(post)}>
+                                <Pencil className="h-4 w-4" /> Edit
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="text-red-700 border-red-200 hover:bg-red-50"
+                                onClick={() => handleDeletePost({ id: post.id, page: post.page })}
+                                disabled={deletePostMutation.isPending}
+                              >
+                                <Trash2 className="h-4 w-4" /> Delete
+                              </Button>
+                            </div>
+                          </div>
                           <p className="text-xs text-slate-500 mb-2">{new Date(post.createdAt).toLocaleString()}</p>
                           <p className="text-sm text-slate-700 line-clamp-3 whitespace-pre-line">{post.content}</p>
+                          {editingPostId === post.id ? (
+                            <p className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-1">
+                              <Pencil className="h-3 w-3" /> Editing this post
+                            </p>
+                          ) : null}
                         </div>
                       ))}
                     </div>

@@ -5,7 +5,7 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes"; // Only import api
 import { z } from "zod";
-import { createMarketPostSchema, insertLeadSchema, marketPageSchema, upsertMarketUpdateSchema } from "@shared/schema"; // Import schema directly
+import { createMarketPostSchema, insertLeadSchema, marketPageSchema, updateMarketPostSchema, upsertMarketUpdateSchema } from "@shared/schema"; // Import schema directly
 
 function validateAdminRequest(req: Request) {
   const configuredKey = process.env.ADMIN_DASHBOARD_KEY || process.env.ADMIN_KEY || "pennyfloat-admin";
@@ -156,6 +156,67 @@ export async function registerRoutes(
       }
 
       console.error("Error creating market post:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put(api.marketPosts.update.path, async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const params = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
+      const payload = updateMarketPostSchema.parse(req.body);
+      const updated = await storage.updateMarketPost(params.id, payload);
+
+      if (!updated) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      return res.status(200).json({
+        ...updated,
+        createdAt: updated.createdAt ? new Date(updated.createdAt).toISOString() : new Date().toISOString(),
+        updatedAt: updated.updatedAt ? new Date(updated.updatedAt).toISOString() : new Date().toISOString(),
+      });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error updating market post:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete(api.marketPosts.delete.path, async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const params = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
+      const removed = await storage.deleteMarketPost(params.id);
+
+      if (!removed) {
+        return res.status(404).json({ message: "Post not found" });
+      }
+
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error deleting market post:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
   });

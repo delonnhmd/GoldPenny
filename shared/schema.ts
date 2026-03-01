@@ -59,12 +59,18 @@ export const createMarketPostSchema = z.object({
   content: z.string().min(20, "Post content is required"),
 });
 
+export const updateMarketPostSchema = z.object({
+  title: z.string().min(3, "Post title is required"),
+  content: z.string().min(20, "Post content is required"),
+});
+
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 export type Lead = typeof leads.$inferSelect;
 export type MarketPage = z.infer<typeof marketPageSchema>;
 export type UpsertMarketUpdateInput = z.infer<typeof upsertMarketUpdateSchema>;
 export type MarketUpdate = typeof marketUpdates.$inferSelect;
 export type CreateMarketPostInput = z.infer<typeof createMarketPostSchema>;
+export type UpdateMarketPostInput = z.infer<typeof updateMarketPostSchema>;
 export type MarketPost = typeof marketPosts.$inferSelect;
 
 export const creditScoreRanges = [

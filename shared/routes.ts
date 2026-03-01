@@ -1,6 +1,6 @@
 
 import { z } from 'zod';
-import { createMarketPostSchema, insertLeadSchema, marketPageSchema, upsertMarketUpdateSchema } from './schema';
+import { createMarketPostSchema, insertLeadSchema, marketPageSchema, updateMarketPostSchema, upsertMarketUpdateSchema } from './schema';
 
 const reportPeriodSchema = z.enum(['day', 'week']);
 
@@ -107,6 +107,28 @@ export const api = {
         400: errorSchemas.validation,
       },
     },
+    update: {
+      method: 'PUT' as const,
+      path: '/api/admin/market-posts/:id' as const,
+      input: z.object({ id: z.number().int().positive() }).merge(updateMarketPostSchema),
+      responses: {
+        200: marketPostSchema,
+        401: errorSchemas.validation,
+        400: errorSchemas.validation,
+        404: errorSchemas.validation,
+      },
+    },
+    delete: {
+      method: 'DELETE' as const,
+      path: '/api/admin/market-posts/:id' as const,
+      input: z.object({ id: z.number().int().positive() }),
+      responses: {
+        200: z.object({ success: z.boolean() }),
+        401: errorSchemas.validation,
+        400: errorSchemas.validation,
+        404: errorSchemas.validation,
+      },
+    },
   },
   admin: {
     leads: {
@@ -136,5 +158,6 @@ export type MarketUpdateResponse = z.infer<typeof api.marketUpdates.getByPage.re
 export type UpsertMarketUpdateRequest = z.infer<typeof api.marketUpdates.upsert.input>;
 export type MarketPostResponse = z.infer<typeof api.marketPosts.listByPage.responses[200]>;
 export type CreateMarketPostRequest = z.infer<typeof api.marketPosts.create.input>;
+export type UpdateMarketPostRequest = z.infer<typeof api.marketPosts.update.input>;
 export type AdminLeadResponse = z.infer<typeof api.admin.leads.responses[200]>;
 export type AdminReportResponse = z.infer<typeof api.admin.report.responses[200]>;

@@ -11,6 +11,7 @@ import {
   type MarketPage,
   type MarketPost,
   type MarketUpdate,
+  type UpdateMarketPostInput,
   type UpsertMarketUpdateInput,
 } from "@shared/schema";
 
@@ -32,6 +33,8 @@ export interface IStorage {
   getLeadReport(period: ReportPeriod): Promise<LeadReport>;
   listMarketPosts(page: MarketPage, limit?: number): Promise<MarketPost[]>;
   createMarketPost(payload: CreateMarketPostInput): Promise<MarketPost>;
+  updateMarketPost(id: number, payload: UpdateMarketPostInput): Promise<MarketPost | null>;
+  deleteMarketPost(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -163,6 +166,29 @@ export class DatabaseStorage implements IStorage {
       .returning();
 
     return post;
+  }
+
+  async updateMarketPost(id: number, payload: UpdateMarketPostInput): Promise<MarketPost | null> {
+    await this.ensureMarketPostsTable();
+
+    const [updated] = await db!
+      .update(marketPosts)
+      .set({
+        title: payload.title,
+        content: payload.content,
+        updatedAt: new Date(),
+      })
+      .where(eq(marketPosts.id, id))
+      .returning();
+
+    return updated ?? null;
+  }
+
+  async deleteMarketPost(id: number): Promise<boolean> {
+    await this.ensureMarketPostsTable();
+
+    const result = await db!.delete(marketPosts).where(eq(marketPosts.id, id)).returning({ id: marketPosts.id });
+    return result.length > 0;
   }
 }
 
@@ -347,6 +373,29 @@ export class InMemoryStorage implements IStorage {
 
     this.marketPosts.push(post);
     return post;
+  }
+
+  async updateMarketPost(id: number, payload: UpdateMarketPostInput): Promise<MarketPost | null> {
+    const index = this.marketPosts.findIndex((post) => post.id === id);
+    if (index < 0) {
+      return null;
+    }
+
+    const updated: MarketPost = {
+      ...this.marketPosts[index],
+      title: payload.title,
+      content: payload.content,
+      updatedAt: new Date(),
+    };
+
+    this.marketPosts[index] = updated;
+    return updated;
+  }
+
+  async deleteMarketPost(id: number): Promise<boolean> {
+    const before = this.marketPosts.length;
+    this.marketPosts = this.marketPosts.filter((post) => post.id !== id);
+    return this.marketPosts.length < before;
   }
 }
 
