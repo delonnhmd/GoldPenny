@@ -1180,7 +1180,7 @@ export default function Home() {
           </div>
 
           <div id="terms-of-service">
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">Terms of Service (Friendly Draft)</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Terms of Service</h3>
             <p className="text-slate-700 leading-relaxed mb-3">By using PennyFloat, you agree to these basics:</p>
             <ul className="list-disc pl-6 space-y-2 text-slate-700">
               <li><span className="font-semibold text-slate-900">What PennyFloat does:</span> We help you compare options and connect to third-party partners.</li>
@@ -1193,7 +1193,7 @@ export default function Home() {
           </div>
 
           <div id="e-consent">
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">E-Consent (Friendly Draft)</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">E-Consent</h3>
             <ul className="list-disc pl-6 space-y-2 text-slate-700">
               <li>By using PennyFloat and submitting information, you agree that notices and disclosures may be provided electronically.</li>
               <li>You can print or save anything you receive online.</li>
@@ -1203,7 +1203,7 @@ export default function Home() {
           </div>
 
           <div id="ad-disclosure">
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">Ad Disclosure (Friendly Draft)</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Ad Disclosure</h3>
             <p className="text-slate-700 leading-relaxed mb-3">
               PennyFloat is free because we may earn money from advertising.
             </p>
