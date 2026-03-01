@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useMarketPosts } from "@/hooks/use-market-posts";
 import { Link } from "wouter";
 
@@ -16,6 +17,16 @@ function getWordPreview(content: string, limit = 100) {
 export default function Market() {
   const { data, isLoading } = useMarketPosts("market");
   const [expandedPosts, setExpandedPosts] = useState<Record<number, boolean>>({});
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const filteredPosts = (data ?? []).filter((post) => {
+    if (!normalizedSearchTerm) return true;
+
+    const title = post.title.toLowerCase();
+    const content = post.content.toLowerCase();
+    return title.includes(normalizedSearchTerm) || content.includes(normalizedSearchTerm);
+  });
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -27,6 +38,14 @@ export default function Market() {
           <Link href="/loan-calculators">
             <Button className="font-semibold shadow-md shadow-primary/20">Open Loan Calculators</Button>
           </Link>
+          <Input
+            type="search"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Search market posts"
+            aria-label="Search market posts"
+            className="max-w-md"
+          />
 
           {isLoading ? (
             <Card className="p-6 md:p-8 border-slate-200 bg-white">
@@ -36,9 +55,13 @@ export default function Market() {
             <Card className="p-6 md:p-8 border-slate-200 bg-white">
               <p className="text-slate-500">No market posts published yet.</p>
             </Card>
+          ) : filteredPosts.length === 0 ? (
+            <Card className="p-6 md:p-8 border-slate-200 bg-white">
+              <p className="text-slate-500">No market posts match your search.</p>
+            </Card>
           ) : (
             <div className="space-y-4">
-              {(data ?? []).map((post) => {
+              {filteredPosts.map((post) => {
                 const isExpanded = Boolean(expandedPosts[post.id]);
                 const { preview, isTruncated } = getWordPreview(post.content, 166);
                 const fullContentId = `market-post-full-${post.id}`;

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useMarketPosts } from "@/hooks/use-market-posts";
 
 function getWordPreview(content: string, limit = 100) {
@@ -14,6 +15,16 @@ function getWordPreview(content: string, limit = 100) {
 export default function News() {
   const { data, isLoading } = useMarketPosts("rates");
   const [expandedPosts, setExpandedPosts] = useState<Record<number, boolean>>({});
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const filteredPosts = (data ?? []).filter((post) => {
+    if (!normalizedSearchTerm) return true;
+
+    const title = post.title.toLowerCase();
+    const content = post.content.toLowerCase();
+    return title.includes(normalizedSearchTerm) || content.includes(normalizedSearchTerm);
+  });
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -22,6 +33,14 @@ export default function News() {
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
           <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending News</h1>
           <p className="text-slate-600">News updates and weekly commentary posts published from your admin dashboard.</p>
+          <Input
+            type="search"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Search news posts"
+            aria-label="Search news posts"
+            className="max-w-md"
+          />
 
           {isLoading ? (
             <Card className="p-6 md:p-8 border-slate-200 bg-white">
@@ -31,9 +50,13 @@ export default function News() {
             <Card className="p-6 md:p-8 border-slate-200 bg-white">
               <p className="text-slate-500">No news posts published yet.</p>
             </Card>
+          ) : filteredPosts.length === 0 ? (
+            <Card className="p-6 md:p-8 border-slate-200 bg-white">
+              <p className="text-slate-500">No news posts match your search.</p>
+            </Card>
           ) : (
             <div className="space-y-4">
-              {(data ?? []).map((post) => {
+              {filteredPosts.map((post) => {
                 const isExpanded = Boolean(expandedPosts[post.id]);
                 const { preview, isTruncated } = getWordPreview(post.content, 166);
                 const fullContentId = `news-post-full-${post.id}`;
