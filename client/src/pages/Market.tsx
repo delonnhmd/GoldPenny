@@ -1,7 +1,9 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useMarketPosts } from "@/hooks/use-market-posts";
+import { Link } from "wouter";
 
 export default function Market() {
   const { data, isLoading } = useMarketPosts("market");
@@ -13,6 +15,9 @@ export default function Market() {
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
           <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending Market</h1>
           <p className="text-slate-600">Daily market news posts and lending commentary from your team.</p>
+          <Link href="/loan-calculators">
+            <Button className="font-semibold shadow-md shadow-primary/20">Open Loan Calculators</Button>
+          </Link>
 
           {isLoading ? (
             <Card className="p-6 md:p-8 border-slate-200 bg-white">

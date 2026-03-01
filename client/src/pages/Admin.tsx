@@ -66,7 +66,7 @@ export default function Admin() {
 
       toast({
         title: "Post published",
-        description: `${page === "rates" ? "Rates" : "Market"} post is now live.`,
+        description: `${page === "rates" ? "News" : "Market"} post is now live.`,
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to publish post";
@@ -128,7 +128,7 @@ export default function Admin() {
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-4xl space-y-6">
           <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Content Admin</h1>
-          <p className="text-slate-600">Publish blog-style news posts for Rates and Market pages. Changes are live immediately.</p>
+          <p className="text-slate-600">Publish blog-style news posts for News and Market pages. Changes are live immediately.</p>
 
           <Card className="p-6 border-slate-200 bg-white space-y-4">
             <label className="text-sm font-semibold text-slate-700">Admin Key</label>
@@ -148,7 +148,7 @@ export default function Admin() {
             <>
               <Card className="p-6 border-slate-200 bg-white space-y-5">
                 <div className="flex flex-wrap gap-2">
-                  <Button type="button" variant={page === "rates" ? "default" : "outline"} onClick={() => setPage("rates")}>Rates Page</Button>
+                  <Button type="button" variant={page === "rates" ? "default" : "outline"} onClick={() => setPage("rates")}>News Page</Button>
                   <Button type="button" variant={page === "market" ? "default" : "outline"} onClick={() => setPage("market")}>Market Page</Button>
                 </div>
 
@@ -159,7 +159,7 @@ export default function Admin() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700">Post Content</label>
-                  <Textarea value={postContent} onChange={(event) => setPostContent(event.target.value)} rows={8} placeholder="Write your market or rates update..." />
+                  <Textarea value={postContent} onChange={(event) => setPostContent(event.target.value)} rows={8} placeholder="Write your market or news update..." />
                 </div>
 
                 <div className="flex justify-end">

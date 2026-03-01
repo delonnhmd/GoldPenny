@@ -24,8 +24,9 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-8">
           <a href="/#how-it-works" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">How it Works</a>
           <a href="/#benefits" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Benefits</a>
-          <Link href="/rates" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Rates</Link>
+          <Link href="/rates" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">News</Link>
           <Link href="/market" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Market</Link>
+          <Link href="/loan-calculators" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Loan Calculators</Link>
           <a href="/#faq" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">FAQ</a>
         </nav>
 

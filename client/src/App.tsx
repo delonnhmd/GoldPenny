@@ -6,17 +6,19 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Offers from "./pages/Offers";
-import Rates from "./pages/Rates";
+import News from "./pages/News";
 import Market from "./pages/Market";
 import Admin from "./pages/Admin";
+import LoanCalculators from "./pages/LoanCalculators";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/offers" component={Offers} />
-      <Route path="/rates" component={Rates} />
+      <Route path="/rates" component={News} />
       <Route path="/market" component={Market} />
+      <Route path="/loan-calculators" component={LoanCalculators} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
