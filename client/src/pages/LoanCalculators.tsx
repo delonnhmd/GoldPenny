@@ -65,6 +65,7 @@ function NumberField({ id, label, value, onChange, min = 0, max, step = 1, suffi
         <Input
           id={id}
           type="number"
+          className={suffix ? "no-number-spinner pr-10" : "no-number-spinner"}
           value={Number.isFinite(value) ? value : 0}
           min={min}
           max={max}
