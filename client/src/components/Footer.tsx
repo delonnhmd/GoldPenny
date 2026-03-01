@@ -19,7 +19,10 @@ export function Footer() {
               <h3 className="text-2xl text-white font-display">PennyFloat</h3>
             </div>
             <p className="text-sm leading-relaxed max-w-md text-slate-400">
-              PennyFloat helps you compare personal loan and auto loan options in one place. Answer a few quick questions, then we will show partners you can check rates with. Free to use.
+              We compare and explain short-term cash tools so borrowers can make informed decisions. PennyFloat is an educational comparison resource focused on helping people understand costs, terms, and trade-offs.
+            </p>
+            <p className="text-sm leading-relaxed max-w-md text-slate-400 mt-3">
+              MD Media LLC (Texas, USA) • Contact: admin@pennyfloat.com • Publisher: Minh Ho
             </p>
             <div className="flex gap-4 mt-6">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
@@ -49,7 +52,7 @@ export function Footer() {
               <li><a href="/#privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a></li>
               <li><a href="/#terms-of-service" className="hover:text-white transition-colors">Terms of Service</a></li>
               <li><a href="/#e-consent" className="hover:text-white transition-colors">E-Consent</a></li>
-              <li><a href="/#ad-disclosure" className="hover:text-white transition-colors">Ad Disclosure</a></li>
+              <li><a href="/affiliate-disclosure" className="hover:text-white transition-colors">Affiliate Disclosure</a></li>
               <li><a href="/#apr-disclosure" className="hover:text-white transition-colors">APR Disclosure</a></li>
             </ul>
           </div>
@@ -57,10 +60,10 @@ export function Footer() {
         
         <div className="border-t border-slate-800 pt-8 text-xs text-slate-500 text-center leading-relaxed">
           <p className="mb-4">
-            <strong>Legal Disclaimer:</strong> PennyFloat is a free website that helps you explore offers from third-party partners. We do not lend money, approve loans, or guarantee rates. Any loan decision, including approval, APR, fees, and repayment terms, comes from the lender or provider you choose.
+            <strong>Legal Disclaimer:</strong> MD Media LLC, doing business as PennyFloat, provides educational comparison content. Content on this site is for informational purposes only and does not constitute financial advice. We do not lend money, approve loans, or guarantee rates. Any loan decision, including approval, APR, fees, and repayment terms, comes from the lender or provider you choose.
           </p>
           <p>
-            © {new Date().getFullYear()} PennyFloat. All rights reserved.
+            © {new Date().getFullYear()} MD Media LLC. All rights reserved.
           </p>
         </div>
       </div>

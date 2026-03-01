@@ -10,6 +10,7 @@ import News from "./pages/News";
 import Market from "./pages/Market";
 import Admin from "./pages/Admin";
 import LoanCalculators from "./pages/LoanCalculators";
+import AffiliateDisclosure from "./pages/AffiliateDisclosure";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/rates" component={News} />
       <Route path="/market" component={Market} />
       <Route path="/loan-calculators" component={LoanCalculators} />
+      <Route path="/affiliate-disclosure" component={AffiliateDisclosure} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>

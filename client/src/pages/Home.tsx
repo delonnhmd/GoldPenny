@@ -45,7 +45,6 @@ const step3Schema = z.object({
   fullName: z.string().min(2, "Full name is required"),
   zipCode: z.string().min(5).max(10).regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code"),
   email: z.string().email(),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
 });
 
 // Combined schema type
@@ -123,7 +122,6 @@ export default function Home() {
       fullName: "",
       zipCode: "",
       email: "",
-      phone: "",
     },
     mode: "onChange",
   });
@@ -138,7 +136,6 @@ export default function Home() {
       fullName: "",
       zipCode: "",
       email: "",
-      phone: "",
     },
     mode: "onChange",
   });
@@ -150,7 +147,7 @@ export default function Home() {
     } else if (currentStep === 2) {
       isValid = await form.trigger(["creditScoreRange", "employmentStatus"]);
     } else {
-      isValid = await form.trigger(["fullName", "zipCode", "email", "phone"]);
+      isValid = await form.trigger(["fullName", "zipCode", "email"]);
     }
     
     if (isValid) {
@@ -169,7 +166,7 @@ export default function Home() {
     } else if (currentStep === 2) {
       isValid = await carForm.trigger(["creditScoreRange", "employmentStatus"]);
     } else {
-      isValid = await carForm.trigger(["fullName", "zipCode", "email", "phone"]);
+      isValid = await carForm.trigger(["fullName", "zipCode", "email"]);
     }
 
     if (isValid) {
@@ -243,8 +240,11 @@ export default function Home() {
                 </span>
               </h1>
               
-              <p className="text-lg lg:text-xl text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Compare offers from our network of trusted lenders. Whether for debt consolidation, home improvement, or emergencies—we make it fast, simple, and free.
+              <p className="text-lg lg:text-xl text-slate-600 mb-4 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                We compare and explain short-term cash tools so borrowers can make informed decisions.
+              </p>
+              <p className="text-base text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                PennyFloat is an educational comparison resource. We focus on clear explanations of costs, terms, and trade-offs so you can review options with more confidence.
               </p>
               <p className="text-sm text-slate-500 mb-8 max-w-2xl mx-auto lg:mx-0">
                 Impact-Site-Verification: 60e7108b-a262-4838-b750-2bda07b40c9d
@@ -471,24 +471,6 @@ export default function Home() {
                             )}
                           />
 
-                          <FormField
-                            control={form.control}
-                            name="phone"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-700 font-semibold">Phone Number</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="(555) 123-4567" type="tel" {...field} className="h-12 text-lg" />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          
-                          <p className="text-xs text-slate-500 mt-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
-                            By clicking "See My Offers", you agree to our Terms of Use and Privacy Policy. You consent to receive phone calls and SMS messages from us and our partners to provide updates on your loan request.
-                          </p>
-
                           <div className="flex gap-3 pt-2">
                             <Button type="button" variant="outline" onClick={prevStep} disabled={isPending} className="flex-1 h-12">
                               <ChevronLeft className="mr-2 w-4 h-4" /> Back
@@ -506,6 +488,10 @@ export default function Home() {
                               )}
                             </Button>
                           </div>
+
+                          <p className="text-xs text-slate-500 mt-3 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                            By clicking "See My Offers," you agree to our Terms and Privacy Policy. By submitting your email address through our website, you consent to receive communications from us related to financial tools, comparisons, and educational content. You may unsubscribe at any time using the unsubscribe link included in our emails.
+                          </p>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -718,24 +704,6 @@ export default function Home() {
                           )}
                         />
 
-                        <FormField
-                          control={carForm.control}
-                          name="phone"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-slate-700 font-semibold">Phone Number</FormLabel>
-                              <FormControl>
-                                <Input placeholder="(555) 123-4567" type="tel" {...field} className="h-12 text-lg" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <p className="text-xs text-slate-500 mt-4 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
-                          By clicking "See My Offers", you agree to our Terms of Use and Privacy Policy. You consent to receive phone calls and SMS messages from us and our partners to provide updates on your loan request.
-                        </p>
-
                         <div className="flex gap-3 pt-2">
                           <Button type="button" variant="outline" onClick={prevCarStep} disabled={isCarPending} className="flex-1 h-12">
                             <ChevronLeft className="mr-2 w-4 h-4" /> Back
@@ -753,6 +721,10 @@ export default function Home() {
                             )}
                           </Button>
                         </div>
+
+                        <p className="text-xs text-slate-500 mt-3 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                          By clicking "See My Offers," you agree to our Terms and Privacy Policy. By submitting your email address through our website, you consent to receive communications from us related to financial tools, comparisons, and educational content. You may unsubscribe at any time using the unsubscribe link included in our emails.
+                        </p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -998,13 +970,16 @@ export default function Home() {
           <div>
             <h2 className="text-3xl font-bold font-display text-slate-900 mb-4">About Us</h2>
             <p className="text-slate-700 leading-relaxed mb-4">
-              PennyFloat helps you compare personal loan and auto loan options in one place. Answer a few quick questions, then we will show partners you can check rates with. Free to use.
+              We compare and explain short-term cash tools so borrowers can make informed decisions.
             </p>
             <p className="text-slate-700 leading-relaxed mb-4">
-              We built PennyFloat to keep it simple.
+              PennyFloat, operated by MD Media LLC and led by Minh Ho, is built to help people understand borrowing choices in plain language. We publish educational content and comparison tools to explain payments, total costs, and key terms.
             </p>
             <p className="text-slate-700 leading-relaxed">
-              Money stuff is already stressful. PennyFloat is here to make the first step easy, without confusing forms.
+              Our goal is clarity, not pressure. We do not provide financial advice, and we encourage borrowers to read lender disclosures carefully before choosing any product.
+            </p>
+            <p className="text-slate-700 leading-relaxed mt-4">
+              All content is reviewed and updated periodically to reflect current market conditions and product changes.
             </p>
           </div>
 
@@ -1018,9 +993,9 @@ export default function Home() {
 
           <div>
             <h3 className="text-2xl font-bold text-slate-900 mb-3">What PennyFloat is (and is not)</h3>
-            <p className="text-slate-700 leading-relaxed mb-2">PennyFloat is a referral and comparison website.</p>
+            <p className="text-slate-700 leading-relaxed mb-2">PennyFloat is an educational comparison website.</p>
             <p className="text-slate-700 leading-relaxed">
-              We are not a lender, and we do not make lending decisions. Your final approval, rate, and terms come from the partner you choose.
+              We are not a lender, and we do not make lending decisions. Final approval, APR, fees, and repayment terms come from the lender or provider you choose.
             </p>
           </div>
 
@@ -1061,6 +1036,8 @@ export default function Home() {
             <h3 className="text-2xl font-bold text-slate-900 mb-3">Contact</h3>
             <p className="text-slate-700 mb-3">Need help or have a question? We are here.</p>
             <div className="space-y-1 text-slate-700">
+              <p>Business Entity: MD Media LLC</p>
+              <p>Publisher: Minh Ho</p>
               <p>Phone: (346) 291-7636</p>
               <p>Email: admin@pennyfloat.com</p>
               <p>Hours: Mon-Fri, 9am-5pm CT</p>
@@ -1076,38 +1053,129 @@ export default function Home() {
           </div>
 
           <div id="privacy-policy">
-            <h3 className="text-2xl font-bold text-slate-900 mb-3">Privacy Policy (Friendly Draft)</h3>
-            <h4 className="text-lg font-semibold text-slate-900 mb-1">What we collect</h4>
+            <h3 className="text-2xl font-bold text-slate-900 mb-3">Privacy Policy</h3>
+            <p className="text-slate-700 leading-relaxed mb-2"><span className="font-semibold text-slate-900">Effective Date:</span> February 28, 2026</p>
+            <p className="text-slate-700 leading-relaxed mb-4"><span className="font-semibold text-slate-900">Last Updated:</span> February 28, 2026</p>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              PennyFloat is a U.S.-based financial comparison website operated by MD Media LLC in Texas. We provide educational content and comparison tools related to cash advance apps, personal loans, and small business funding.
+            </p>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">1) We Are Not a Lender</h4>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              PennyFloat and MD Media LLC are not lenders, banks, credit unions, or financial institutions. We do not make loan offers, underwrite loans, make credit decisions, or set loan terms. We have no control over and are not responsible for lender underwriting decisions, rates, fees, terms, or funding timelines.
+            </p>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">Data Controller</h4>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              MD Media LLC is the data controller for personal information collected through this website.
+            </p>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">2) Information We Collect</h4>
+            <p className="text-slate-700 leading-relaxed mb-2">Information you may provide includes:</p>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-3">
+              <li>Name</li>
+              <li>Email address</li>
+              <li>Requested loan amount</li>
+              <li>Income type</li>
+            </ul>
+            <p className="text-slate-700 leading-relaxed mb-2">We may also collect information automatically, including:</p>
             <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
-              <li>what type of loan you want (personal or auto)</li>
-              <li>amount and purpose (optional)</li>
-              <li>income type (optional)</li>
-              <li>ZIP code/location</li>
-              <li>your email/phone (only if you choose to enter it)</li>
+              <li>IP address, browser type, and device details</li>
+              <li>Pages viewed, links clicked, and referral sources</li>
+              <li>Cookie identifiers and similar tracking data</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">3) How We Use Information</h4>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
+              <li>Provide educational comparison content and site functionality</li>
+              <li>Respond to requests and support questions</li>
+              <li>Match submitted information with potential lending partners</li>
+              <li>Analyze and improve website performance and content quality</li>
+              <li>Help prevent fraud, abuse, and security incidents</li>
+              <li>Comply with legal and regulatory obligations</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">4) Cookies and Tracking Technologies</h4>
+            <p className="text-slate-700 leading-relaxed mb-2">
+              We use cookies, pixels, and similar technologies for analytics, site operation, and marketing measurement.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-2">Tools currently include:</p>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
+              <li>Google Analytics</li>
+              <li>Meta Pixel</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">5) Affiliate Disclosure</h4>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              Some links on our site are affiliate links. If you click a link and complete certain actions, we may receive compensation. This does not change our goal of providing clear educational comparisons.
+            </p>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">6) Third-Party Sharing</h4>
+            <p className="text-slate-700 leading-relaxed mb-2">
+              We may share submitted information with third-party lending partners or financial service providers solely for the purpose of potential matching or referral opportunities.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-2">
+              We do not sell personal information for monetary consideration.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-2">We may also share data with:</p>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
+              <li>Analytics and advertising providers</li>
+              <li>Technology and hosting service providers</li>
+              <li>Professional advisors and authorities when required by law</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">7) Data Protection</h4>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              We use reasonable administrative, technical, and physical safeguards to protect your information. No method of internet transmission or storage is 100% secure, so absolute security cannot be guaranteed.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              We retain personal information only as long as reasonably necessary for business, legal, or compliance purposes.
+            </p>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">Children's Privacy</h4>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              This website is not intended for individuals under 18 years of age. We do not knowingly collect personal information from minors.
+            </p>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">8) Your Privacy Rights</h4>
+            <p className="text-slate-700 leading-relaxed mb-2">Depending on your state, you may have rights to:</p>
+            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
+              <li>Request access to personal information we hold about you</li>
+              <li>Request correction or deletion of personal information</li>
+              <li>Opt out of certain data-sharing uses where applicable</li>
             </ul>
             <p className="text-slate-700 leading-relaxed mb-4">
-              We may also collect basic website info (like device type, IP address, and cookies) to help prevent spam and improve the site.
+              Residents of certain states, including California, Virginia, Colorado, Connecticut, and others, may have additional rights under applicable state privacy laws.
             </p>
-            <h4 className="text-lg font-semibold text-slate-900 mb-1">How we use it</h4>
-            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
-              <li>show relevant options</li>
-              <li>connect you to partners you choose</li>
-              <li>improve the site</li>
-              <li>stop fraud and bots</li>
-              <li>understand what is working (analytics)</li>
-            </ul>
-            <h4 className="text-lg font-semibold text-slate-900 mb-1">Who we share it with</h4>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">Communications</h4>
             <p className="text-slate-700 leading-relaxed mb-4">
-              We may share the information you submit with partners so you can see offers or apply. Partners may also use your info based on their own privacy policies.
+              We comply with the CAN-SPAM Act and provide unsubscribe options in marketing emails.
             </p>
-            <h4 className="text-lg font-semibold text-slate-900 mb-1">Your choices</h4>
-            <ul className="list-disc pl-6 space-y-1 text-slate-700 mb-4">
-              <li>You can skip optional questions.</li>
-              <li>You can ask us to delete submitted info by contacting us.</li>
-            </ul>
-            <h4 className="text-lg font-semibold text-slate-900 mb-1">Keeping your info safe</h4>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">9) Communications (Email Only)</h4>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              By submitting your email address through our website, you consent to receive communications from us related to financial tools, comparisons, and educational content. You may unsubscribe at any time using the unsubscribe link included in our emails.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              We comply with the CAN-SPAM Act. All marketing emails include a clear unsubscribe option.
+            </p>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              We do not engage in telemarketing and do not sell phone-based lead data.
+            </p>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">10) Contact</h4>
+            <p className="text-slate-700 leading-relaxed mb-4">
+              For privacy questions or requests, contact us at: <span className="font-semibold text-slate-900">admin@pennyfloat.com</span>
+            </p>
+
+            <p className="text-slate-700 leading-relaxed mb-4">
+              Content on this site is for informational purposes only and does not constitute financial advice.
+            </p>
+
+            <h4 className="text-lg font-semibold text-slate-900 mb-1">11) Policy Updates</h4>
             <p className="text-slate-700 leading-relaxed">
-              We use reasonable security measures, but no website can guarantee 100% protection.
+              We may update this Privacy Policy from time to time. Any changes will be posted on this page with an updated effective date.
             </p>
           </div>
 

@@ -8,7 +8,6 @@ const adminLeadSchema = z.object({
   id: z.number(),
   fullName: z.string(),
   email: z.string(),
-  phone: z.string(),
   loanPurpose: z.string(),
   loanAmount: z.number(),
   creditScoreRange: z.string(),

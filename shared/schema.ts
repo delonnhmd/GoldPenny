@@ -12,7 +12,7 @@ export const leads = pgTable("leads", {
   fullName: text("full_name").notNull(),
   zipCode: varchar("zip_code", { length: 10 }).notNull(),
   email: text("email").notNull(),
-  phone: text("phone").notNull(),
+  phone: text("phone"),
   ipAddress: text("ip_address"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -39,7 +39,8 @@ export const marketPosts = pgTable("market_posts", {
 export const insertLeadSchema = createInsertSchema(leads).omit({ 
   id: true, 
   createdAt: true,
-  ipAddress: true // server-side only
+  ipAddress: true, // server-side only
+  phone: true // no longer collected from website forms
 });
 
 export const marketPageSchema = z.enum(["rates", "market"]);

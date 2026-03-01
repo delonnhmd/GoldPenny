@@ -85,7 +85,6 @@ export default function Admin() {
       "id",
       "fullName",
       "email",
-      "phone",
       "loanPurpose",
       "loanAmount",
       "creditScoreRange",
@@ -98,7 +97,6 @@ export default function Admin() {
       lead.id,
       lead.fullName,
       lead.email,
-      lead.phone,
       lead.loanPurpose,
       lead.loanAmount,
       lead.creditScoreRange,
@@ -249,7 +247,6 @@ export default function Admin() {
                       <TableRow>
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
-                        <TableHead>Phone</TableHead>
                         <TableHead>Purpose</TableHead>
                         <TableHead>Amount</TableHead>
                         <TableHead>Submitted</TableHead>
@@ -260,7 +257,6 @@ export default function Admin() {
                         <TableRow key={lead.id}>
                           <TableCell className="font-medium">{lead.fullName}</TableCell>
                           <TableCell>{lead.email}</TableCell>
-                          <TableCell>{lead.phone}</TableCell>
                           <TableCell>{lead.loanPurpose}</TableCell>
                           <TableCell>${lead.loanAmount.toLocaleString()}</TableCell>
                           <TableCell>{new Date(lead.createdAt).toLocaleString()}</TableCell>

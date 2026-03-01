@@ -262,7 +262,7 @@ export default function LoanCalculators() {
     { label: "Year 1 Monthly Payment", value: buydownResult.paymentSnapshots.year1 ? formatCurrency(buydownResult.paymentSnapshots.year1) : "N/A" },
     { label: "Year 2 Monthly Payment", value: buydownResult.paymentSnapshots.year2 ? formatCurrency(buydownResult.paymentSnapshots.year2) : "N/A" },
     { label: "Year 3 Monthly Payment", value: buydownResult.paymentSnapshots.year3 ? formatCurrency(buydownResult.paymentSnapshots.year3) : "N/A" },
-    { label: "Year 4+ Monthly Payment", value: buydownResult.paymentSnapshots.year4Plus ? formatCurrency(buydownResult.paymentSnapshots.year4Plus) : "N/A" },
+    { label: "Year 4 Actual Monthly Payment", value: buydownResult.paymentSnapshots.year4Actual ? formatCurrency(buydownResult.paymentSnapshots.year4Actual) : "N/A", hint: "This is the note-rate payment after the temporary buydown period." },
     { label: "Estimated Buydown Cost", value: formatCurrency(buydownResult.savings.estimatedBuydownCost) },
   ];
 
@@ -504,12 +504,12 @@ export default function LoanCalculators() {
                 </Table>
               </Card>
 
-              <AmortizationTable rows={buydownResult.amortization} defaultVisibleRows={36} title="Buydown Amortization (Monthly, First 36 Shown)" />
+              <AmortizationTable rows={buydownResult.amortization} defaultVisibleRows={48} title="Buydown Amortization (Monthly, First 48 Shown)" />
 
               <Card className="p-5 border-slate-200 bg-white space-y-3">
                 <h3 className="text-lg font-semibold text-slate-900">Explanation</h3>
                 <p className="text-sm text-slate-600">A temporary buydown means someone prepays part of the interest up front so your payment is lower in early years. The note rate is still your permanent contract rate once the buydown period ends.</p>
-                <p className="text-sm text-slate-600">This calculator recalculates payment at each year boundary using the remaining balance and remaining term. That is why Year 1, Year 2, Year 3, and Year 4+ can differ.</p>
+                <p className="text-sm text-slate-600">This calculator recalculates payment at each year boundary using the remaining balance and remaining term. That is why Year 1, Year 2, Year 3, and Year 4 can differ in a 3-2-1 buydown structure.</p>
                 <p className="text-sm text-slate-600">Who typically pays the subsidy can vary: seller, builder, lender, or borrower, depending on negotiation and program rules.</p>
                 <p className="text-sm text-red-700 font-medium">Warning: make sure you can afford the note-rate payment after the temporary buydown ends.</p>
               </Card>

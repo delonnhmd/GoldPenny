@@ -199,7 +199,14 @@ export async function registerRoutes(
       const rows = await storage.listLeads(parsed.limit ?? 100);
       return res.status(200).json(
         rows.map((lead) => ({
-          ...lead,
+          id: lead.id,
+          fullName: lead.fullName,
+          email: lead.email,
+          loanPurpose: lead.loanPurpose,
+          loanAmount: lead.loanAmount,
+          creditScoreRange: lead.creditScoreRange,
+          employmentStatus: lead.employmentStatus,
+          zipCode: lead.zipCode,
           createdAt: lead.createdAt ? new Date(lead.createdAt).toISOString() : new Date().toISOString(),
         }))
       );

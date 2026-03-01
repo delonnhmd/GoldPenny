@@ -234,7 +234,7 @@ export class InMemoryStorage implements IStorage {
       fullName: insertLead.fullName,
       zipCode: insertLead.zipCode,
       email: insertLead.email,
-      phone: insertLead.phone,
+      phone: null,
       ipAddress: insertLead.ipAddress ?? null,
       createdAt: new Date(),
     };

@@ -39,7 +39,7 @@ export interface BuydownCalculationResult {
     year1: number | null;
     year2: number | null;
     year3: number | null;
-    year4Plus: number | null;
+    year4Actual: number | null;
   };
   savings: {
     year1: number;
@@ -188,6 +188,14 @@ function paymentForYear(yearlySummary: BuydownYearSummary[], year: number): numb
   return found ? found.monthlyPayment : null;
 }
 
+function monthsInBuydownYear(termMonths: number, year: number): number {
+  const startMonth = (year - 1) * 12;
+  if (startMonth >= termMonths) {
+    return 0;
+  }
+  return Math.min(12, termMonths - startMonth);
+}
+
 export function calculateBuydownAmortization(input: {
   loanAmount: number;
   noteRateAPR: number;
@@ -213,7 +221,7 @@ export function calculateBuydownAmortization(input: {
         year1: null,
         year2: null,
         year3: null,
-        year4Plus: null,
+        year4Actual: null,
       },
       savings: {
         year1: 0,
@@ -293,30 +301,42 @@ export function calculateBuydownAmortization(input: {
   }
 
   const baselinePayment = baseline.monthlyPayment;
-  const year1Payment = paymentForYear(yearlySummary, 1);
-  const year2Payment = paymentForYear(yearlySummary, 2);
-  const year3Payment = paymentForYear(yearlySummary, 3);
-  const year4PlusPayment = paymentForYear(yearlySummary, 4);
 
-  const year1Savings = Math.max(0, baselinePayment - (year1Payment ?? baselinePayment));
-  const year2Savings = Math.max(0, baselinePayment - (year2Payment ?? baselinePayment));
-  const year3Savings = Math.max(0, baselinePayment - (year3Payment ?? baselinePayment));
+  const year1DisplayPayment = calculateMonthlyPayment(
+    principal,
+    Math.max(0, noteRateAPR + buydownAdjustmentForYear(input.buydownType, 1)),
+    termMonths,
+  );
+  const year2DisplayPayment = calculateMonthlyPayment(
+    principal,
+    Math.max(0, noteRateAPR + buydownAdjustmentForYear(input.buydownType, 2)),
+    termMonths,
+  );
+  const year3DisplayPayment = calculateMonthlyPayment(
+    principal,
+    Math.max(0, noteRateAPR + buydownAdjustmentForYear(input.buydownType, 3)),
+    termMonths,
+  );
+  const year4ActualPayment = baselinePayment;
 
-  const estimatedBuydownCost = yearlySummary.reduce((sum, item) => {
-    const monthsInPeriod = Math.min(12, termMonths - (item.year - 1) * 12);
-    const monthlySavings = Math.max(0, baselinePayment - item.monthlyPayment);
-    return sum + monthlySavings * Math.max(0, monthsInPeriod);
-  }, 0);
+  const year1Savings = Math.max(0, baselinePayment - year1DisplayPayment);
+  const year2Savings = Math.max(0, baselinePayment - year2DisplayPayment);
+  const year3Savings = Math.max(0, baselinePayment - year3DisplayPayment);
+
+  const estimatedBuydownCost =
+    year1Savings * monthsInBuydownYear(termMonths, 1) +
+    year2Savings * monthsInBuydownYear(termMonths, 2) +
+    year3Savings * monthsInBuydownYear(termMonths, 3);
 
   return {
     baseline,
     yearlySummary,
     amortization,
     paymentSnapshots: {
-      year1: year1Payment,
-      year2: year2Payment,
-      year3: year3Payment,
-      year4Plus: year4PlusPayment,
+      year1: year1DisplayPayment,
+      year2: year2DisplayPayment,
+      year3: year3DisplayPayment,
+      year4Actual: year4ActualPayment,
     },
     savings: {
       year1: year1Savings,
