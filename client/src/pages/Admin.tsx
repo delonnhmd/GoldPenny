@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -27,6 +27,7 @@ export default function Admin() {
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
   const [reportPeriod, setReportPeriod] = useState<"day" | "week">("day");
+  const postContentRef = useRef<HTMLTextAreaElement | null>(null);
 
   const isProtected = useMemo(() => adminKey.trim().length > 0, [adminKey]);
   const isUnlocked = isProtected;
@@ -72,6 +73,58 @@ export default function Admin() {
       const message = error instanceof Error ? error.message : "Failed to publish post";
       toast({ title: "Publish failed", description: message, variant: "destructive" });
     }
+  };
+
+  const wrapSelectedText = (prefix: string, suffix = prefix) => {
+    const textarea = postContentRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = postContent.slice(0, start);
+    const selected = postContent.slice(start, end) || "text";
+    const after = postContent.slice(end);
+    const nextValue = `${before}${prefix}${selected}${suffix}${after}`;
+
+    setPostContent(nextValue);
+
+    requestAnimationFrame(() => {
+      const nextStart = start + prefix.length;
+      const nextEnd = nextStart + selected.length;
+      textarea.focus();
+      textarea.setSelectionRange(nextStart, nextEnd);
+    });
+  };
+
+  const insertImageMarkdown = (alignment: "left" | "right") => {
+    const textarea = postContentRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    const imageUrl = window.prompt("Image URL");
+    if (!imageUrl || !imageUrl.trim()) {
+      return;
+    }
+
+    const altText = window.prompt("Image alt text", "image") || "image";
+    const markdown = `![${altText.trim() || "image"}](${imageUrl.trim()} "${alignment}")`;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = postContent.slice(0, start);
+    const after = postContent.slice(end);
+    const nextValue = `${before}${markdown}${after}`;
+
+    setPostContent(nextValue);
+
+    requestAnimationFrame(() => {
+      const cursor = start + markdown.length;
+      textarea.focus();
+      textarea.setSelectionRange(cursor, cursor);
+    });
   };
 
   const handleExportCsv = () => {
@@ -157,7 +210,20 @@ export default function Admin() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-slate-700">Post Content</label>
-                  <Textarea value={postContent} onChange={(event) => setPostContent(event.target.value)} rows={8} placeholder="Write your market or news update..." />
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => wrapSelectedText("**")}>Bold</Button>
+                    <Button type="button" variant="outline" size="sm" onClick={() => wrapSelectedText("*")}>Italic</Button>
+                    <Button type="button" variant="outline" size="sm" onClick={() => insertImageMarkdown("left")}>Insert Left Image</Button>
+                    <Button type="button" variant="outline" size="sm" onClick={() => insertImageMarkdown("right")}>Insert Right Image</Button>
+                  </div>
+                  <Textarea
+                    ref={postContentRef}
+                    value={postContent}
+                    onChange={(event) => setPostContent(event.target.value)}
+                    rows={8}
+                    placeholder="Write your market or news update..."
+                  />
+                  <p className="text-xs text-slate-500">Formatting uses Markdown (Bold, Italic, Image). Use left/right image buttons for corner placement with wrapped text.</p>
                 </div>
 
                 <div className="flex justify-end">

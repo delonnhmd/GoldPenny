@@ -4,11 +4,19 @@ import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useMarketPosts } from "@/hooks/use-market-posts";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 function getWordPreview(content: string, limit = 100) {
-  const words = content.trim().split(/\s+/);
+  const plainText = content
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[[^\]]+\]\([^)]*\)/g, "$1")
+    .replace(/[*_`>#~-]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const words = plainText.split(/\s+/);
   const isTruncated = words.length > limit;
-  const preview = isTruncated ? `${words.slice(0, limit).join(" ")}...` : content;
+  const preview = isTruncated ? `${words.slice(0, limit).join(" ")}...` : plainText;
   return { preview, isTruncated };
 }
 
@@ -69,7 +77,30 @@ export default function News() {
                     <p className={isExpanded ? "hidden" : "text-slate-700 leading-relaxed whitespace-pre-line"}>{preview}</p>
 
                     <div id={fullContentId} className={isExpanded ? "block" : "hidden"}>
-                      <p className="text-slate-700 leading-relaxed whitespace-pre-line">{post.content}</p>
+                      <div className="prose prose-slate max-w-none prose-p:leading-relaxed">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            img: ({ node: _node, ...props }) => {
+                              const align = (props.title ?? "").toLowerCase().trim();
+                              const floatClass = align === "left"
+                                ? "md:float-left md:mr-4"
+                                : "md:float-right md:ml-4";
+
+                              return (
+                                <img
+                                  {...props}
+                                  className={`not-prose ${floatClass} md:mb-3 md:mt-1 rounded-md max-w-full h-auto md:w-[220px]`}
+                                  loading="lazy"
+                                />
+                              );
+                            },
+                          }}
+                        >
+                          {post.content}
+                        </ReactMarkdown>
+                      </div>
+                      <div className="clear-both" />
                     </div>
 
                     {isTruncated ? (
