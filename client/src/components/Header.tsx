@@ -10,7 +10,7 @@ import {
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full pt-[env(safe-area-inset-top)] bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <header className="relative md:sticky md:top-0 z-50 w-full pt-[env(safe-area-inset-top)] bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/">
           <div className="flex items-center gap-2 cursor-pointer group">
