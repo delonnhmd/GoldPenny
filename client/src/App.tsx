@@ -11,6 +11,7 @@ import Market from "./pages/Market";
 import Admin from "./pages/Admin";
 import LoanCalculators from "./pages/LoanCalculators";
 import AffiliateDisclosure from "./pages/AffiliateDisclosure";
+import TexasCashAdvanceApps2026 from "./pages/TexasCashAdvanceApps2026";
 
 function Router() {
   return (
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/offers" component={Offers} />
       <Route path="/rates" component={News} />
       <Route path="/market" component={Market} />
+      <Route path="/texas-cash-advance-apps-2026" component={TexasCashAdvanceApps2026} />
       <Route path="/loan-calculators" component={LoanCalculators} />
       <Route path="/affiliate-disclosure" component={AffiliateDisclosure} />
       <Route path="/admin" component={Admin} />
