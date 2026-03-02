@@ -3,20 +3,24 @@ import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "./db";
 import {
   leads,
-  marketPosts,
-  marketUpdates,
-  type CreateMarketPostInput,
+  smartPennyPosts,
+  smartPennyUpdates,
+  type CreateSmartPennyPostInput,
   type InsertLead,
   type Lead,
-  type MarketPage,
-  type MarketPost,
-  type MarketUpdate,
-  type UpdateMarketPostInput,
-  type UpsertMarketUpdateInput,
+  type SmartPennyPage,
+  type SmartPennyPost,
+  type SmartPennyUpdate,
+  type UpdateSmartPennyPostInput,
+  type UpsertSmartPennyUpdateInput,
 } from "@shared/schema";
 
 type InsertLeadWithIp = InsertLead & { ipAddress?: string | null };
 type ReportPeriod = "day" | "week";
+type DbSmartPennyPage = "rates" | "market";
+
+const toDbSmartPennyPage = (page: SmartPennyPage): DbSmartPennyPage => (page === "smart-penny" ? "market" : "rates");
+const fromDbSmartPennyPage = (page: string): SmartPennyPage => (page === "market" ? "smart-penny" : "rates");
 
 export type LeadReport = {
   period: ReportPeriod;
@@ -27,18 +31,18 @@ export type LeadReport = {
 
 export interface IStorage {
   createLead(lead: InsertLeadWithIp): Promise<Lead>;
-  getMarketUpdate(page: MarketPage): Promise<MarketUpdate | null>;
-  upsertMarketUpdate(payload: UpsertMarketUpdateInput): Promise<MarketUpdate>;
+  getSmartPennyUpdate(page: SmartPennyPage): Promise<SmartPennyUpdate | null>;
+  upsertSmartPennyUpdate(payload: UpsertSmartPennyUpdateInput): Promise<SmartPennyUpdate>;
   listLeads(limit?: number): Promise<Lead[]>;
   getLeadReport(period: ReportPeriod): Promise<LeadReport>;
-  listMarketPosts(page: MarketPage, limit?: number): Promise<MarketPost[]>;
-  createMarketPost(payload: CreateMarketPostInput): Promise<MarketPost>;
-  updateMarketPost(id: number, payload: UpdateMarketPostInput): Promise<MarketPost | null>;
-  deleteMarketPost(id: number): Promise<boolean>;
+  listSmartPennyPosts(page: SmartPennyPage, limit?: number): Promise<SmartPennyPost[]>;
+  createSmartPennyPost(payload: CreateSmartPennyPostInput): Promise<SmartPennyPost>;
+  updateSmartPennyPost(id: number, payload: UpdateSmartPennyPostInput): Promise<SmartPennyPost | null>;
+  deleteSmartPennyPost(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
-  private async ensureMarketPostsTable(): Promise<void> {
+  private async ensureSmartPennyPostsTable(): Promise<void> {
     await db!.execute(sql`
       CREATE TABLE IF NOT EXISTS market_posts (
         id serial PRIMARY KEY,
@@ -56,21 +60,30 @@ export class DatabaseStorage implements IStorage {
     return lead;
   }
 
-  async getMarketUpdate(page: MarketPage): Promise<MarketUpdate | null> {
+  async getSmartPennyUpdate(page: SmartPennyPage): Promise<SmartPennyUpdate | null> {
+    const dbPage = toDbSmartPennyPage(page);
     const [item] = await db!
       .select()
-      .from(marketUpdates)
-      .where(eq(marketUpdates.page, page))
+      .from(smartPennyUpdates)
+      .where(eq(smartPennyUpdates.page, dbPage))
       .limit(1);
 
-    return item ?? null;
+    if (!item) {
+      return null;
+    }
+
+    return {
+      ...item,
+      page: fromDbSmartPennyPage(item.page),
+    };
   }
 
-  async upsertMarketUpdate(payload: UpsertMarketUpdateInput): Promise<MarketUpdate> {
+  async upsertSmartPennyUpdate(payload: UpsertSmartPennyUpdateInput): Promise<SmartPennyUpdate> {
+    const dbPage = toDbSmartPennyPage(payload.page);
     const [item] = await db!
-      .insert(marketUpdates)
+      .insert(smartPennyUpdates)
       .values({
-        page: payload.page,
+        page: dbPage,
         title: payload.title,
         summary: payload.summary,
         bullets: payload.bullets,
@@ -78,7 +91,7 @@ export class DatabaseStorage implements IStorage {
         updatedAt: new Date(),
       })
       .onConflictDoUpdate({
-        target: marketUpdates.page,
+        target: smartPennyUpdates.page,
         set: {
           title: payload.title,
           summary: payload.summary,
@@ -89,7 +102,10 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
 
-    return item;
+    return {
+      ...item,
+      page: fromDbSmartPennyPage(item.page),
+    };
   }
 
   async listLeads(limit = 100): Promise<Lead[]> {
@@ -140,24 +156,31 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  async listMarketPosts(page: MarketPage, limit = 50): Promise<MarketPost[]> {
-    await this.ensureMarketPostsTable();
+  async listSmartPennyPosts(page: SmartPennyPage, limit = 50): Promise<SmartPennyPost[]> {
+    await this.ensureSmartPennyPostsTable();
+    const dbPage = toDbSmartPennyPage(page);
 
-    return db!
+    const rows = await db!
       .select()
-      .from(marketPosts)
-      .where(eq(marketPosts.page, page))
-      .orderBy(desc(marketPosts.createdAt))
+      .from(smartPennyPosts)
+      .where(eq(smartPennyPosts.page, dbPage))
+      .orderBy(desc(smartPennyPosts.createdAt))
       .limit(limit);
+
+    return rows.map((post) => ({
+      ...post,
+      page: fromDbSmartPennyPage(post.page),
+    }));
   }
 
-  async createMarketPost(payload: CreateMarketPostInput): Promise<MarketPost> {
-    await this.ensureMarketPostsTable();
+  async createSmartPennyPost(payload: CreateSmartPennyPostInput): Promise<SmartPennyPost> {
+    await this.ensureSmartPennyPostsTable();
+    const dbPage = toDbSmartPennyPage(payload.page);
 
     const [post] = await db!
-      .insert(marketPosts)
+      .insert(smartPennyPosts)
       .values({
-        page: payload.page,
+        page: dbPage,
         title: payload.title,
         content: payload.content,
         createdAt: new Date(),
@@ -165,36 +188,46 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
 
-    return post;
+    return {
+      ...post,
+      page: fromDbSmartPennyPage(post.page),
+    };
   }
 
-  async updateMarketPost(id: number, payload: UpdateMarketPostInput): Promise<MarketPost | null> {
-    await this.ensureMarketPostsTable();
+  async updateSmartPennyPost(id: number, payload: UpdateSmartPennyPostInput): Promise<SmartPennyPost | null> {
+    await this.ensureSmartPennyPostsTable();
 
     const [updated] = await db!
-      .update(marketPosts)
+      .update(smartPennyPosts)
       .set({
         title: payload.title,
         content: payload.content,
         updatedAt: new Date(),
       })
-      .where(eq(marketPosts.id, id))
+      .where(eq(smartPennyPosts.id, id))
       .returning();
 
-    return updated ?? null;
+    if (!updated) {
+      return null;
+    }
+
+    return {
+      ...updated,
+      page: fromDbSmartPennyPage(updated.page),
+    };
   }
 
-  async deleteMarketPost(id: number): Promise<boolean> {
-    await this.ensureMarketPostsTable();
+  async deleteSmartPennyPost(id: number): Promise<boolean> {
+    await this.ensureSmartPennyPostsTable();
 
-    const result = await db!.delete(marketPosts).where(eq(marketPosts.id, id)).returning({ id: marketPosts.id });
+    const result = await db!.delete(smartPennyPosts).where(eq(smartPennyPosts.id, id)).returning({ id: smartPennyPosts.id });
     return result.length > 0;
   }
 }
 
 export class InMemoryStorage implements IStorage {
   private leads: Lead[] = [];
-  private marketPosts: MarketPost[] = [
+  private smartPennyPosts: SmartPennyPost[] = [
     {
       id: 1,
       page: "rates",
@@ -205,14 +238,14 @@ export class InMemoryStorage implements IStorage {
     },
     {
       id: 2,
-      page: "market",
+      page: "smart-penny",
       title: "Small Business Lending Pulse",
       content: "Working capital demand remains strong. Inventory and equipment use-cases are seeing solid lender interest, while risk reviews are slightly tighter in seasonal industries.",
       createdAt: new Date(),
       updatedAt: new Date(),
     },
   ];
-  private marketUpdates: MarketUpdate[] = [
+  private smartPennyUpdates: SmartPennyUpdate[] = [
     {
       id: 1,
       page: "rates",
@@ -231,8 +264,8 @@ export class InMemoryStorage implements IStorage {
     },
     {
       id: 2,
-      page: "market",
-      title: "Small Business Lending Market Update",
+      page: "smart-penny",
+      title: "Small Business Lending Smart Penny Update",
       summary: "Lender appetite remains healthy in core sectors, with tighter underwriting in higher-risk categories.",
       bullets: [
         "Working capital demand is trending up",
@@ -248,7 +281,7 @@ export class InMemoryStorage implements IStorage {
   ];
   private nextId = 1;
   private nextPostId = 3;
-  private nextMarketUpdateId = 3;
+  private nextSmartPennyUpdateId = 3;
 
   async createLead(insertLead: InsertLeadWithIp): Promise<Lead> {
     const lead: Lead = {
@@ -269,28 +302,28 @@ export class InMemoryStorage implements IStorage {
     return lead;
   }
 
-  async getMarketUpdate(page: MarketPage): Promise<MarketUpdate | null> {
-    return this.marketUpdates.find((item) => item.page === page) ?? null;
+  async getSmartPennyUpdate(page: SmartPennyPage): Promise<SmartPennyUpdate | null> {
+    return this.smartPennyUpdates.find((item) => item.page === page) ?? null;
   }
 
-  async upsertMarketUpdate(payload: UpsertMarketUpdateInput): Promise<MarketUpdate> {
-    const index = this.marketUpdates.findIndex((item) => item.page === payload.page);
+  async upsertSmartPennyUpdate(payload: UpsertSmartPennyUpdateInput): Promise<SmartPennyUpdate> {
+    const index = this.smartPennyUpdates.findIndex((item) => item.page === payload.page);
 
     if (index >= 0) {
-      const updated: MarketUpdate = {
-        ...this.marketUpdates[index],
+      const updated: SmartPennyUpdate = {
+        ...this.smartPennyUpdates[index],
         title: payload.title,
         summary: payload.summary,
         bullets: payload.bullets,
         tips: payload.tips,
         updatedAt: new Date(),
       };
-      this.marketUpdates[index] = updated;
+      this.smartPennyUpdates[index] = updated;
       return updated;
     }
 
-    const created: MarketUpdate = {
-      id: this.nextMarketUpdateId++,
+    const created: SmartPennyUpdate = {
+      id: this.nextSmartPennyUpdateId++,
       page: payload.page,
       title: payload.title,
       summary: payload.summary,
@@ -299,7 +332,7 @@ export class InMemoryStorage implements IStorage {
       updatedAt: new Date(),
     };
 
-    this.marketUpdates.push(created);
+    this.smartPennyUpdates.push(created);
     return created;
   }
 
@@ -350,8 +383,8 @@ export class InMemoryStorage implements IStorage {
     };
   }
 
-  async listMarketPosts(page: MarketPage, limit = 50): Promise<MarketPost[]> {
-    return this.marketPosts
+  async listSmartPennyPosts(page: SmartPennyPage, limit = 50): Promise<SmartPennyPost[]> {
+    return this.smartPennyPosts
       .filter((post) => post.page === page)
       .sort((a, b) => {
         const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
@@ -361,8 +394,8 @@ export class InMemoryStorage implements IStorage {
       .slice(0, limit);
   }
 
-  async createMarketPost(payload: CreateMarketPostInput): Promise<MarketPost> {
-    const post: MarketPost = {
+  async createSmartPennyPost(payload: CreateSmartPennyPostInput): Promise<SmartPennyPost> {
+    const post: SmartPennyPost = {
       id: this.nextPostId++,
       page: payload.page,
       title: payload.title,
@@ -371,31 +404,31 @@ export class InMemoryStorage implements IStorage {
       updatedAt: new Date(),
     };
 
-    this.marketPosts.push(post);
+    this.smartPennyPosts.push(post);
     return post;
   }
 
-  async updateMarketPost(id: number, payload: UpdateMarketPostInput): Promise<MarketPost | null> {
-    const index = this.marketPosts.findIndex((post) => post.id === id);
+  async updateSmartPennyPost(id: number, payload: UpdateSmartPennyPostInput): Promise<SmartPennyPost | null> {
+    const index = this.smartPennyPosts.findIndex((post) => post.id === id);
     if (index < 0) {
       return null;
     }
 
-    const updated: MarketPost = {
-      ...this.marketPosts[index],
+    const updated: SmartPennyPost = {
+      ...this.smartPennyPosts[index],
       title: payload.title,
       content: payload.content,
       updatedAt: new Date(),
     };
 
-    this.marketPosts[index] = updated;
+    this.smartPennyPosts[index] = updated;
     return updated;
   }
 
-  async deleteMarketPost(id: number): Promise<boolean> {
-    const before = this.marketPosts.length;
-    this.marketPosts = this.marketPosts.filter((post) => post.id !== id);
-    return this.marketPosts.length < before;
+  async deleteSmartPennyPost(id: number): Promise<boolean> {
+    const before = this.smartPennyPosts.length;
+    this.smartPennyPosts = this.smartPennyPosts.filter((post) => post.id !== id);
+    return this.smartPennyPosts.length < before;
   }
 }
 

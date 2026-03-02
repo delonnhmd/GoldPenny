@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useMarketPosts } from "@/hooks/use-market-posts";
+import { useSmartPennyPosts } from "@/hooks/use-smart-penny-posts";
 import { Link } from "wouter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -22,8 +22,8 @@ function getWordPreview(content: string, limit = 100) {
   return { preview, isTruncated };
 }
 
-export default function Market() {
-  const { data, isLoading } = useMarketPosts("market");
+export default function SmartPenny() {
+  const { data, isLoading } = useSmartPennyPosts("smart-penny");
   const [expandedPosts, setExpandedPosts] = useState<Record<number, boolean>>({});
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -41,8 +41,8 @@ export default function Market() {
       <Header />
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
-          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending Market</h1>
-          <p className="text-slate-600">Daily market news posts and lending commentary from your team.</p>
+          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending Smart Penny</h1>
+          <p className="text-slate-600">Daily Smart Penny news posts and lending commentary from your team.</p>
           <Link href="/loan-calculators">
             <Button className="font-semibold shadow-md shadow-primary/20">Open Loan Calculators</Button>
           </Link>
@@ -50,29 +50,29 @@ export default function Market() {
             type="search"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Search market posts"
-            aria-label="Search market posts"
+            placeholder="Search Smart Penny posts"
+            aria-label="Search Smart Penny posts"
             className="max-w-md"
           />
 
           {isLoading ? (
             <Card className="p-6 md:p-8 border-slate-200 bg-white">
-              <p className="text-slate-500">Loading market posts…</p>
+              <p className="text-slate-500">Loading Smart Penny posts…</p>
             </Card>
           ) : (data ?? []).length === 0 ? (
             <Card className="p-6 md:p-8 border-slate-200 bg-white">
-              <p className="text-slate-500">No market posts published yet.</p>
+              <p className="text-slate-500">No Smart Penny posts published yet.</p>
             </Card>
           ) : filteredPosts.length === 0 ? (
             <Card className="p-6 md:p-8 border-slate-200 bg-white">
-              <p className="text-slate-500">No market posts match your search.</p>
+              <p className="text-slate-500">No Smart Penny posts match your search.</p>
             </Card>
           ) : (
             <div className="space-y-4">
               {filteredPosts.map((post) => {
                 const isExpanded = Boolean(expandedPosts[post.id]);
                 const { preview, isTruncated } = getWordPreview(post.content, 166);
-                const fullContentId = `market-post-full-${post.id}`;
+                const fullContentId = `smart-penny-post-full-${post.id}`;
 
                 return (
                   <Card key={post.id} className="p-6 md:p-8 border-slate-200 bg-white">

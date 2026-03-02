@@ -1,6 +1,6 @@
 
 import { z } from 'zod';
-import { createMarketPostSchema, insertLeadSchema, marketPageSchema, updateMarketPostSchema, upsertMarketUpdateSchema } from './schema';
+import { createSmartPennyPostSchema, insertLeadSchema, smartPennyPageSchema, updateSmartPennyPostSchema, upsertSmartPennyUpdateSchema } from './schema';
 
 const reportPeriodSchema = z.enum(['day', 'week']);
 
@@ -28,9 +28,9 @@ const adminReportSchema = z.object({
   ),
 });
 
-const marketPostSchema = z.object({
+const smartPennyPostSchema = z.object({
   id: z.number(),
-  page: marketPageSchema,
+  page: smartPennyPageSchema,
   title: z.string(),
   content: z.string(),
   createdAt: z.string(),
@@ -61,14 +61,14 @@ export const api = {
       },
     },
   },
-  marketUpdates: {
+  smartPennyUpdates: {
     getByPage: {
       method: 'GET' as const,
-      path: '/api/market-updates' as const,
-      input: z.object({ page: marketPageSchema }),
+      path: '/api/smart-penny-updates' as const,
+      input: z.object({ page: smartPennyPageSchema }),
       responses: {
         200: z.object({
-          page: marketPageSchema,
+          page: smartPennyPageSchema,
           title: z.string(),
           summary: z.string(),
           bullets: z.array(z.string()),
@@ -79,8 +79,8 @@ export const api = {
     },
     upsert: {
       method: 'PUT' as const,
-      path: '/api/admin/market-updates' as const,
-      input: upsertMarketUpdateSchema,
+      path: '/api/admin/smart-penny-updates' as const,
+      input: upsertSmartPennyUpdateSchema,
       responses: {
         200: z.object({ success: z.boolean() }),
         401: errorSchemas.validation,
@@ -88,31 +88,31 @@ export const api = {
       },
     },
   },
-  marketPosts: {
+  smartPennyPosts: {
     listByPage: {
       method: 'GET' as const,
-      path: '/api/market-posts' as const,
-      input: z.object({ page: marketPageSchema, limit: z.number().optional() }),
+      path: '/api/smart-penny-posts' as const,
+      input: z.object({ page: smartPennyPageSchema, limit: z.number().optional() }),
       responses: {
-        200: z.array(marketPostSchema),
+        200: z.array(smartPennyPostSchema),
       },
     },
     create: {
       method: 'POST' as const,
-      path: '/api/admin/market-posts' as const,
-      input: createMarketPostSchema,
+      path: '/api/admin/smart-penny-posts' as const,
+      input: createSmartPennyPostSchema,
       responses: {
-        201: marketPostSchema,
+        201: smartPennyPostSchema,
         401: errorSchemas.validation,
         400: errorSchemas.validation,
       },
     },
     update: {
       method: 'PUT' as const,
-      path: '/api/admin/market-posts/:id' as const,
-      input: z.object({ id: z.number().int().positive() }).merge(updateMarketPostSchema),
+      path: '/api/admin/smart-penny-posts/:id' as const,
+      input: z.object({ id: z.number().int().positive() }).merge(updateSmartPennyPostSchema),
       responses: {
-        200: marketPostSchema,
+        200: smartPennyPostSchema,
         401: errorSchemas.validation,
         400: errorSchemas.validation,
         404: errorSchemas.validation,
@@ -120,7 +120,7 @@ export const api = {
     },
     delete: {
       method: 'DELETE' as const,
-      path: '/api/admin/market-posts/:id' as const,
+      path: '/api/admin/smart-penny-posts/:id' as const,
       input: z.object({ id: z.number().int().positive() }),
       responses: {
         200: z.object({ success: z.boolean() }),
@@ -154,10 +154,10 @@ export const api = {
 
 export type LeadInput = z.infer<typeof api.leads.create.input>;
 export type LeadResponse = z.infer<typeof api.leads.create.responses[201]>;
-export type MarketUpdateResponse = z.infer<typeof api.marketUpdates.getByPage.responses[200]>;
-export type UpsertMarketUpdateRequest = z.infer<typeof api.marketUpdates.upsert.input>;
-export type MarketPostResponse = z.infer<typeof api.marketPosts.listByPage.responses[200]>;
-export type CreateMarketPostRequest = z.infer<typeof api.marketPosts.create.input>;
-export type UpdateMarketPostRequest = z.infer<typeof api.marketPosts.update.input>;
+export type SmartPennyUpdateResponse = z.infer<typeof api.smartPennyUpdates.getByPage.responses[200]>;
+export type UpsertSmartPennyUpdateRequest = z.infer<typeof api.smartPennyUpdates.upsert.input>;
+export type SmartPennyPostResponse = z.infer<typeof api.smartPennyPosts.listByPage.responses[200]>;
+export type CreateSmartPennyPostRequest = z.infer<typeof api.smartPennyPosts.create.input>;
+export type UpdateSmartPennyPostRequest = z.infer<typeof api.smartPennyPosts.update.input>;
 export type AdminLeadResponse = z.infer<typeof api.admin.leads.responses[200]>;
 export type AdminReportResponse = z.infer<typeof api.admin.report.responses[200]>;

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useCreateMarketPost, useDeleteMarketPost, useMarketPosts, useUpdateMarketPost } from "@/hooks/use-market-posts";
+import { useCreateSmartPennyPost, useDeleteSmartPennyPost, useSmartPennyPosts, useUpdateSmartPennyPost } from "@/hooks/use-smart-penny-posts";
 import { useAdminLeads, useAdminReport } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -14,7 +14,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import TurndownService from "turndown";
 
-type MarketPage = "rates" | "market";
+type AdminPage = "rates" | "smart-penny";
 
 function escapeCsv(value: string | number) {
   const str = String(value ?? "");
@@ -27,7 +27,7 @@ function escapeCsv(value: string | number) {
 export default function Admin() {
   const { toast } = useToast();
   const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem("adminKey") || "");
-  const [page, setPage] = useState<MarketPage>("rates");
+  const [page, setPage] = useState<AdminPage>("rates");
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState("");
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
@@ -48,10 +48,10 @@ export default function Admin() {
   const isProtected = useMemo(() => adminKey.trim().length > 0, [adminKey]);
   const isUnlocked = isProtected;
 
-  const postsQuery = useMarketPosts(page);
-  const createPostMutation = useCreateMarketPost(adminKey);
-  const updatePostMutation = useUpdateMarketPost(adminKey);
-  const deletePostMutation = useDeleteMarketPost(adminKey);
+  const postsQuery = useSmartPennyPosts(page);
+  const createPostMutation = useCreateSmartPennyPost(adminKey);
+  const updatePostMutation = useUpdateSmartPennyPost(adminKey);
+  const deletePostMutation = useDeleteSmartPennyPost(adminKey);
   const leadsQuery = useAdminLeads(adminKey, 100, isUnlocked);
   const reportQuery = useAdminReport(adminKey, reportPeriod, isUnlocked);
 
@@ -103,7 +103,7 @@ export default function Admin() {
 
         toast({
           title: "Post published",
-          description: `${page === "rates" ? "News" : "Market"} post is now live.`,
+          description: `${page === "rates" ? "News" : "Smart Penny"} post is now live.`,
         });
       }
 
@@ -120,7 +120,7 @@ export default function Admin() {
     setPostContent(post.content);
   };
 
-  const handleDeletePost = async (post: { id: number; page: MarketPage }) => {
+  const handleDeletePost = async (post: { id: number; page: AdminPage }) => {
     const confirmed = window.confirm("Delete this post? This cannot be undone.");
     if (!confirmed) {
       return;
@@ -335,7 +335,7 @@ export default function Admin() {
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-4xl space-y-6">
           <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Content Admin</h1>
-          <p className="text-slate-600">Publish blog-style news posts for News and Market pages. Changes are live immediately.</p>
+          <p className="text-slate-600">Publish blog-style news posts for News and Smart Penny pages. Changes are live immediately.</p>
 
           <Card className="p-6 border-slate-200 bg-white space-y-4">
             <label className="text-sm font-semibold text-slate-700">Admin Key</label>
@@ -356,7 +356,7 @@ export default function Admin() {
               <Card className="p-6 border-slate-200 bg-white space-y-5">
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant={page === "rates" ? "default" : "outline"} onClick={() => setPage("rates")}>News Page</Button>
-                  <Button type="button" variant={page === "market" ? "default" : "outline"} onClick={() => setPage("market")}>Market Page</Button>
+                  <Button type="button" variant={page === "smart-penny" ? "default" : "outline"} onClick={() => setPage("smart-penny")}>Smart Penny Page</Button>
                 </div>
 
                 <div className="space-y-2">
@@ -409,7 +409,7 @@ export default function Admin() {
                     onChange={(event) => setPostContent(event.target.value)}
                     onPaste={handlePostContentPaste}
                     rows={8}
-                    placeholder="Write your market or news update..."
+                    placeholder="Write your Smart Penny or news update..."
                   />
                   <p className="text-xs text-slate-500">Markdown toolbar plus rich paste support: content from Google Docs, Word, and web pages is pasted with formatting preserved.</p>
 

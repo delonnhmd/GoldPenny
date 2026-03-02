@@ -5,7 +5,7 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes"; // Only import api
 import { z } from "zod";
-import { createMarketPostSchema, insertLeadSchema, marketPageSchema, updateMarketPostSchema, upsertMarketUpdateSchema } from "@shared/schema"; // Import schema directly
+import { createSmartPennyPostSchema, insertLeadSchema, smartPennyPageSchema, updateSmartPennyPostSchema, upsertSmartPennyUpdateSchema } from "@shared/schema"; // Import schema directly
 
 function validateAdminRequest(req: Request) {
   const configuredKey = process.env.ADMIN_DASHBOARD_KEY || process.env.ADMIN_KEY || "pennyfloat-admin";
@@ -60,18 +60,18 @@ export async function registerRoutes(
     }
   });
 
-  app.get(api.marketUpdates.getByPage.path, async (req, res) => {
+  app.get(api.smartPennyUpdates.getByPage.path, async (req, res) => {
     try {
       const parsed = z
-        .object({ page: marketPageSchema })
+        .object({ page: smartPennyPageSchema })
         .parse({ page: req.query.page });
 
-      const update = await storage.getMarketUpdate(parsed.page);
+      const update = await storage.getSmartPennyUpdate(parsed.page);
 
       if (!update) {
         return res.status(200).json({
           page: parsed.page,
-          title: parsed.page === "rates" ? "Rates Update" : "Market Update",
+          title: parsed.page === "rates" ? "Rates Update" : "Smart Penny Update",
           summary: "No update published yet.",
           bullets: [],
           tips: [],
@@ -96,21 +96,21 @@ export async function registerRoutes(
         });
       }
 
-      console.error("Error getting market update:", err);
+      console.error("Error getting smart penny update:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  app.get(api.marketPosts.listByPage.path, async (req, res) => {
+  app.get(api.smartPennyPosts.listByPage.path, async (req, res) => {
     try {
       const parsed = z
         .object({
-          page: marketPageSchema,
+          page: smartPennyPageSchema,
           limit: z.coerce.number().min(1).max(200).optional(),
         })
         .parse(req.query);
 
-      const posts = await storage.listMarketPosts(parsed.page, parsed.limit ?? 50);
+      const posts = await storage.listSmartPennyPosts(parsed.page, parsed.limit ?? 50);
       return res.status(200).json(
         posts.map((post) => ({
           ...post,
@@ -127,19 +127,19 @@ export async function registerRoutes(
         });
       }
 
-      console.error("Error listing market posts:", err);
+      console.error("Error listing smart penny posts:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  app.post(api.marketPosts.create.path, async (req, res) => {
+  app.post(api.smartPennyPosts.create.path, async (req, res) => {
     try {
       if (!validateAdminRequest(req)) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const payload = createMarketPostSchema.parse(req.body);
-      const post = await storage.createMarketPost(payload);
+      const payload = createSmartPennyPostSchema.parse(req.body);
+      const post = await storage.createSmartPennyPost(payload);
 
       return res.status(201).json({
         ...post,
@@ -155,20 +155,20 @@ export async function registerRoutes(
         });
       }
 
-      console.error("Error creating market post:", err);
+      console.error("Error creating smart penny post:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  app.put(api.marketPosts.update.path, async (req, res) => {
+  app.put(api.smartPennyPosts.update.path, async (req, res) => {
     try {
       if (!validateAdminRequest(req)) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
       const params = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
-      const payload = updateMarketPostSchema.parse(req.body);
-      const updated = await storage.updateMarketPost(params.id, payload);
+      const payload = updateSmartPennyPostSchema.parse(req.body);
+      const updated = await storage.updateSmartPennyPost(params.id, payload);
 
       if (!updated) {
         return res.status(404).json({ message: "Post not found" });
@@ -188,19 +188,19 @@ export async function registerRoutes(
         });
       }
 
-      console.error("Error updating market post:", err);
+      console.error("Error updating smart penny post:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  app.delete(api.marketPosts.delete.path, async (req, res) => {
+  app.delete(api.smartPennyPosts.delete.path, async (req, res) => {
     try {
       if (!validateAdminRequest(req)) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
       const params = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
-      const removed = await storage.deleteMarketPost(params.id);
+      const removed = await storage.deleteSmartPennyPost(params.id);
 
       if (!removed) {
         return res.status(404).json({ message: "Post not found" });
@@ -216,19 +216,19 @@ export async function registerRoutes(
         });
       }
 
-      console.error("Error deleting market post:", err);
+      console.error("Error deleting smart penny post:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
   });
 
-  app.put(api.marketUpdates.upsert.path, async (req, res) => {
+  app.put(api.smartPennyUpdates.upsert.path, async (req, res) => {
     try {
       if (!validateAdminRequest(req)) {
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const payload = upsertMarketUpdateSchema.parse(req.body);
-      await storage.upsertMarketUpdate(payload);
+      const payload = upsertSmartPennyUpdateSchema.parse(req.body);
+      await storage.upsertSmartPennyUpdate(payload);
 
       return res.status(200).json({ success: true });
     } catch (err) {
@@ -240,7 +240,7 @@ export async function registerRoutes(
         });
       }
 
-      console.error("Error upserting market update:", err);
+      console.error("Error upserting smart penny update:", err);
       return res.status(500).json({ message: "Internal server error" });
     }
   });

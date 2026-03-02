@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useMarketPosts } from "@/hooks/use-market-posts";
+import { useSmartPennyPosts } from "@/hooks/use-smart-penny-posts";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -21,7 +21,7 @@ function getWordPreview(content: string, limit = 100) {
 }
 
 export default function News() {
-  const { data, isLoading } = useMarketPosts("rates");
+  const { data, isLoading } = useSmartPennyPosts("rates");
   const [expandedPosts, setExpandedPosts] = useState<Record<number, boolean>>({});
   const [searchTerm, setSearchTerm] = useState("");
 

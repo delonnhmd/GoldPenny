@@ -17,7 +17,7 @@ export const leads = pgTable("leads", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const marketUpdates = pgTable("market_updates", {
+export const smartPennyUpdates = pgTable("market_updates", {
   id: serial("id").primaryKey(),
   page: varchar("page", { length: 32 }).notNull().unique(),
   title: text("title").notNull(),
@@ -27,7 +27,7 @@ export const marketUpdates = pgTable("market_updates", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const marketPosts = pgTable("market_posts", {
+export const smartPennyPosts = pgTable("market_posts", {
   id: serial("id").primaryKey(),
   page: varchar("page", { length: 32 }).notNull(),
   title: text("title").notNull(),
@@ -43,35 +43,35 @@ export const insertLeadSchema = createInsertSchema(leads).omit({
   phone: true // no longer collected from website forms
 });
 
-export const marketPageSchema = z.enum(["rates", "market"]);
+export const smartPennyPageSchema = z.enum(["rates", "smart-penny"]);
 
-export const upsertMarketUpdateSchema = z.object({
-  page: marketPageSchema,
+export const upsertSmartPennyUpdateSchema = z.object({
+  page: smartPennyPageSchema,
   title: z.string().min(3, "Headline is required"),
   summary: z.string().min(10, "Weekly summary is required"),
   bullets: z.array(z.string().min(1)).default([]),
   tips: z.array(z.string().min(1)).default([]),
 });
 
-export const createMarketPostSchema = z.object({
-  page: marketPageSchema,
+export const createSmartPennyPostSchema = z.object({
+  page: smartPennyPageSchema,
   title: z.string().min(3, "Post title is required"),
   content: z.string().min(20, "Post content is required"),
 });
 
-export const updateMarketPostSchema = z.object({
+export const updateSmartPennyPostSchema = z.object({
   title: z.string().min(3, "Post title is required"),
   content: z.string().min(20, "Post content is required"),
 });
 
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 export type Lead = typeof leads.$inferSelect;
-export type MarketPage = z.infer<typeof marketPageSchema>;
-export type UpsertMarketUpdateInput = z.infer<typeof upsertMarketUpdateSchema>;
-export type MarketUpdate = typeof marketUpdates.$inferSelect;
-export type CreateMarketPostInput = z.infer<typeof createMarketPostSchema>;
-export type UpdateMarketPostInput = z.infer<typeof updateMarketPostSchema>;
-export type MarketPost = typeof marketPosts.$inferSelect;
+export type SmartPennyPage = z.infer<typeof smartPennyPageSchema>;
+export type UpsertSmartPennyUpdateInput = z.infer<typeof upsertSmartPennyUpdateSchema>;
+export type SmartPennyUpdate = typeof smartPennyUpdates.$inferSelect;
+export type CreateSmartPennyPostInput = z.infer<typeof createSmartPennyPostSchema>;
+export type UpdateSmartPennyPostInput = z.infer<typeof updateSmartPennyPostSchema>;
+export type SmartPennyPost = typeof smartPennyPosts.$inferSelect;
 
 export const creditScoreRanges = [
   "Below 580",

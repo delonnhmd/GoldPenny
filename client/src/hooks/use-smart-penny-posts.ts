@@ -1,26 +1,28 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { api, type CreateMarketPostRequest, type MarketPostResponse } from "@shared/routes";
+import { api, type CreateSmartPennyPostRequest, type SmartPennyPostResponse } from "@shared/routes";
 import { queryClient } from "@/lib/queryClient";
 
-export function useMarketPosts(page: "rates" | "market") {
-  return useQuery<MarketPostResponse>({
-    queryKey: [api.marketPosts.listByPage.path, page],
+type SmartPennyPage = "rates" | "smart-penny";
+
+export function useSmartPennyPosts(page: SmartPennyPage) {
+  return useQuery<SmartPennyPostResponse>({
+    queryKey: [api.smartPennyPosts.listByPage.path, page],
     queryFn: async () => {
-      const res = await fetch(`${api.marketPosts.listByPage.path}?page=${page}`);
+      const res = await fetch(`${api.smartPennyPosts.listByPage.path}?page=${page}`);
       if (!res.ok) {
         const text = await res.text();
         throw new Error(text || "Failed to load posts");
       }
-      return (await res.json()) as MarketPostResponse;
+      return (await res.json()) as SmartPennyPostResponse;
     },
   });
 }
 
-export function useCreateMarketPost(adminKey: string) {
+export function useCreateSmartPennyPost(adminKey: string) {
   return useMutation({
-    mutationFn: async (payload: CreateMarketPostRequest) => {
-      const res = await fetch(api.marketPosts.create.path, {
-        method: api.marketPosts.create.method,
+    mutationFn: async (payload: CreateSmartPennyPostRequest) => {
+      const res = await fetch(api.smartPennyPosts.create.path, {
+        method: api.smartPennyPosts.create.method,
         headers: {
           "Content-Type": "application/json",
           "x-admin-key": adminKey,
@@ -39,17 +41,17 @@ export function useCreateMarketPost(adminKey: string) {
       return res.json();
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: [api.marketPosts.listByPage.path, variables.page] });
+      queryClient.invalidateQueries({ queryKey: [api.smartPennyPosts.listByPage.path, variables.page] });
     },
   });
 }
 
-export function useUpdateMarketPost(adminKey: string) {
+export function useUpdateSmartPennyPost(adminKey: string) {
   return useMutation({
-    mutationFn: async (payload: { id: number; page: "rates" | "market"; title: string; content: string }) => {
-      const path = api.marketPosts.update.path.replace(":id", String(payload.id));
+    mutationFn: async (payload: { id: number; page: SmartPennyPage; title: string; content: string }) => {
+      const path = api.smartPennyPosts.update.path.replace(":id", String(payload.id));
       const res = await fetch(path, {
-        method: api.marketPosts.update.method,
+        method: api.smartPennyPosts.update.method,
         headers: {
           "Content-Type": "application/json",
           "x-admin-key": adminKey,
@@ -71,17 +73,17 @@ export function useUpdateMarketPost(adminKey: string) {
       return res.json();
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: [api.marketPosts.listByPage.path, variables.page] });
+      queryClient.invalidateQueries({ queryKey: [api.smartPennyPosts.listByPage.path, variables.page] });
     },
   });
 }
 
-export function useDeleteMarketPost(adminKey: string) {
+export function useDeleteSmartPennyPost(adminKey: string) {
   return useMutation({
-    mutationFn: async (payload: { id: number; page: "rates" | "market" }) => {
-      const path = api.marketPosts.delete.path.replace(":id", String(payload.id));
+    mutationFn: async (payload: { id: number; page: SmartPennyPage }) => {
+      const path = api.smartPennyPosts.delete.path.replace(":id", String(payload.id));
       const res = await fetch(path, {
-        method: api.marketPosts.delete.method,
+        method: api.smartPennyPosts.delete.method,
         headers: {
           "x-admin-key": adminKey,
         },
@@ -98,7 +100,7 @@ export function useDeleteMarketPost(adminKey: string) {
       return res.json();
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: [api.marketPosts.listByPage.path, variables.page] });
+      queryClient.invalidateQueries({ queryKey: [api.smartPennyPosts.listByPage.path, variables.page] });
     },
   });
 }

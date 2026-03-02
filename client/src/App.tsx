@@ -7,7 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Offers from "./pages/Offers";
 import News from "./pages/News";
-import Market from "./pages/Market";
+import SmartPenny from "./pages/SmartPenny";
 import Admin from "./pages/Admin";
 import LoanCalculators from "./pages/LoanCalculators";
 import AffiliateDisclosure from "./pages/AffiliateDisclosure";
@@ -19,7 +19,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/offers" component={Offers} />
       <Route path="/rates" component={News} />
-      <Route path="/market" component={Market} />
+      <Route path="/smart-penny" component={SmartPenny} />
       <Route path="/texas-cash-advance-apps-2026" component={TexasCashAdvanceApps2026} />
       <Route path="/loan-calculators" component={LoanCalculators} />
       <Route path="/affiliate-disclosure" component={AffiliateDisclosure} />
