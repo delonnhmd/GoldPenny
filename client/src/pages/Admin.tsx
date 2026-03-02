@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Bold, Code2, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, Pencil, Quote, Strikethrough, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import TurndownService from "turndown";
 
 type MarketPage = "rates" | "market";
 
@@ -32,6 +33,17 @@ export default function Admin() {
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [reportPeriod, setReportPeriod] = useState<"day" | "week">("day");
   const postContentRef = useRef<HTMLTextAreaElement | null>(null);
+  const turndownService = useMemo(
+    () =>
+      new TurndownService({
+        headingStyle: "atx",
+        bulletListMarker: "-",
+        codeBlockStyle: "fenced",
+        emDelimiter: "*",
+        strongDelimiter: "**",
+      }),
+    []
+  );
 
   const isProtected = useMemo(() => adminKey.trim().length > 0, [adminKey]);
   const isUnlocked = isProtected;
@@ -229,6 +241,48 @@ export default function Admin() {
     });
   };
 
+  const insertAtSelection = (text: string) => {
+    const textarea = postContentRef.current;
+    if (!textarea) {
+      setPostContent((current) => `${current}${text}`);
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = postContent.slice(0, start);
+    const after = postContent.slice(end);
+    const nextValue = `${before}${text}${after}`;
+    setPostContent(nextValue);
+
+    requestAnimationFrame(() => {
+      const cursor = start + text.length;
+      textarea.focus();
+      textarea.setSelectionRange(cursor, cursor);
+    });
+  };
+
+  const handlePostContentPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const html = event.clipboardData.getData("text/html");
+    if (!html) {
+      return;
+    }
+
+    const markdown = turndownService
+      .turndown(html)
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+
+    const fallbackText = event.clipboardData.getData("text/plain").trim();
+    const nextText = markdown || fallbackText;
+    if (!nextText) {
+      return;
+    }
+
+    event.preventDefault();
+    insertAtSelection(nextText);
+  };
+
   const handleExportCsv = () => {
     const leads = leadsQuery.data ?? [];
     if (!leads.length) {
@@ -353,10 +407,11 @@ export default function Admin() {
                     ref={postContentRef}
                     value={postContent}
                     onChange={(event) => setPostContent(event.target.value)}
+                    onPaste={handlePostContentPaste}
                     rows={8}
                     placeholder="Write your market or news update..."
                   />
-                  <p className="text-xs text-slate-500">Markdown toolbar: bold, italic, strike, heading, lists, quote, link, code, and left/right article images.</p>
+                  <p className="text-xs text-slate-500">Markdown toolbar plus rich paste support: content from Google Docs, Word, and web pages is pasted with formatting preserved.</p>
 
                   <div className="rounded-md border border-slate-200 bg-white p-4 space-y-3">
                     <h3 className="text-sm font-semibold text-slate-700">Live Preview</h3>
