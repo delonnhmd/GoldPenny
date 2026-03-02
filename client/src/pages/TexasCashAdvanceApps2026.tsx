@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 const PAGE_TITLE = "Texas Cash Advance Apps (2026): Costs, Risks, and Safer Alternatives | PennyFloat";
 const PAGE_DESCRIPTION =
   "Educational guide for Texas borrowers comparing cash advance apps in 2026, including fees, repayment risks, rollover patterns, and safer alternatives.";
+const PAGE_KEYWORDS =
+  "texas cash advance apps, cash advance fees, payday alternatives, adelanto de efectivo texas, apps de adelanto de efectivo, costos de adelanto, alternativas a payday loans";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/texas-cash-advance-apps-2026";
 const PAGE_ROBOTS = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
@@ -33,6 +35,7 @@ export default function TexasCashAdvanceApps2026() {
   useEffect(() => {
     document.title = PAGE_TITLE;
     setMetaTag("description", PAGE_DESCRIPTION);
+    setMetaTag("keywords", PAGE_KEYWORDS);
     setMetaTag("robots", PAGE_ROBOTS);
     setCanonical(PAGE_CANONICAL);
   }, []);

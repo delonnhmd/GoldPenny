@@ -1,6 +1,7 @@
 type PageSeo = {
   title: string;
   description: string;
+  keywords?: string;
   canonical?: string;
   robots?: string;
 };
@@ -25,9 +26,12 @@ function upsertCanonical(url: string) {
   link.setAttribute("href", url);
 }
 
-export function setPageSeo({ title, description, canonical, robots = "index, follow" }: PageSeo) {
+export function setPageSeo({ title, description, keywords, canonical, robots = "index, follow" }: PageSeo) {
   document.title = title;
   upsertMetaTag("description", description);
+  if (keywords) {
+    upsertMetaTag("keywords", keywords);
+  }
   upsertMetaTag("robots", robots);
 
   if (canonical) {

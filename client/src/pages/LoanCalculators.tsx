@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -30,6 +30,12 @@ import {
   toPositiveInt,
   type BuydownType,
 } from "@/lib/finance";
+import { setPageSeo } from "@/lib/seo";
+
+const PAGE_TITLE = "Loan Calculators: Mortgage, Auto, Personal & Business | PennyFloat";
+const PAGE_DESCRIPTION = "Use loan calculators to estimate monthly payments, APR impact, interest cost, and total repayment across mortgage, auto, personal, and business scenarios.";
+const PAGE_KEYWORDS = "loan calculators, mortgage calculator, auto loan calculator, personal loan calculator, business loan calculator, APR calculator, calculadora de préstamos, calculadora de hipoteca, calculadora de préstamo de auto, costo total del préstamo";
+const PAGE_CANONICAL = "https://www.pennyfloat.com/loan-calculators";
 
 const MAX_RATE = 100;
 
@@ -82,6 +88,16 @@ function NumberField({ id, label, value, onChange, min = 0, max, step = 1, suffi
 }
 
 export default function LoanCalculators() {
+  useEffect(() => {
+    setPageSeo({
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      keywords: PAGE_KEYWORDS,
+      canonical: PAGE_CANONICAL,
+      robots: "index, follow, max-image-preview:large",
+    });
+  }, []);
+
   const [activeTab, setActiveTab] = useState("mortgage");
 
   const [mortgageAmount, setMortgageAmount] = useState(300000);

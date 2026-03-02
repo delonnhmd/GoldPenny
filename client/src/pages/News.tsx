@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -6,6 +6,12 @@ import { Input } from "@/components/ui/input";
 import { useSmartPennyPosts } from "@/hooks/use-smart-penny-posts";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { setPageSeo } from "@/lib/seo";
+
+const PAGE_TITLE = "Business Lending News, Rates, and Market Updates | PennyFloat";
+const PAGE_DESCRIPTION = "Read business lending news, rate updates, approval trends, and practical borrowing insights for small businesses.";
+const PAGE_KEYWORDS = "business lending news, loan rate updates, approval trends, financing news, market rates, noticias de préstamos, tasas de interés, noticias de financiamiento, tendencias de aprobación, crédito para negocio";
+const PAGE_CANONICAL = "https://www.pennyfloat.com/rates";
 
 function getWordPreview(content: string, limit = 100) {
   const plainText = content
@@ -21,6 +27,16 @@ function getWordPreview(content: string, limit = 100) {
 }
 
 export default function News() {
+  useEffect(() => {
+    setPageSeo({
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      keywords: PAGE_KEYWORDS,
+      canonical: PAGE_CANONICAL,
+      robots: "index, follow, max-image-preview:large",
+    });
+  }, []);
+
   const { data, isLoading } = useSmartPennyPosts("rates");
   const [expandedPosts, setExpandedPosts] = useState<Record<number, boolean>>({});
   const [searchTerm, setSearchTerm] = useState("");

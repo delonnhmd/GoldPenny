@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "wouter";
 import { ArrowRight, CheckCircle2, ShieldCheck, Clock, Percent } from "lucide-react";
 
@@ -6,6 +7,12 @@ import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { setPageSeo } from "@/lib/seo";
+
+const PAGE_TITLE = "Business Loan Offers & Cash Advance Options | PennyFloat";
+const PAGE_DESCRIPTION = "Compare business loan offers and cash advance options by APR, fees, repayment schedule, and total cost before choosing a lender.";
+const PAGE_KEYWORDS = "business loan offers, cash advance offers, lender comparison, APR and fees, loan repayment options, ofertas de préstamos, comparar préstamos, adelanto de efectivo, APR y comisiones, costo total del préstamo";
+const PAGE_CANONICAL = "https://www.pennyfloat.com/offers";
 
 type CreditTier = "low" | "mid" | "high";
 type LoanType = "personal" | "auto";
@@ -71,6 +78,16 @@ function formatAmount(amount: number) {
 }
 
 export default function Offers() {
+  useEffect(() => {
+    setPageSeo({
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      keywords: PAGE_KEYWORDS,
+      canonical: PAGE_CANONICAL,
+      robots: "index, follow, max-image-preview:large",
+    });
+  }, []);
+
   const params = new URLSearchParams(window.location.search);
 
   const fullName = params.get("name") || "there";
