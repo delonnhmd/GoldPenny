@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 type CreditTier = "low" | "mid" | "high";
 type LoanType = "personal" | "auto";
@@ -192,7 +193,10 @@ export default function Offers() {
             Partner links are currently placeholder URLs and can be replaced with your affiliate links anytime.
           </p>
 
-          <div className="mt-8 text-center">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link href="/es/ofertas" onClick={() => setPreferredLanguage("es")}>
+              <Button variant="outline" className="font-semibold">Ver versión en español</Button>
+            </Link>
             <Link href="/">
               <Button variant="outline" className="font-semibold">Back to Home</Button>
             </Link>

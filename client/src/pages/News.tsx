@@ -2,10 +2,13 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSmartPennyPosts } from "@/hooks/use-smart-penny-posts";
+import { Link } from "wouter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 function getWordPreview(content: string, limit = 100) {
   const plainText = content
@@ -39,8 +42,15 @@ export default function News() {
       <Header />
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
-          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending News</h1>
-          <p className="text-slate-600">News updates and weekly commentary posts published from your admin dashboard.</p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending News</h1>
+              <p className="text-slate-600">News updates and weekly commentary posts published from your admin dashboard.</p>
+            </div>
+            <Link href="/es/noticias" onClick={() => setPreferredLanguage("es")}>
+              <Button variant="outline">Ver versión en español</Button>
+            </Link>
+          </div>
           <Input
             type="search"
             value={searchTerm}

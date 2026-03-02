@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { setPageSeo } from "@/lib/seo";
+import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 const PAGE_TITLE = "Apps de Adelanto de Efectivo en Texas 2026: Costos y Riesgos | Penny Float";
 const PAGE_DESCRIPTION = "Guía en español para evaluar apps de adelanto de efectivo en Texas: costos totales, riesgos de uso repetido y alternativas más seguras.";
@@ -36,7 +37,7 @@ export default function TexasCashAdvanceApps2026Es() {
               <li>Impacto en flujo de efectivo semanal o quincenal.</li>
             </ul>
             <div className="flex flex-wrap gap-3">
-              <Link href="/texas-cash-advance-apps-2026">
+              <Link href="/texas-cash-advance-apps-2026" onClick={() => setPreferredLanguage("en")}>
                 <Button variant="outline">Ver versión en inglés</Button>
               </Link>
               <Link href="/es/ofertas">

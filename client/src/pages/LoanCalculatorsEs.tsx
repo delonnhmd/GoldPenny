@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { setPageSeo } from "@/lib/seo";
+import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 const PAGE_TITLE = "Calculadoras de Préstamos para Negocio | Penny Float";
 const PAGE_DESCRIPTION = "Usa calculadoras en español para estimar pagos, costo total y comparar escenarios de financiamiento para negocio.";
@@ -36,7 +37,7 @@ export default function LoanCalculatorsEs() {
               <li>Probar escenarios según monto y tasa.</li>
             </ul>
             <div className="flex flex-wrap gap-3">
-              <Link href="/loan-calculators">
+              <Link href="/loan-calculators" onClick={() => setPreferredLanguage("en")}>
                 <Button variant="outline">Ver versión en inglés</Button>
               </Link>
               <Link href="/es/ofertas">

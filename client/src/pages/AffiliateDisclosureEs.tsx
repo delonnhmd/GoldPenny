@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { setPageSeo } from "@/lib/seo";
+import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 const PAGE_TITLE = "Divulgación de Afiliados | Penny Float";
 const PAGE_DESCRIPTION = "Conoce cómo funciona nuestra divulgación de afiliados y cómo mantenemos transparencia en recomendaciones y comparativas.";
@@ -36,7 +37,7 @@ export default function AffiliateDisclosureEs() {
               <li>El costo final y condiciones dependen del proveedor elegido.</li>
             </ul>
             <div className="flex flex-wrap gap-3">
-              <Link href="/affiliate-disclosure">
+              <Link href="/affiliate-disclosure" onClick={() => setPreferredLanguage("en")}>
                 <Button variant="outline">Ver versión en inglés</Button>
               </Link>
               <Link href="/es">

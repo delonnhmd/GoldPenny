@@ -2,6 +2,9 @@ import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 const PAGE_TITLE = "Texas Cash Advance Apps (2026): Costs, Risks, and Safer Alternatives | PennyFloat";
 const PAGE_DESCRIPTION =
@@ -42,9 +45,14 @@ export default function TexasCashAdvanceApps2026() {
       <Header />
       <main className="py-12 md:py-16">
         <article className="container mx-auto px-4 max-w-4xl space-y-6">
-          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">
-            Texas Cash Advance Apps (2026): Costs, Risks, and Safer Alternatives
-          </h1>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">
+              Texas Cash Advance Apps (2026): Costs, Risks, and Safer Alternatives
+            </h1>
+            <Link href="/es/apps-adelanto-efectivo-texas-2026" onClick={() => setPreferredLanguage("es")}>
+              <Button variant="outline">Ver versión en español</Button>
+            </Link>
+          </div>
 
           <p className="text-slate-700 text-lg leading-relaxed">
             Cash advance apps can look simple in the moment, but the true cost depends on how often you use them,

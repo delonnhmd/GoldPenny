@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { setPageSeo } from "@/lib/seo";
+import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 const PAGE_TITLE = "Ofertas de Préstamos y Adelantos para Negocio | Penny Float";
 const PAGE_DESCRIPTION = "Compara ofertas de financiamiento para negocio en español: costo total, APR, comisiones y plazos antes de tomar una decisión.";
@@ -36,7 +37,7 @@ export default function OffersEs() {
               <li>Confirma periodicidad de pago y cargos por atraso.</li>
             </ul>
             <div className="flex flex-wrap gap-3">
-              <Link href="/offers">
+              <Link href="/offers" onClick={() => setPreferredLanguage("en")}>
                 <Button variant="outline">Ver versión en inglés</Button>
               </Link>
               <Link href="/es/calculadoras-de-prestamos">

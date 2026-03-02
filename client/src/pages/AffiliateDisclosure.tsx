@@ -1,6 +1,9 @@
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
+import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 export default function AffiliateDisclosure() {
   return (
@@ -8,10 +11,17 @@ export default function AffiliateDisclosure() {
       <Header />
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-4xl space-y-6">
-          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Affiliate Disclosure</h1>
-          <p className="text-slate-600">
-            We believe in clear and transparent disclosures so you can understand how this website operates.
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Affiliate Disclosure</h1>
+              <p className="text-slate-600">
+                We believe in clear and transparent disclosures so you can understand how this website operates.
+              </p>
+            </div>
+            <Link href="/es/divulgacion-afiliados" onClick={() => setPreferredLanguage("es")}>
+              <Button variant="outline">Ver versión en español</Button>
+            </Link>
+          </div>
 
           <Card className="p-6 border-slate-200 bg-white space-y-4">
             <p className="text-slate-700 leading-relaxed">
