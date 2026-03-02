@@ -7,31 +7,14 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-
-const languageRoutePairs = [
-  { en: "/", es: "/es" },
-  { en: "/offers", es: "/es/ofertas" },
-  { en: "/rates", es: "/es/noticias" },
-  { en: "/smart-penny", es: "/es/smart-penny" },
-  { en: "/loan-calculators", es: "/es/calculadoras-de-prestamos" },
-  { en: "/affiliate-disclosure", es: "/es/divulgacion-afiliados" },
-  { en: "/texas-cash-advance-apps-2026", es: "/es/apps-adelanto-efectivo-texas-2026" },
-];
-
-function normalizePath(path: string) {
-  if (path.length > 1 && path.endsWith("/")) {
-    return path.slice(0, -1);
-  }
-  return path;
-}
+import { getMappedPath, inferLanguageFromPath, normalizePath, setPreferredLanguage } from "@/lib/languageRoutes";
 
 export function Header() {
   const [location] = useLocation();
   const currentPath = normalizePath(location.split("?")[0]);
-  const routePair = languageRoutePairs.find((pair) => pair.en === currentPath || pair.es === currentPath);
-  const englishPath = routePair?.en ?? currentPath;
-  const spanishPath = routePair?.es ?? "/es";
-  const isSpanish = currentPath.startsWith("/es");
+  const englishPath = getMappedPath(currentPath, "en");
+  const spanishPath = getMappedPath(currentPath, "es");
+  const isSpanish = inferLanguageFromPath(currentPath) === "es";
 
   return (
     <header className="relative md:sticky md:top-0 z-50 w-full pt-[env(safe-area-inset-top)] bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
@@ -51,7 +34,7 @@ export function Header() {
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8">
           {isSpanish ? (
             <>
               <Link href="/es" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Inicio</Link>
@@ -73,22 +56,24 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center rounded-md border border-slate-200 bg-white p-0.5">
+          <div className="hidden lg:flex items-center rounded-md border border-slate-200 bg-white p-0.5">
             <Link
               href={englishPath}
+              onClick={() => setPreferredLanguage("en")}
               className={`px-2 py-1 text-xs font-semibold rounded ${!isSpanish ? "bg-slate-900 text-white" : "text-slate-600 hover:text-slate-900"}`}
             >
               English
             </Link>
             <Link
               href={spanishPath}
+              onClick={() => setPreferredLanguage("es")}
               className={`px-2 py-1 text-xs font-semibold rounded ${isSpanish ? "bg-slate-900 text-white" : "text-slate-600 hover:text-slate-900"}`}
             >
               Español
             </Link>
           </div>
 
-          <a href={isSpanish ? "/es/ofertas" : "/#apply"} className="hidden sm:block">
+          <a href={isSpanish ? "/es/ofertas" : "/#apply"} className="hidden lg:block">
             <Button className="font-semibold shadow-md shadow-primary/20">{isSpanish ? "Ver opciones" : "Check Your Rate"}</Button>
           </a>
 
@@ -150,6 +135,7 @@ export function Header() {
                   <SheetClose asChild>
                     <Link
                       href={englishPath}
+                      onClick={() => setPreferredLanguage("en")}
                       className={`flex-1 text-center px-2 py-2 text-xs font-semibold rounded ${!isSpanish ? "bg-slate-900 text-white" : "text-slate-600 hover:text-slate-900"}`}
                     >
                       English
@@ -158,6 +144,7 @@ export function Header() {
                   <SheetClose asChild>
                     <Link
                       href={spanishPath}
+                      onClick={() => setPreferredLanguage("es")}
                       className={`flex-1 text-center px-2 py-2 text-xs font-semibold rounded ${isSpanish ? "bg-slate-900 text-white" : "text-slate-600 hover:text-slate-900"}`}
                     >
                       Español

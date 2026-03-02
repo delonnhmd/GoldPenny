@@ -1,24 +1,8 @@
 import { useEffect } from "react";
 import { useLocation } from "wouter";
+import { inferLanguageFromPath, languageRoutePairs, normalizePath } from "@/lib/languageRoutes";
 
 const SITE_URL = "https://www.pennyfloat.com";
-
-const routePairs = [
-  { en: "/", es: "/es" },
-  { en: "/offers", es: "/es/ofertas" },
-  { en: "/rates", es: "/es/noticias" },
-  { en: "/smart-penny", es: "/es/smart-penny" },
-  { en: "/loan-calculators", es: "/es/calculadoras-de-prestamos" },
-  { en: "/affiliate-disclosure", es: "/es/divulgacion-afiliados" },
-  { en: "/texas-cash-advance-apps-2026", es: "/es/apps-adelanto-efectivo-texas-2026" },
-] as const;
-
-function normalizePath(path: string) {
-  if (path.length > 1 && path.endsWith("/")) {
-    return path.slice(0, -1);
-  }
-  return path;
-}
 
 function upsertAlternate(hreflang: "en" | "es" | "x-default", href: string) {
   let link = document.querySelector(`link[rel='alternate'][hreflang='${hreflang}'][data-managed='hreflang']`) as HTMLLinkElement | null;
@@ -48,8 +32,8 @@ export function SeoHreflang() {
 
   useEffect(() => {
     const currentPath = normalizePath(location.split("?")[0]);
-    const matched = routePairs.find((pair) => pair.en === currentPath || pair.es === currentPath);
-    const isSpanishRoute = matched ? matched.es === currentPath : currentPath.startsWith("/es");
+    const matched = languageRoutePairs.find((pair) => pair.en === currentPath || pair.es === currentPath);
+    const isSpanishRoute = matched ? matched.es === currentPath : inferLanguageFromPath(currentPath) === "es";
 
     if (!matched) {
       document
