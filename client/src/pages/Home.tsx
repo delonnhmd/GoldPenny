@@ -197,7 +197,7 @@ export default function Home() {
   const prevCarStep = () => setCarStep((prev) => Math.max(prev - 1, 1));
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen bg-[#f4fafc] font-sans">
       <Header />
 
       {/* Hero Section */}
