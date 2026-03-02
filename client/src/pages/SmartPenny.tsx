@@ -8,7 +8,6 @@ import { useSmartPennyPosts } from "@/hooks/use-smart-penny-posts";
 import { Link } from "wouter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { setPreferredLanguage } from "@/lib/languageRoutes";
 
 function getWordPreview(content: string, limit = 100) {
   const plainText = content
@@ -42,15 +41,8 @@ export default function SmartPenny() {
       <Header />
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending Smart Penny</h1>
-              <p className="text-slate-600">Daily Smart Penny news posts and lending commentary from your team.</p>
-            </div>
-            <Link href="/es/smart-penny" onClick={() => setPreferredLanguage("es")}>
-              <Button variant="outline">Ver versión en español</Button>
-            </Link>
-          </div>
+          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending Smart Penny</h1>
+          <p className="text-slate-600">Daily Smart Penny news posts and lending commentary from your team.</p>
           <Link href="/loan-calculators">
             <Button className="font-semibold shadow-md shadow-primary/20">Open Loan Calculators</Button>
           </Link>

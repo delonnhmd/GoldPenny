@@ -2,14 +2,11 @@ import { useMemo, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Link } from "wouter";
-import { setPreferredLanguage } from "@/lib/languageRoutes";
 import {
   Table,
   TableBody,
@@ -295,14 +292,9 @@ export default function LoanCalculators() {
       <Header />
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-7xl space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Loan Calculators</h1>
-              <p className="text-slate-600 mt-2">Run quick payment estimates across mortgage, refinance, auto, personal, and business scenarios.</p>
-            </div>
-            <Link href="/es/calculadoras-de-prestamos" onClick={() => setPreferredLanguage("es")}>
-              <Button variant="outline">Ver versión en español</Button>
-            </Link>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Loan Calculators</h1>
+            <p className="text-slate-600 mt-2">Run quick payment estimates across mortgage, refinance, auto, personal, and business scenarios.</p>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
