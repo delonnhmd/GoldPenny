@@ -167,7 +167,7 @@ const businessIndustryOptions = [
   "Medical Spa",
   "Medical Training",
   "Mineral / Oil Mining Exploration",
-  "Non for Profit",
+  "Non-Profit",
   "Not For Profit",
   "Nursery",
   "Optometrist",
