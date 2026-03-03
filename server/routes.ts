@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import { api } from "@shared/routes"; // Only import api
 import { z } from "zod";
 import { createSmartPennyPostSchema, insertLeadSchema, smartPennyPageSchema, updateSmartPennyPostSchema, upsertSmartPennyUpdateSchema } from "@shared/schema"; // Import schema directly
+import { decideLeadRoute } from "./leadRouting";
 
 function validateAdminRequest(req: Request) {
   const configuredKey = process.env.ADMIN_DASHBOARD_KEY || process.env.ADMIN_KEY || "pennyfloat-admin";
@@ -22,6 +23,36 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  app.post(api.leads.routeDecision.path, async (req, res) => {
+    try {
+      const payload = api.leads.routeDecision.input.parse(req.body);
+
+      const decision = decideLeadRoute({
+        businessLocation: payload.business_location,
+        industry: payload.industry,
+        loanAmount: payload.loan_amount,
+        creditScore: payload.credit_score,
+        annualSales: payload.annual_sales,
+        timeInBusiness: payload.time_in_business,
+        subId1: payload.sub_id_1,
+        subId2: payload.sub_id_2,
+      });
+
+      return res.status(200).json(decision);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({
+          message: "Validation failed",
+          field: err.errors[0].path.join('.'),
+          errors: err.errors,
+        });
+      }
+
+      console.error("Error generating lead route decision:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
 
   app.post(api.leads.create.path, async (req, res) => {
     try {

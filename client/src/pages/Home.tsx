@@ -29,6 +29,7 @@ import { Footer } from "@/components/Footer";
 import { StepIndicator } from "@/components/StepIndicator";
 import { useCreateLead } from "@/hooks/use-leads";
 import { insertLeadSchema, creditScoreRanges, employmentStatuses, loanPurposes } from "@shared/schema";
+import { api } from "@shared/routes";
 
 // Form schemas for each step
 const step1Schema = z.object({
@@ -61,6 +62,9 @@ const businessLoanSchema = z.object({
   amountRange: z.string().min(1, "This field is required."),
   purpose: z.string().min(1, "This field is required."),
   term: z.string().min(1, "This field is required."),
+  creditScore: z.string().min(1, "This field is required."),
+  annualSales: z.string().min(1, "This field is required."),
+  businessLocation: z.string().min(1, "This field is required."),
 });
 
 type BusinessLoanFormValues = z.infer<typeof businessLoanSchema>;
@@ -75,30 +79,161 @@ const businessAmountOptions = [
   { label: "$1,000,000+", value: 1000000 },
 ] as const;
 
-const businessPurposeOptions = [
-  "Buy Inventory",
-  "Buy Equipment",
-  "Expansion",
-  "Cover Payroll",
+const businessIndustryOptions = [
+  "Adult",
+  "Advertising",
+  "Aerospace / Defense",
+  "Agriculture",
+  "Apparel",
+  "Auction",
+  "Auto",
+  "Auto Repair",
+  "Auto Sales",
+  "Aviation",
+  "Banking",
+  "Bar / Nightclub",
+  "Beauty / Nail Salon",
+  "Biotechnology",
+  "Broker / Re-Sellers - Coin, Ticket, Pawn Shop",
+  "Business Services",
+  "Call Center",
+  "Cannabis",
+  "Car Rental",
+  "Casino / Gambling / Sports Clubs",
+  "Cell Phone Sales",
+  "Chemicals",
+  "Cleaning",
+  "Communications",
+  "Construction",
+  "Consulting",
+  "Contractor - General",
+  "Contractor - Painting",
+  "Contractor - Paving",
+  "Contractor - Plumbing",
+  "Contractor - Roofing",
+  "Convenience Store",
+  "Courier Service",
+  "Day Care / Child Care",
+  "Dental",
+  "Design",
+  "Detective",
+  "Dry Cleaner",
+  "E-Commerce - Holds Inventory",
+  "E-Commerce - No Inventory / Drop Shipping",
+  "Education",
+  "Electrician",
+  "Electronics",
+  "Electronic Sales",
+  "Energy",
+  "Engineering",
+  "Entertainment",
+  "Environmental",
+  "Environmental Services",
+  "Equipment Rental",
+  "Equipment Sales",
+  "Equipment Service / Repair",
+  "Farming / Agriculture",
+  "Finance",
+  "Financial - Collection / Money Services",
+  "Financial Services",
+  "Fire Arms / Ammunition",
+  "Fitness Center",
+  "Florist",
+  "Food / Beverage",
+  "Fuel Delivery",
+  "Funeral Home",
+  "Furniture Store",
+  "Gas Station",
+  "Government",
+  "Grocery Store",
+  "Healthcare",
+  "Home Healthcare",
+  "Hospitality",
+  "HVAC",
+  "Import / Export",
+  "Insurance",
+  "Janitorial",
+  "Junk Yard",
+  "Landscaping",
+  "Legal Services / Law Firm",
+  "Liquor Store",
+  "Logging",
+  "Machinery",
+  "Manufacturing",
+  "Marketing",
+  "Massage Therapy",
+  "Media",
+  "Medical",
+  "Medical Spa",
+  "Medical Training",
+  "Mineral / Oil Mining Exploration",
+  "Non for Profit",
+  "Not For Profit",
+  "Nursery",
+  "Optometrist",
+  "Pest Control",
+  "Pet Groomer",
+  "Pharmacy",
+  "Photography",
+  "Plastic Surgeon",
+  "Plumbing",
+  "Primary Care",
+  "Printing",
+  "Professional Services",
+  "Property Management",
   "Real Estate",
-  "Acquire a Business",
-  "Working Capital",
-  "Start a Business",
+  "Recreation",
+  "Religious Institute",
+  "Restaurant",
+  "Retail",
+  "Salon",
+  "School/Education",
+  "Security",
+  "Shipping",
+  "Sign Language Interpretation",
+  "Smoke / Tobacco / Vape shops",
+  "Staffing",
+  "Storage",
+  "Technology",
+  "Telecommunications",
+  "Towing",
+  "Transportation",
+  "Travel",
+  "Trucking",
+  "Uber / Lyft / Taxi",
+  "Utilities",
+  "Veterinarian",
+  "Waste Management",
+  "Wholesale / Distributor",
+  "Window Tinting",
   "Other",
 ] as const;
 
 const businessTermOptions = [
-  "3 Months",
-  "6 Months",
-  "12 Months",
-  "24 Months",
-  "48 Months",
-  "More than 48 Months",
+  "Startup / New Business",
+  "Less than 6 Months",
+  "6-12 Months",
+  "1-2 Years",
+  "2-5 Years",
+  "5+ Years",
 ] as const;
+
+const businessAnnualSalesOptions = [
+  "No Gross Sales (Startup)",
+  "Under $50,000",
+  "$50,000 - $100,000",
+  "$100,000 - $250,000",
+  "$250,000 - $500,000",
+  "$500,000 - $1,000,000",
+  "$1,000,000+",
+] as const;
+
+const businessLocationOptions = ["United States", "Canada"] as const;
 
 export default function Home() {
   const [step, setStep] = useState(1);
   const [carStep, setCarStep] = useState(1);
+  const [isBusinessSubmitting, setIsBusinessSubmitting] = useState(false);
   const { mutate: createLead, isPending } = useCreateLead();
   const { mutate: createCarLead, isPending: isCarPending } = useCreateLead();
 
@@ -108,6 +243,9 @@ export default function Home() {
       amountRange: "",
       purpose: "",
       term: "",
+      creditScore: "",
+      annualSales: "",
+      businessLocation: "",
     },
     mode: "onTouched",
   });
@@ -178,17 +316,51 @@ export default function Home() {
     createCarLead(data);
   };
 
-  const onBusinessSubmit = (data: BusinessLoanFormValues) => {
+  const onBusinessSubmit = async (data: BusinessLoanFormValues) => {
+    setIsBusinessSubmitting(true);
+
     const matchedAmount = businessAmountOptions.find((option) => option.label === data.amountRange);
     const amount = matchedAmount?.value ?? 50000;
-    const searchParams = new URLSearchParams({
+
+    const locationParams = new URLSearchParams(window.location.search);
+
+    try {
+      const response = await fetch(api.leads.routeDecision.path, {
+        method: api.leads.routeDecision.method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          business_location: data.businessLocation,
+          industry: data.purpose,
+          loan_amount: amount,
+          credit_score: data.creditScore,
+          annual_sales: data.annualSales,
+          time_in_business: data.term,
+          sub_id_1: locationParams.get("sub_id_1") ?? undefined,
+          sub_id_2: locationParams.get("sub_id_2") ?? undefined,
+        }),
+      });
+
+      if (response.ok) {
+        const result = (await response.json()) as { targetUrl: string };
+        window.location.href = result.targetUrl;
+        return;
+      }
+    } catch (error) {
+      console.error("Business route decision failed", error);
+    } finally {
+      setIsBusinessSubmitting(false);
+    }
+
+    const fallbackSearchParams = new URLSearchParams({
       name: "Business Owner",
       purpose: data.purpose,
       amount: String(amount),
-      score: "650-719",
+      score: data.creditScore,
     });
 
-    window.location.href = `/offers?${searchParams.toString()}`;
+    window.location.href = `/offers?${fallbackSearchParams.toString()}`;
   };
 
   const nextStep = () => validateStep(step);
@@ -788,15 +960,15 @@ export default function Home() {
                     name="purpose"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-semibold text-slate-700">What do you need funds for?</FormLabel>
+                        <FormLabel className="text-base font-semibold text-slate-700">What industry is your business in?</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="h-12 text-base">
-                              <SelectValue placeholder="Purpose" />
+                              <SelectValue placeholder="Select industry" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {businessPurposeOptions.map((option) => (
+                            {businessIndustryOptions.map((option) => (
                               <SelectItem key={option} value={option}>{option}</SelectItem>
                             ))}
                           </SelectContent>
@@ -811,11 +983,11 @@ export default function Home() {
                     name="term"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-base font-semibold text-slate-700">About how long do you need funds?</FormLabel>
+                        <FormLabel className="text-base font-semibold text-slate-700">How long have you been in business?</FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="h-12 text-base">
-                              <SelectValue placeholder="Length" />
+                              <SelectValue placeholder="Time in business" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -829,8 +1001,77 @@ export default function Home() {
                     )}
                   />
 
-                  <Button type="submit" className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
-                    Get Qualified
+                  <FormField
+                    control={businessForm.control}
+                    name="creditScore"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold text-slate-700">What is your credit score?</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 text-base">
+                              <SelectValue placeholder="Credit score" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {creditScoreRanges.map((option) => (
+                              <SelectItem key={option} value={option}>{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={businessForm.control}
+                    name="annualSales"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold text-slate-700">What are your annual sales?</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 text-base">
+                              <SelectValue placeholder="Annual sales" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {businessAnnualSalesOptions.map((option) => (
+                              <SelectItem key={option} value={option}>{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={businessForm.control}
+                    name="businessLocation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-base font-semibold text-slate-700">Where is your business located?</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 text-base">
+                              <SelectValue placeholder="Business location" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {businessLocationOptions.map((option) => (
+                              <SelectItem key={option} value={option}>{option}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button type="submit" disabled={isBusinessSubmitting} className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
+                    {isBusinessSubmitting ? "Routing..." : "Get Qualified"}
                   </Button>
                 </form>
               </Form>

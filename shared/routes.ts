@@ -60,6 +60,28 @@ export const api = {
         400: errorSchemas.validation,
       },
     },
+    routeDecision: {
+      method: 'POST' as const,
+      path: '/api/leads/route-decision' as const,
+      input: z.object({
+        business_location: z.string().optional(),
+        industry: z.string().optional(),
+        loan_amount: z.union([z.number(), z.string()]).optional(),
+        credit_score: z.string().optional(),
+        annual_sales: z.string().optional(),
+        time_in_business: z.string().optional(),
+        sub_id_1: z.string().optional(),
+        sub_id_2: z.string().optional(),
+      }),
+      responses: {
+        200: z.object({
+          partner: z.enum(['AFN', 'ROK']),
+          reason: z.string(),
+          targetUrl: z.string().url(),
+        }),
+        400: errorSchemas.validation,
+      },
+    },
   },
   smartPennyUpdates: {
     getByPage: {
@@ -154,6 +176,8 @@ export const api = {
 
 export type LeadInput = z.infer<typeof api.leads.create.input>;
 export type LeadResponse = z.infer<typeof api.leads.create.responses[201]>;
+export type LeadRouteDecisionInput = z.infer<typeof api.leads.routeDecision.input>;
+export type LeadRouteDecisionResponse = z.infer<typeof api.leads.routeDecision.responses[200]>;
 export type SmartPennyUpdateResponse = z.infer<typeof api.smartPennyUpdates.getByPage.responses[200]>;
 export type UpsertSmartPennyUpdateRequest = z.infer<typeof api.smartPennyUpdates.upsert.input>;
 export type SmartPennyPostResponse = z.infer<typeof api.smartPennyPosts.listByPage.responses[200]>;
