@@ -98,52 +98,8 @@ export default function Offers() {
   const requestedAmount = Number.isFinite(amount) && amount > 0 ? amount : 15000;
   const creditTier = getCreditTier(creditScore);
   const loanType = getLoanType(loanPurpose);
-  const commonTrackingParams = {
-    source: "pennyfloat",
-    placement: "offers-page",
-    loanType,
-    creditTier,
-    amount: String(requestedAmount),
-  };
-
-  const offers = [
-    {
-      key: "trusted",
-      lender: "Trusted Lending Group",
-      apr: "7.99% - 12.49%",
-      term: "36 - 60 months",
-      monthly: formatAmount(Math.max(requestedAmount / 48, 80)),
-      highlight: "Best overall match",
-      partnerUrl: buildPartnerUrl(partnerBaseUrls[loanType][creditTier].trusted, {
-        ...commonTrackingParams,
-        partner: "trusted-lending-group",
-      }),
-    },
-    {
-      key: "summit",
-      lender: "Summit Finance Network",
-      apr: "8.49% - 14.99%",
-      term: "24 - 60 months",
-      monthly: formatAmount(Math.max(requestedAmount / 42, 95)),
-      highlight: "Fastest funding",
-      partnerUrl: buildPartnerUrl(partnerBaseUrls[loanType][creditTier].summit, {
-        ...commonTrackingParams,
-        partner: "summit-finance-network",
-      }),
-    },
-    {
-      key: "crestline",
-      lender: "Crestline Capital",
-      apr: "9.25% - 16.99%",
-      term: "24 - 72 months",
-      monthly: formatAmount(Math.max(requestedAmount / 54, 75)),
-      highlight: "Flexible terms",
-      partnerUrl: buildPartnerUrl(partnerBaseUrls[loanType][creditTier].crestline, {
-        ...commonTrackingParams,
-        partner: "crestline-capital",
-      }),
-    },
-  ];
+  const isMaintenanceMode = loanType === "personal" || loanType === "auto";
+  const maintenanceLabel = loanType === "auto" ? "Car Loan Offers" : "Personal Loan Offers";
 
   return (
     <div className="min-h-screen bg-[#f4fafc] font-sans">
@@ -181,33 +137,22 @@ export default function Offers() {
             </div>
           </Card>
 
-          <div className="space-y-4">
-            {offers.map((offer) => (
-              <Card key={offer.key} className="p-6 border-slate-100 shadow-sm bg-white">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                  <div>
-                    <Badge className="mb-3 bg-primary/10 text-primary hover:bg-primary/10 border border-primary/20">{offer.highlight}</Badge>
-                    <h2 className="text-xl font-bold text-slate-900 mb-2">{offer.lender}</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-slate-600">
-                      <p><span className="font-semibold text-slate-800">APR:</span> {offer.apr}</p>
-                      <p><span className="font-semibold text-slate-800">Term:</span> {offer.term}</p>
-                      <p><span className="font-semibold text-slate-800">Est. Monthly:</span> {offer.monthly}</p>
-                    </div>
-                  </div>
-
-                  <Button asChild className="h-11 px-6 font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shrink-0">
-                    <a href={offer.partnerUrl} target="_blank" rel="noopener noreferrer nofollow">
-                      Continue to Lender <ArrowRight className="ml-2 w-4 h-4" />
-                    </a>
+          {isMaintenanceMode ? (
+            <Card className="p-6 md:p-8 border-amber-200 bg-amber-50/60 shadow-sm">
+              <div className="max-w-3xl mx-auto text-center">
+                <Badge className="mb-3 bg-amber-100 text-amber-800 hover:bg-amber-100 border border-amber-200">Temporarily Unavailable</Badge>
+                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">{maintenanceLabel} are under maintenance</h2>
+                <p className="text-slate-700 leading-relaxed mb-6">
+                  We are updating our lender integrations for this category. Please check back soon, or return to the home page to explore other resources.
+                </p>
+                <Link href="/">
+                  <Button className="h-11 px-6 font-semibold bg-slate-900 hover:bg-slate-800 text-white">
+                    Back to Home <ArrowRight className="ml-2 w-4 h-4" />
                   </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          <p className="mt-4 text-center text-xs text-slate-500">
-            Partner links are currently placeholder URLs and can be replaced with your affiliate links anytime.
-          </p>
+                </Link>
+              </div>
+            </Card>
+          ) : null}
 
           <div className="mt-8 text-center">
             <Link href="/">
