@@ -61,6 +61,25 @@
     hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 
     active:translate-y-0 active:shadow-sm transition-all duration-200;
   }
+
+  .finance-affiliate-html {
+    @apply relative mx-auto w-full max-w-[728px] overflow-hidden;
+  }
+
+  .finance-affiliate-html > a {
+    @apply block w-full;
+  }
+
+  .finance-affiliate-html > a > img {
+    @apply mx-auto block w-full max-w-full h-auto;
+  }
+
+  .finance-affiliate-html > img[height="0"][width="0"] {
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute;
+    visibility: hidden;
+  }
 }
 
 /* Smooth scrolling */

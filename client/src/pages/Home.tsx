@@ -27,6 +27,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { StepIndicator } from "@/components/StepIndicator";
+import { HomepageFinanceBannerSection } from "@/components/HomepageFinanceBannerSection";
 import { useCreateLead } from "@/hooks/use-leads";
 import { insertLeadSchema, creditScoreRanges, employmentStatuses, loanPurposes } from "@shared/schema";
 import { api } from "@shared/routes";
@@ -1177,6 +1178,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <HomepageFinanceBannerSection />
 
       {/* FAQ Section */}
       <section id="faq" className="py-20 bg-slate-50">
