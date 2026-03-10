@@ -418,10 +418,6 @@ export default function Home() {
               <p className="text-base text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                 PennyFloat is an educational comparison resource. We focus on clear explanations of costs, terms, and trade-offs so you can review options with more confidence.
               </p>
-              <p className="text-sm text-slate-500 mb-8 max-w-2xl mx-auto lg:mx-0">
-                Impact-Site-Verification: 60e7108b-a262-4838-b750-2bda07b40c9d
-              </p>
-
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button
                   type="button"
