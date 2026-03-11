@@ -52,6 +52,7 @@ export function PageSideAdRails() {
     const selected = selectBannersForPage({
       pageType: context.pageType,
       currentPageCategory: context.currentPageCategory,
+      slotType: "sidebar",
       maxItems: 2,
     });
 

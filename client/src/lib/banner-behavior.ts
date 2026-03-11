@@ -1,7 +1,7 @@
 import type { BannerCategory } from "@/lib/banner-config";
 
 const STORAGE_KEY = "pennyfloat.banner.behavior.v1";
-const CATEGORIES: BannerCategory[] = ["finance", "business_software", "lifestyle"];
+const CATEGORIES: BannerCategory[] = ["finance", "business_software", "lifestyle", "trading"];
 
 type CategoryScoreMap = Record<BannerCategory, number>;
 
@@ -17,6 +17,7 @@ function createZeroScoreMap(): CategoryScoreMap {
     finance: 0,
     business_software: 0,
     lifestyle: 0,
+    trading: 0,
   };
 }
 

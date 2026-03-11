@@ -1,4 +1,6 @@
-export type BannerCategory = "finance" | "business_software" | "lifestyle";
+import { adInventory } from "@/data/adInventory.js";
+
+export type BannerCategory = "finance" | "business_software" | "lifestyle" | "trading";
 
 export type BannerPageType =
   | "homepage"
@@ -9,12 +11,21 @@ export type BannerPageType =
   | "market_blog";
 
 export type BannerType = "html" | "cta";
+export type BannerSlotType =
+  | "leaderboard"
+  | "content-top"
+  | "content-mid"
+  | "sidebar"
+  | "inline-box";
+export type BannerAdSize = "728x90" | "160x600" | "250x250";
 
 export type BannerAdItem = {
   id: string;
   title: string;
   category: BannerCategory;
   type: BannerType;
+  size: BannerAdSize;
+  compatibleSlotTypes?: BannerSlotType[];
   trackingUrl: string;
   htmlCode?: string;
   imageUrl?: string;
@@ -30,64 +41,32 @@ export type BannerAdItem = {
   updatedAt: string;
 };
 
-// Manual banner catalog. Category is always explicitly provided here.
-// Do not auto-categorize banners from URL patterns.
-const nowIso = new Date().toISOString();
+type RawAdInventoryItem = Omit<
+  BannerAdItem,
+  "clickCount" | "impressionCount" | "lastClickedAt" | "createdAt" | "updatedAt"
+> &
+  Partial<
+    Pick<
+      BannerAdItem,
+      "clickCount" | "impressionCount" | "lastClickedAt" | "createdAt" | "updatedAt"
+    >
+  >;
 
-export const bannerAds: BannerAdItem[] = [
-  {
-    id: "it-media-728x90-finance-1",
-    title: "IT Media Finance Offer",
-    category: "finance",
-    type: "html",
-    trackingUrl: "https://it-media.pxf.io/c/7021230/1478648/17319",
-    htmlCode: `<a rel="sponsored"
-           href="https://it-media.pxf.io/c/7021230/1478648/17319" target="_top" id="1478648">
-<img src="https://a.impactradius-go.com/display-ad/17319-1478648" border="0" alt="" width="728" height="90"/></a><img height="0" width="0" src="https://imp.pxf.io/i/7021230/1478648/17319" style="position:absolute;visibility:hidden;" border="0" />`,
-    allowedPages: ["homepage", "loan", "business", "mortgage", "blog", "market_blog"],
-    enabled: true,
-    priority: 10,
-    clickCount: 0,
-    impressionCount: 0,
-    lastClickedAt: null,
-    createdAt: nowIso,
-    updatedAt: nowIso,
-  },
-  {
-    id: "business-software-sample-1",
-    title: "Business Software Tools",
-    category: "business_software",
-    type: "cta",
-    trackingUrl: "https://example.com/business-software/track",
-    description: "Compare software options that help with invoicing, payroll, and cash-flow planning.",
-    ctaLabel: "Explore Tools",
-    allowedPages: ["business", "blog", "market_blog"],
-    enabled: true,
-    priority: 7,
-    clickCount: 0,
-    impressionCount: 0,
-    lastClickedAt: null,
-    createdAt: nowIso,
-    updatedAt: nowIso,
-  },
-  {
-    id: "lifestyle-sample-1",
-    title: "Lifestyle Savings Picks",
-    category: "lifestyle",
-    type: "cta",
-    trackingUrl: "https://example.com/lifestyle/track",
-    description: "Sponsored lifestyle picks focused on practical savings and daily value.",
-    ctaLabel: "View Picks",
-    allowedPages: ["blog", "market_blog"],
-    enabled: true,
-    priority: 5,
-    clickCount: 0,
-    impressionCount: 0,
-    lastClickedAt: null,
-    createdAt: nowIso,
-    updatedAt: nowIso,
-  },
-];
+const rawInventory = adInventory as RawAdInventoryItem[];
+
+// Normalized manual catalog consumed by banner selection/tracking.
+// Category and page rules are read directly from the ad inventory file.
+export const bannerAds: BannerAdItem[] = rawInventory.map((ad) => {
+  const nowIso = new Date().toISOString();
+  return {
+    ...ad,
+    clickCount: ad.clickCount ?? 0,
+    impressionCount: ad.impressionCount ?? 0,
+    lastClickedAt: ad.lastClickedAt ?? null,
+    createdAt: ad.createdAt ?? nowIso,
+    updatedAt: ad.updatedAt ?? nowIso,
+  };
+});
 
 // Future logic: A/B testing and campaign rotation can be layered on top of this
 // static catalog (for example weighted experiments by page type and audience segment).

@@ -71,7 +71,15 @@
   }
 
   .affiliate-banner-html > a > img {
-    @apply mx-auto block w-full max-w-full h-auto;
+    @apply mx-auto block w-auto max-w-full h-auto;
+  }
+
+  .affiliate-banner-html video {
+    @apply mx-auto block max-w-full h-auto;
+  }
+
+  .affiliate-banner-html > span > div {
+    max-width: 100% !important;
   }
 
   .affiliate-banner-html > img[height="0"][width="0"] {

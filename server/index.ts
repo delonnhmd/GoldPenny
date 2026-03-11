@@ -37,6 +37,12 @@ app.use(
           "data:",
           "https://a.impactradius-go.com",
           "https://imp.pxf.io",
+          "https://united.elfm.net",
+          "https://partners.challenges.eightcap.com",
+        ],
+        "media-src": [
+          "'self'",
+          "https://a.impactradius-go.com",
         ],
       },
     },

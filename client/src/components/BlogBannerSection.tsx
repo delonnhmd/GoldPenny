@@ -28,6 +28,7 @@ export function BlogBannerSection({
       selectBannersForPage({
         pageType,
         currentPageCategory,
+        slotType: "content-mid",
         maxItems,
       }),
     [pageType, currentPageCategory, maxItems],

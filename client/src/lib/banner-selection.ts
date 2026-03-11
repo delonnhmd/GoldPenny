@@ -1,9 +1,11 @@
 import { getBehaviorScores } from "@/lib/banner-behavior";
 import {
   bannerAds,
+  type BannerAdSize,
   type BannerAdItem,
   type BannerCategory,
   type BannerPageType,
+  type BannerSlotType,
 } from "@/lib/banner-config";
 
 type BlogPageType = Extract<BannerPageType, "blog" | "market_blog">;
@@ -11,10 +13,16 @@ type BlogPageType = Extract<BannerPageType, "blog" | "market_blog">;
 type BannerSelectionInput = {
   pageType: BannerPageType;
   currentPageCategory?: BannerCategory;
+  slotType?: BannerSlotType;
   maxItems?: number;
 };
 
 const BLOG_MIN_BEHAVIOR_POINTS = 3;
+const SLOT_COMPATIBILITY_BY_SIZE: Record<BannerAdSize, BannerSlotType[]> = {
+  "728x90": ["leaderboard", "content-top", "content-mid"],
+  "160x600": ["sidebar"],
+  "250x250": ["content-mid", "sidebar", "inline-box"],
+};
 
 const BLOG_RELEVANCE_MATRIX: Record<
   BannerCategory,
@@ -24,16 +32,25 @@ const BLOG_RELEVANCE_MATRIX: Record<
     finance: 1,
     business_software: 0.45,
     lifestyle: 0,
+    trading: 0.5,
   },
   business_software: {
     finance: 0.55,
     business_software: 1,
     lifestyle: 0,
+    trading: 0.7,
   },
   lifestyle: {
     finance: 0.4,
     business_software: 0,
     lifestyle: 1,
+    trading: 0,
+  },
+  trading: {
+    finance: 0.5,
+    business_software: 0.7,
+    lifestyle: 0,
+    trading: 1,
   },
 };
 
@@ -46,6 +63,21 @@ function getEnabledBanners() {
   return bannerAds.filter((banner) => banner.enabled);
 }
 
+function getCompatibleSlotsForBanner(banner: BannerAdItem) {
+  if (banner.compatibleSlotTypes && banner.compatibleSlotTypes.length > 0) {
+    return banner.compatibleSlotTypes;
+  }
+  return SLOT_COMPATIBILITY_BY_SIZE[banner.size] ?? [];
+}
+
+function isBannerCompatibleWithSlot(
+  banner: BannerAdItem,
+  slotType?: BannerSlotType,
+) {
+  if (!slotType) return true;
+  return getCompatibleSlotsForBanner(banner).includes(slotType);
+}
+
 function getAllowedCategoriesForPage(
   pageType: BannerPageType,
   currentPageCategory: BannerCategory,
@@ -54,6 +86,7 @@ function getAllowedCategoriesForPage(
   if (pageType === "loan") return ["finance"];
   if (pageType === "mortgage") return ["finance"];
   if (pageType === "business") return ["finance", "business_software"];
+  if (pageType === "market_blog") return ["finance", "business_software", "trading"];
 
   // Blog pages use relevance map to avoid unrelated categories.
   return (Object.keys(BLOG_RELEVANCE_MATRIX[currentPageCategory]) as BannerCategory[]).filter(
@@ -76,7 +109,10 @@ function filterCandidatesByPageRules(
 
 function hasEnoughBehaviorData() {
   const scores = getBehaviorScores().totalScoreByCategory;
-  const totalBehaviorPoints = scores.finance + scores.business_software + scores.lifestyle;
+  const totalBehaviorPoints = Object.values(scores).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
   return totalBehaviorPoints >= BLOG_MIN_BEHAVIOR_POINTS;
 }
 
@@ -141,9 +177,12 @@ function selectBlogBanners(
 export function selectBannersForPage({
   pageType,
   currentPageCategory = "finance",
+  slotType,
   maxItems = 2,
 }: BannerSelectionInput): BannerAdItem[] {
-  const enabled = getEnabledBanners();
+  const enabled = getEnabledBanners().filter((banner) =>
+    isBannerCompatibleWithSlot(banner, slotType),
+  );
   const candidates = filterCandidatesByPageRules(enabled, pageType, currentPageCategory);
 
   if (pageType === "blog" || pageType === "market_blog") {

@@ -8,6 +8,7 @@ export function HomepageFinanceBannerSection() {
       selectBannersForPage({
         pageType: "homepage",
         currentPageCategory: "finance",
+        slotType: "content-top",
         maxItems: 1,
       }),
     [],
