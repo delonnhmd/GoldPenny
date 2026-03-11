@@ -27,13 +27,13 @@ export type BannerCatalog = Record<BannerCategory, BannerDefinition[]>;
 export const bannerCatalog: BannerCatalog = {
   finance: [
     {
-      id: "it-media-1201x631-test",
+      id: "it-media-728x90-test",
       category: "finance",
       kind: "raw_affiliate_html",
       sponsoredLabel: "Sponsored",
       html: `<a rel="sponsored"
-           href="https://it-media.pxf.io/c/7021230/1473136/17319" target="_top" id="1473136">
-<img src="https://a.impactradius-go.com/display-ad/17319-1473136" border="0" alt="" width="1201" height="631"/></a><img height="0" width="0" src="https://imp.pxf.io/i/7021230/1473136/17319" style="position:absolute;visibility:hidden;" border="0" />`,
+           href="https://it-media.pxf.io/c/7021230/1478648/17319" target="_top" id="1478648">
+<img src="https://a.impactradius-go.com/display-ad/17319-1478648" border="0" alt="" width="728" height="90"/></a><img height="0" width="0" src="https://imp.pxf.io/i/7021230/1478648/17319" style="position:absolute;visibility:hidden;" border="0" />`,
     },
   ],
   business_software: [],
