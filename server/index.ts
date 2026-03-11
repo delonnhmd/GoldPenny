@@ -19,7 +19,23 @@ app.disable("x-powered-by");
 app.set("trust proxy", 1);
 
 // Basic security headers
-app.use(helmet());
+const defaultCspDirectives = helmet.contentSecurityPolicy.getDefaultDirectives();
+
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...defaultCspDirectives,
+        "img-src": [
+          "'self'",
+          "data:",
+          "https://a.impactradius-go.com",
+          "https://imp.pxf.io",
+        ],
+      },
+    },
+  }),
+);
 
 // Block common secret-probing paths (they should NEVER exist)
 const blocked = [

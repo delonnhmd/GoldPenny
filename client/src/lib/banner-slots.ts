@@ -33,7 +33,7 @@ export const bannerCatalog: BannerCatalog = {
       sponsoredLabel: "Sponsored",
       html: `<a rel="sponsored"
            href="https://it-media.pxf.io/c/7021230/1473136/17319" target="_top" id="1473136">
-<img src="//a.impactradius-go.com/display-ad/17319-1473136" border="0" alt="" width="1201" height="631"/></a><img height="0" width="0" src="https://imp.pxf.io/i/7021230/1473136/17319" style="position:absolute;visibility:hidden;" border="0" />`,
+<img src="https://a.impactradius-go.com/display-ad/17319-1473136" border="0" alt="" width="1201" height="631"/></a><img height="0" width="0" src="https://imp.pxf.io/i/7021230/1473136/17319" style="position:absolute;visibility:hidden;" border="0" />`,
     },
   ],
   business_software: [],
