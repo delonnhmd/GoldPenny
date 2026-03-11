@@ -23,6 +23,12 @@ const defaultCspDirectives = helmet.contentSecurityPolicy.getDefaultDirectives()
 
 app.use(
   helmet({
+    // HSTS: force browsers to use HTTPS for 1 year (required for 256-bit SSL trust badges)
+    strictTransportSecurity: {
+      maxAge: 31536000,        // 1 year in seconds
+      includeSubDomains: true, // apply to all subdomains
+      preload: true,           // eligible for browser HSTS preload list
+    },
     contentSecurityPolicy: {
       directives: {
         ...defaultCspDirectives,
@@ -36,6 +42,16 @@ app.use(
     },
   }),
 );
+
+// Redirect HTTP → HTTPS in production (when not behind a proxy that already does it)
+if (process.env.NODE_ENV === "production") {
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.headers["x-forwarded-proto"] === "http") {
+      return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+}
 
 // Block common secret-probing paths (they should NEVER exist)
 const blocked = [
