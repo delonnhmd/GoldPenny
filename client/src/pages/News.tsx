@@ -3,6 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { BlogBannerSection } from "@/components/BlogBannerSection";
 import { useSmartPennyPosts } from "@/hooks/use-smart-penny-posts";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -141,6 +142,11 @@ export default function News() {
             </div>
           )}
         </div>
+        <BlogBannerSection
+          pageType="market_blog"
+          currentPageCategory="finance"
+          maxItems={2}
+        />
       </main>
       <Footer />
     </div>

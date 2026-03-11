@@ -1,37 +1,17 @@
-import { Button } from "@/components/ui/button";
-import {
-  type BannerDefinition,
-  type CustomCtaBanner,
-  type RawAffiliateHtmlBanner,
-  getHomepageFinanceBanners,
-} from "@/lib/banner-slots";
-
-function isRawAffiliateHtmlBanner(banner: BannerDefinition): banner is RawAffiliateHtmlBanner {
-  return banner.kind === "raw_affiliate_html";
-}
-
-function renderCustomCtaBanner(banner: CustomCtaBanner) {
-  return (
-    <div className="mx-auto w-full max-w-3xl rounded-xl border border-slate-200 bg-slate-50 p-5 md:p-6">
-      <h3 className="text-xl font-semibold text-slate-900">{banner.title}</h3>
-      <p className="mt-2 text-slate-600 leading-relaxed">{banner.description}</p>
-      <div className="mt-5">
-        <Button asChild className="font-semibold">
-          <a
-            href={banner.trackingUrl}
-            target={banner.ctaTarget ?? "_blank"}
-            rel="sponsored noopener noreferrer"
-          >
-            {banner.ctaLabel}
-          </a>
-        </Button>
-      </div>
-    </div>
-  );
-}
+import { useMemo } from "react";
+import { BannerRenderer } from "@/components/BannerRenderer";
+import { selectBannersForPage } from "@/lib/banner-selection";
 
 export function HomepageFinanceBannerSection() {
-  const financeBanners = getHomepageFinanceBanners();
+  const financeBanners = useMemo(
+    () =>
+      selectBannersForPage({
+        pageType: "homepage",
+        currentPageCategory: "finance",
+        maxItems: 1,
+      }),
+    [],
+  );
 
   if (financeBanners.length === 0) {
     return null;
@@ -51,23 +31,7 @@ export function HomepageFinanceBannerSection() {
 
         <div className="space-y-6">
           {financeBanners.map((banner) => (
-            <div key={banner.id} className="rounded-2xl border border-slate-200 bg-white px-4 py-5 md:px-6 md:py-6 shadow-sm">
-              <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">
-                {banner.sponsoredLabel ?? "Sponsored"}
-              </span>
-
-              <div className="mt-4">
-                {isRawAffiliateHtmlBanner(banner) ? (
-                  // Future logic: if affiliate HTML is unavailable, swap to a custom CTA fallback card.
-                  <div
-                    className="finance-affiliate-html"
-                    dangerouslySetInnerHTML={{ __html: banner.html }}
-                  />
-                ) : (
-                  renderCustomCtaBanner(banner)
-                )}
-              </div>
-            </div>
+            <BannerRenderer key={banner.id} banner={banner} />
           ))}
         </div>
       </div>

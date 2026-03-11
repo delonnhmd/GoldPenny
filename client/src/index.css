@@ -62,23 +62,33 @@
     active:translate-y-0 active:shadow-sm transition-all duration-200;
   }
 
-  .finance-affiliate-html {
+  .affiliate-banner-html {
     @apply relative mx-auto w-full max-w-[728px] overflow-hidden;
   }
 
-  .finance-affiliate-html > a {
+  .affiliate-banner-html > a {
     @apply block w-full;
   }
 
-  .finance-affiliate-html > a > img {
+  .affiliate-banner-html > a > img {
     @apply mx-auto block w-full max-w-full h-auto;
   }
 
-  .finance-affiliate-html > img[height="0"][width="0"] {
+  .affiliate-banner-html > img[height="0"][width="0"] {
     width: 0 !important;
     height: 0 !important;
     position: absolute;
     visibility: hidden;
+  }
+
+  .side-ad-rail {
+    display: none;
+  }
+
+  @media (min-width: 1700px) {
+    .side-ad-rail {
+      display: block;
+    }
   }
 }
 

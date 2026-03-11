@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BlogBannerSection } from "@/components/BlogBannerSection";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,6 +131,11 @@ export default function SmartPenny() {
             </div>
           )}
         </div>
+        <BlogBannerSection
+          pageType="blog"
+          currentPageCategory="business_software"
+          maxItems={2}
+        />
       </main>
       <Footer />
     </div>

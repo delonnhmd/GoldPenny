@@ -3,6 +3,7 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PageSideAdRails } from "@/components/PageSideAdRails";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Offers from "./pages/Offers";
@@ -34,6 +35,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
+        <PageSideAdRails />
         <Router />
       </TooltipProvider>
     </QueryClientProvider>

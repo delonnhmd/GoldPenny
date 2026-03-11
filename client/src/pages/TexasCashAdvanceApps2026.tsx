@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { BlogBannerSection } from "@/components/BlogBannerSection";
 import { Card } from "@/components/ui/card";
 
 const PAGE_TITLE = "Texas Cash Advance Apps (2026): Costs, Risks, and Safer Alternatives | PennyFloat";
@@ -129,6 +130,11 @@ export default function TexasCashAdvanceApps2026() {
             </p>
           </Card>
         </article>
+        <BlogBannerSection
+          pageType="blog"
+          currentPageCategory="finance"
+          maxItems={2}
+        />
       </main>
       <Footer />
     </div>
