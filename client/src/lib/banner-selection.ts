@@ -59,6 +59,25 @@ function sortByPriorityDesc(a: BannerAdItem, b: BannerAdItem) {
   return a.id.localeCompare(b.id);
 }
 
+function hashWithSeed(value: string, seed: string) {
+  let hash = 0;
+  const combined = `${seed}:${value}`;
+  for (let i = 0; i < combined.length; i += 1) {
+    hash = (hash << 5) - hash + combined.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+function sortBySeededRotation(banners: BannerAdItem[], seed: string) {
+  return [...banners].sort((a, b) => {
+    const aScore = hashWithSeed(a.id, seed);
+    const bScore = hashWithSeed(b.id, seed);
+    if (aScore !== bScore) return aScore - bScore;
+    return a.id.localeCompare(b.id);
+  });
+}
+
 function getEnabledBanners() {
   return bannerAds.filter((banner) => banner.enabled);
 }
@@ -194,9 +213,31 @@ export function selectBannersForPage({
   }
 
   // Homepage and core money pages are deterministic: no behavior-based mixing.
-  const sorted = candidates.sort(sortByPriorityDesc);
+  const sorted = candidates.sort(sortByPriorityDesc).slice(0, maxItems);
+  if (sorted.length >= maxItems) {
+    return sorted;
+  }
+
+  // Fill remaining slots with a deterministic daily rotation from any
+  // page-compatible category to avoid empty placements.
+  const remaining = maxItems - sorted.length;
+  if (remaining > 0) {
+    const fallbackPool = enabled.filter(
+      (banner) =>
+        (banner.allowedPages.includes(pageType) || pageType === "homepage") &&
+        !sorted.some((selected) => selected.id === banner.id),
+    );
+
+    if (fallbackPool.length > 0) {
+      const daySeed = new Date().toISOString().slice(0, 10);
+      const rotationSeed = `${pageType}:${slotType ?? "any"}:${daySeed}`;
+      const rotatedFallback = sortBySeededRotation(fallbackPool, rotationSeed).slice(0, remaining);
+      return [...sorted, ...rotatedFallback];
+    }
+  }
+
   if (sorted.length > 0) {
-    return sorted.slice(0, maxItems);
+    return sorted;
   }
 
   // Global fallback to finance when nothing matches.

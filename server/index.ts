@@ -35,6 +35,7 @@ app.use(
         "img-src": [
           "'self'",
           "data:",
+          "https:",
           "https://a.impactradius-go.com",
           "https://imp.pxf.io",
           "https://united.elfm.net",
@@ -42,6 +43,7 @@ app.use(
         ],
         "media-src": [
           "'self'",
+          "https:",
           "https://a.impactradius-go.com",
         ],
       },

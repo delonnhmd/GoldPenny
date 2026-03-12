@@ -1,4 +1,4 @@
-import { type MouseEvent, useEffect, useRef } from "react";
+import { type MouseEvent, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trackBannerClick } from "@/lib/banner-behavior";
 import { cn } from "@/lib/utils";
@@ -22,7 +22,9 @@ function getCtaLabel(banner: BannerAdItem) {
 
 export function BannerRenderer({ banner, className }: BannerRendererProps) {
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const htmlContainerRef = useRef<HTMLDivElement | null>(null);
   const hasTrackedImpression = useRef(false);
+  const [showHtmlFallback, setShowHtmlFallback] = useState(false);
 
   useEffect(() => {
     hasTrackedImpression.current = false;
@@ -78,6 +80,89 @@ export function BannerRenderer({ banner, className }: BannerRendererProps) {
 
   const renderAffiliateHtml = banner.type === "html" && Boolean(banner.htmlCode);
 
+  useEffect(() => {
+    if (!renderAffiliateHtml) {
+      setShowHtmlFallback(false);
+      return;
+    }
+
+    const root = htmlContainerRef.current;
+    if (!root || typeof window === "undefined") return;
+
+    setShowHtmlFallback(false);
+    let hasRenderableMedia = false;
+
+    const media = Array.from(root.querySelectorAll("a img, video, iframe"));
+    if (media.length === 0) {
+      setShowHtmlFallback(true);
+      return;
+    }
+
+    const markRenderable = () => {
+      hasRenderableMedia = true;
+      setShowHtmlFallback(false);
+    };
+
+    const cleanupHandlers: Array<() => void> = [];
+
+    for (const node of media) {
+      if (node instanceof HTMLImageElement) {
+        if (node.complete && node.naturalWidth > 0) {
+          markRenderable();
+        }
+
+        const onLoad = () => {
+          if (node.naturalWidth > 0) {
+            markRenderable();
+          }
+        };
+        node.addEventListener("load", onLoad);
+        cleanupHandlers.push(() => node.removeEventListener("load", onLoad));
+        continue;
+      }
+
+      if (node instanceof HTMLVideoElement) {
+        if (node.readyState > 0 || Boolean(node.poster)) {
+          markRenderable();
+        }
+
+        const onLoadedData = () => markRenderable();
+        node.addEventListener("loadeddata", onLoadedData);
+        cleanupHandlers.push(() => node.removeEventListener("loadeddata", onLoadedData));
+        continue;
+      }
+
+      if (node instanceof HTMLIFrameElement) {
+        markRenderable();
+      }
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      if (hasRenderableMedia) return;
+
+      const hasVisibleMedia = media.some((node) => {
+        if (!(node instanceof HTMLElement)) return false;
+        const style = window.getComputedStyle(node);
+        if (style.display === "none" || style.visibility === "hidden") return false;
+
+        if (node instanceof HTMLImageElement) {
+          return node.naturalWidth > 0;
+        }
+        if (node instanceof HTMLVideoElement) {
+          return node.readyState > 0 || Boolean(node.poster);
+        }
+        return node.clientWidth > 0 && node.clientHeight > 0;
+      });
+
+      setShowHtmlFallback(!hasVisibleMedia);
+    }, 1800);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      cleanupHandlers.forEach((remove) => remove());
+    };
+  }, [banner.id, renderAffiliateHtml]);
+
   return (
     <div
       ref={cardRef}
@@ -93,11 +178,30 @@ export function BannerRenderer({ banner, className }: BannerRendererProps) {
       <div className="mt-4">
         {renderAffiliateHtml ? (
           // Raw affiliate HTML is intentionally rendered as-is to preserve network tracking markup.
-          <div
-            className="affiliate-banner-html"
-            onClickCapture={onHtmlClickCapture}
-            dangerouslySetInnerHTML={{ __html: banner.htmlCode ?? "" }}
-          />
+          <div onClickCapture={onHtmlClickCapture}>
+            <div
+              ref={htmlContainerRef}
+              className="affiliate-banner-html"
+              dangerouslySetInnerHTML={{ __html: banner.htmlCode ?? "" }}
+            />
+            {showHtmlFallback ? (
+              <div className="mx-auto mt-4 w-full max-w-3xl rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-sm text-slate-600">Banner blocked or unavailable. Open this offer directly.</p>
+                <div className="mt-3">
+                  <Button asChild className="font-semibold">
+                    <a
+                      href={banner.trackingUrl}
+                      target="_blank"
+                      rel="sponsored noopener noreferrer"
+                      onClick={onCtaClick}
+                    >
+                      {getCtaLabel(banner)}
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </div>
         ) : (
           // Custom CTA fallback when affiliate HTML is unavailable for this banner item.
           <div className="mx-auto w-full max-w-3xl rounded-xl border border-slate-200 bg-slate-50 p-5 md:p-6">
