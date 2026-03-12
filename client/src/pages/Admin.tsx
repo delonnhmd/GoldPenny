@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import { Bold, Code2, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, Pen
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import TurndownService from "turndown";
+import { setPageSeo } from "@/lib/seo";
 
 type AdminPage = "rates" | "smart-penny" | "shopping-guide";
 
@@ -25,6 +26,15 @@ function escapeCsv(value: string | number) {
 }
 
 export default function Admin() {
+  useEffect(() => {
+    setPageSeo({
+      title: "Admin | PennyFloat",
+      description: "PennyFloat content administration portal.",
+      canonical: "https://www.pennyfloat.com/admin",
+      robots: "noindex, nofollow, noarchive",
+    });
+  }, []);
+
   const { toast } = useToast();
   const [adminKey, setAdminKey] = useState(() => sessionStorage.getItem("adminKey") || "");
   const [page, setPage] = useState<AdminPage>("rates");

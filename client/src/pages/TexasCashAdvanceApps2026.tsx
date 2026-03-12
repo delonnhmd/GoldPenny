@@ -3,42 +3,25 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BlogBannerSection } from "@/components/BlogBannerSection";
 import { Card } from "@/components/ui/card";
+import { setPageSeo } from "@/lib/seo";
 
 const PAGE_TITLE = "Texas Cash Advance Apps (2026): Costs, Risks, and Safer Alternatives | PennyFloat";
 const PAGE_DESCRIPTION =
   "Educational guide for Texas borrowers comparing cash advance apps in 2026, including fees, repayment risks, rollover patterns, and safer alternatives.";
 const PAGE_KEYWORDS =
-  "texas cash advance apps, cash advance fees, payday alternatives, adelanto de efectivo texas, apps de adelanto de efectivo, costos de adelanto, alternativas a payday loans";
+  "texas cash advance apps, cash advance fees, payday loan alternatives, earned wage access texas, instant cash advance costs, overdraft alternatives, emergency cash options texas";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/texas-cash-advance-apps-2026";
 const PAGE_ROBOTS = "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
 
-function setMetaTag(name: string, content: string) {
-  let tag = document.querySelector(`meta[name=\"${name}\"]`) as HTMLMetaElement | null;
-  if (!tag) {
-    tag = document.createElement("meta");
-    tag.setAttribute("name", name);
-    document.head.appendChild(tag);
-  }
-  tag.setAttribute("content", content);
-}
-
-function setCanonical(url: string) {
-  let link = document.querySelector("link[rel='canonical']") as HTMLLinkElement | null;
-  if (!link) {
-    link = document.createElement("link");
-    link.setAttribute("rel", "canonical");
-    document.head.appendChild(link);
-  }
-  link.setAttribute("href", url);
-}
-
 export default function TexasCashAdvanceApps2026() {
   useEffect(() => {
-    document.title = PAGE_TITLE;
-    setMetaTag("description", PAGE_DESCRIPTION);
-    setMetaTag("keywords", PAGE_KEYWORDS);
-    setMetaTag("robots", PAGE_ROBOTS);
-    setCanonical(PAGE_CANONICAL);
+    setPageSeo({
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      keywords: PAGE_KEYWORDS,
+      canonical: PAGE_CANONICAL,
+      robots: PAGE_ROBOTS,
+    });
   }, []);
 
   return (

@@ -1,14 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { BlogBannerSection } from "@/components/BlogBannerSection";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { setPageSeo } from "@/lib/seo";
 import { useSmartPennyPosts } from "@/hooks/use-smart-penny-posts";
 import { Link } from "wouter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+
+const PAGE_TITLE = "Smart Penny: Small Business Lending Insights & Updates | PennyFloat";
+const PAGE_DESCRIPTION =
+  "Read Smart Penny updates on small business lending trends, borrowing strategies, and market commentary to help compare funding options.";
+const PAGE_KEYWORDS =
+  "small business lending insights, business loan commentary, borrowing strategy, business financing trends, loan market updates";
+const PAGE_CANONICAL = "https://www.pennyfloat.com/smart-penny";
 
 function getWordPreview(content: string, limit = 100) {
   const plainText = content
@@ -27,6 +35,16 @@ export default function SmartPenny() {
   const { data, isLoading } = useSmartPennyPosts("smart-penny");
   const [expandedPosts, setExpandedPosts] = useState<Record<number, boolean>>({});
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    setPageSeo({
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      keywords: PAGE_KEYWORDS,
+      canonical: PAGE_CANONICAL,
+      robots: "index, follow, max-image-preview:large",
+    });
+  }, []);
 
   const normalizedSearchTerm = searchTerm.trim().toLowerCase();
   const filteredPosts = (data ?? []).filter((post) => {

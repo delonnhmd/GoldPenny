@@ -34,7 +34,7 @@ import { setPageSeo } from "@/lib/seo";
 
 const PAGE_TITLE = "Loan Calculators: Mortgage, Auto, Personal & Business | PennyFloat";
 const PAGE_DESCRIPTION = "Use loan calculators to estimate monthly payments, APR impact, interest cost, and total repayment across mortgage, auto, personal, and business scenarios.";
-const PAGE_KEYWORDS = "loan calculators, mortgage calculator, mortgage payment calculator, monthly mortgage calculator, home loan calculator, amortization schedule calculator, refinance calculator, buydown mortgage calculator, auto loan calculator, personal loan calculator, business loan calculator, APR calculator, calculadora de préstamos, calculadora de hipoteca, calculadora de pago hipotecario, calculadora de préstamo de auto, costo total del préstamo";
+const PAGE_KEYWORDS = "loan calculators, mortgage calculator, mortgage payment calculator, amortization schedule calculator, refinance calculator, buydown mortgage calculator, auto loan calculator, car payment calculator, personal loan calculator, business loan calculator, APR calculator, loan interest calculator";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/loan-calculators";
 
 const MAX_RATE = 100;

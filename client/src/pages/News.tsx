@@ -11,7 +11,7 @@ import { setPageSeo } from "@/lib/seo";
 
 const PAGE_TITLE = "Business Lending News, Rates, and Market Updates | PennyFloat";
 const PAGE_DESCRIPTION = "Read business lending news, rate updates, approval trends, and practical borrowing insights for small businesses.";
-const PAGE_KEYWORDS = "business lending news, loan rate updates, approval trends, financing news, market rates, noticias de préstamos, tasas de interés, noticias de financiamiento, tendencias de aprobación, crédito para negocio";
+const PAGE_KEYWORDS = "business lending news, small business loan rates, approval trends, financing news, SBA lending updates, interest rate outlook, commercial lending market";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/rates";
 
 function getWordPreview(content: string, limit = 100) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -29,8 +29,16 @@ import { Footer } from "@/components/Footer";
 import { StepIndicator } from "@/components/StepIndicator";
 import { HomepageFinanceBannerSection } from "@/components/HomepageFinanceBannerSection";
 import { useCreateLead } from "@/hooks/use-leads";
+import { setPageSeo } from "@/lib/seo";
 import { insertLeadSchema, creditScoreRanges, employmentStatuses, loanPurposes } from "@shared/schema";
 import { api } from "@shared/routes";
+
+const PAGE_TITLE = "Personal, Auto & Business Loan Offers Comparison | PennyFloat";
+const PAGE_DESCRIPTION =
+  "Compare personal loan offers, auto financing options, business funding, and cash advance alternatives. Review APR, fees, and repayment costs before you apply.";
+const PAGE_KEYWORDS =
+  "personal loan offers, auto loan offers, car refinance, business loan comparison, cash advance alternatives, APR comparison, loan repayment calculator, compare loan rates";
+const PAGE_CANONICAL = "https://www.pennyfloat.com/";
 
 // Form schemas for each step
 const step1Schema = z.object({
@@ -237,6 +245,16 @@ export default function Home() {
   const [isBusinessSubmitting, setIsBusinessSubmitting] = useState(false);
   const { mutate: createLead, isPending } = useCreateLead();
   const { mutate: createCarLead, isPending: isCarPending } = useCreateLead();
+
+  useEffect(() => {
+    setPageSeo({
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      keywords: PAGE_KEYWORDS,
+      canonical: PAGE_CANONICAL,
+      robots: "index, follow, max-image-preview:large",
+    });
+  }, []);
 
   const businessForm = useForm<BusinessLoanFormValues>({
     resolver: zodResolver(businessLoanSchema),

@@ -9,9 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { setPageSeo } from "@/lib/seo";
 
-const PAGE_TITLE = "Business Loan Offers & Cash Advance Options | PennyFloat";
-const PAGE_DESCRIPTION = "Compare business loan offers and cash advance options by APR, fees, repayment schedule, and total cost before choosing a lender.";
-const PAGE_KEYWORDS = "business loan offers, cash advance offers, lender comparison, APR and fees, loan repayment options, ofertas de préstamos, comparar préstamos, adelanto de efectivo, APR y comisiones, costo total del préstamo";
+const PAGE_TITLE = "Compare Personal, Auto & Business Loan Offers | PennyFloat";
+const PAGE_DESCRIPTION = "Compare personal, auto, and business loan offers by APR, fees, repayment schedule, and total cost before choosing a lender.";
+const PAGE_KEYWORDS = "loan offers comparison, personal loan offers, auto loan offers, business loan offers, lender comparison, APR and fees, loan repayment options, compare loan rates";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/offers";
 
 type CreditTier = "low" | "mid" | "high";

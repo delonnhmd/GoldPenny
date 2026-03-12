@@ -1,8 +1,26 @@
+import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import { setPageSeo } from "@/lib/seo";
+
+const PAGE_TITLE = "Affiliate Disclosure | PennyFloat";
+const PAGE_DESCRIPTION =
+  "Read PennyFloat's affiliate disclosure, editorial standards, and important consumer notices about loan comparison content.";
+const PAGE_KEYWORDS = "affiliate disclosure, editorial policy, loan comparison website, financial content disclosure";
+const PAGE_CANONICAL = "https://www.pennyfloat.com/affiliate-disclosure";
 
 export default function AffiliateDisclosure() {
+  useEffect(() => {
+    setPageSeo({
+      title: PAGE_TITLE,
+      description: PAGE_DESCRIPTION,
+      keywords: PAGE_KEYWORDS,
+      canonical: PAGE_CANONICAL,
+      robots: "index, follow, max-image-preview:large",
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#f4fafc] font-sans">
       <Header />

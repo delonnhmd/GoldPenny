@@ -29,7 +29,7 @@ import remarkGfm from "remark-gfm";
 
 const PAGE_TITLE = "Loan Shopping Guide: How to Compare & Choose the Right Loan | PennyFloat";
 const PAGE_DESCRIPTION = "Learn how to shop for personal, auto, and mortgage loans the smart way. Compare APR, fees, terms, and lender reputation before you commit.";
-const PAGE_KEYWORDS = "loan shopping guide, how to compare loans, best loan tips, personal loan guide, APR vs interest rate, loan comparison, loan terms explained, credit score loan, guía de préstamos, cómo comparar préstamos, tasas de interés";
+const PAGE_KEYWORDS = "loan shopping guide, how to compare loans, personal loan guide, auto loan guide, mortgage loan tips, APR vs interest rate, loan comparison checklist, loan terms explained, credit score and loans";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/shopping-guide";
 
 const steps = [
