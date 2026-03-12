@@ -380,7 +380,7 @@ export default function LoanCalculators() {
                 <p className="text-sm text-slate-600">In early months, more of each payment goes to interest because the balance is highest then. As the balance drops, interest decreases and principal payoff accelerates.</p>
               </Card>
 
-              <AmortizationTable rows={mortgageResult.amortization} defaultVisibleRows={60} />
+              <AmortizationTable rows={mortgageResult.amortization} defaultVisibleRows={60} metrics={mortgageMetrics} calculatorTitle="Mortgage Calculator" />
             </TabsContent>
 
             <TabsContent value="refinance" className="space-y-4">
@@ -443,7 +443,7 @@ export default function LoanCalculators() {
                 <p className="text-sm text-slate-600">Break-even months tell you how long it takes for monthly savings to recover closing costs. Also compare total interest left on your current loan versus interest on the new loan.</p>
               </Card>
 
-              <AmortizationTable rows={refinanceNewResult.amortization} defaultVisibleRows={60} title="New Loan Amortization (Monthly)" />
+              <AmortizationTable rows={refinanceNewResult.amortization} defaultVisibleRows={60} title="New Loan Amortization (Monthly)" metrics={refinanceMetrics} calculatorTitle="Refinance Calculator" />
             </TabsContent>
 
             <TabsContent value="buydown" className="space-y-4">
@@ -521,7 +521,7 @@ export default function LoanCalculators() {
                 </Table>
               </Card>
 
-              <AmortizationTable rows={buydownResult.amortization} defaultVisibleRows={48} title="Buydown Amortization (Monthly, First 48 Shown)" />
+              <AmortizationTable rows={buydownResult.amortization} defaultVisibleRows={48} title="Buydown Amortization (Monthly, First 48 Shown)" metrics={buydownMetrics} calculatorTitle="Buydown Mortgage Calculator" />
 
               <Card className="p-5 border-slate-200 bg-white space-y-3">
                 <h3 className="text-lg font-semibold text-slate-900">Explanation</h3>
@@ -604,7 +604,7 @@ export default function LoanCalculators() {
                 <p className="text-sm text-slate-600">Longer auto terms usually reduce monthly payment but increase total interest because you pay interest for more months. Shorter terms often cost less overall if affordable.</p>
               </Card>
 
-              <AmortizationTable rows={carResult.amortization} defaultVisibleRows={60} />
+              <AmortizationTable rows={carResult.amortization} defaultVisibleRows={60} metrics={carMetrics} calculatorTitle="Car Loan Calculator" />
             </TabsContent>
 
             <TabsContent value="personal" className="space-y-4">
@@ -631,7 +631,7 @@ export default function LoanCalculators() {
                 <p className="text-sm text-slate-600">Origination fees are upfront lender charges often deducted from disbursed funds. APR reflects borrowing cost, while fee deductions can reduce how much cash you actually receive.</p>
               </Card>
 
-              <AmortizationTable rows={personalResult.amortization} defaultVisibleRows={60} />
+              <AmortizationTable rows={personalResult.amortization} defaultVisibleRows={60} metrics={personalMetrics} calculatorTitle="Personal Loan Calculator" />
             </TabsContent>
 
             <TabsContent value="business" className="space-y-4">
@@ -679,7 +679,7 @@ export default function LoanCalculators() {
                 <p className="text-sm text-slate-600">Business lending products vary widely by lender. Real offers depend on underwriting, cash-flow profile, collateral, industry, and time in business.</p>
               </Card>
 
-              {businessMode === "term" ? <AmortizationTable rows={businessResult.amortization} defaultVisibleRows={60} title="Business Term Loan Amortization (Monthly)" /> : null}
+              {businessMode === "term" ? <AmortizationTable rows={businessResult.amortization} defaultVisibleRows={60} title="Business Term Loan Amortization (Monthly)" metrics={businessMetrics} calculatorTitle="Business Loan Calculator" /> : null}
             </TabsContent>
           </Tabs>
         </div>
