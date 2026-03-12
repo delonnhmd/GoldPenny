@@ -1,4 +1,4 @@
-import { type MouseEvent, useEffect, useRef, useState } from "react";
+import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trackBannerClick } from "@/lib/banner-behavior";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,16 @@ function getCtaDescription(banner: BannerAdItem) {
 function getCtaLabel(banner: BannerAdItem) {
   if (banner.ctaLabel?.trim()) return banner.ctaLabel;
   return "View Offer";
+}
+
+function normalizeAffiliateHtml(html: string) {
+  // Force protocol-relative assets to HTTPS so local HTTP dev doesn't trip CSP
+  // and production stays explicit/consistent.
+  return html.replace(
+    /\b(src|href|poster)\s*=\s*(['"])\/\/([^"' >]+)/gi,
+    (_match, attr: string, quote: string, url: string) =>
+      `${attr}=${quote}https://${url}`,
+  );
 }
 
 export function BannerRenderer({ banner, className }: BannerRendererProps) {
@@ -79,6 +89,10 @@ export function BannerRenderer({ banner, className }: BannerRendererProps) {
   };
 
   const renderAffiliateHtml = banner.type === "html" && Boolean(banner.htmlCode);
+  const affiliateHtml = useMemo(() => {
+    if (!renderAffiliateHtml) return "";
+    return normalizeAffiliateHtml(banner.htmlCode ?? "");
+  }, [banner.htmlCode, renderAffiliateHtml]);
 
   useEffect(() => {
     if (!renderAffiliateHtml) {
@@ -161,7 +175,7 @@ export function BannerRenderer({ banner, className }: BannerRendererProps) {
       window.clearTimeout(timeoutId);
       cleanupHandlers.forEach((remove) => remove());
     };
-  }, [banner.id, renderAffiliateHtml]);
+  }, [banner.id, renderAffiliateHtml, affiliateHtml]);
 
   return (
     <div
@@ -182,7 +196,7 @@ export function BannerRenderer({ banner, className }: BannerRendererProps) {
             <div
               ref={htmlContainerRef}
               className="affiliate-banner-html"
-              dangerouslySetInnerHTML={{ __html: banner.htmlCode ?? "" }}
+              dangerouslySetInnerHTML={{ __html: affiliateHtml }}
             />
             {showHtmlFallback ? (
               <div className="mx-auto mt-4 w-full max-w-3xl rounded-xl border border-slate-200 bg-slate-50 p-4">
