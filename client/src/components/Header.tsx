@@ -34,6 +34,7 @@ export function Header() {
             <Link href="/rates" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">News</Link>
             <Link href="/smart-penny" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Smart Penny</Link>
             <Link href="/loan-calculators" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Loan Calculators</Link>
+            <Link href="/shopping-guide" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Shopping Guide</Link>
             <a href="/#faq" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">FAQ</a>
           </>
         </nav>
@@ -71,6 +72,9 @@ export function Header() {
                   </SheetClose>
                   <SheetClose asChild>
                     <Link href="/loan-calculators" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Loan Calculators</Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/shopping-guide" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Shopping Guide</Link>
                   </SheetClose>
                   <SheetClose asChild>
                     <a href="/#faq" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">FAQ</a>

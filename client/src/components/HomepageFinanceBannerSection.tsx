@@ -9,7 +9,7 @@ export function HomepageFinanceBannerSection() {
         pageType: "homepage",
         currentPageCategory: "finance",
         slotType: "content-top",
-        maxItems: 1,
+        maxItems: 2,
       }),
     [],
   );

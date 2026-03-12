@@ -104,7 +104,7 @@ border="0" />`,
                   />
               </a>`,
     imageUrl: "",
-    allowedPages: ["blog", "market_blog"],
+    allowedPages: ["homepage", "loan", "mortgage", "blog", "market_blog"],
     enabled: true,
     priority: 9,
     clickCount: 0,

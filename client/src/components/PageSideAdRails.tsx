@@ -40,6 +40,10 @@ function getPageBannerContext(pathname: string): PageBannerContext | null {
     return { pageType: "blog", currentPageCategory: "finance" };
   }
 
+  if (pathname.startsWith("/shopping-guide")) {
+    return { pageType: "blog", currentPageCategory: "finance" };
+  }
+
   return { pageType: "blog", currentPageCategory: "finance" };
 }
 

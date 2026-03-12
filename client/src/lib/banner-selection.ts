@@ -82,9 +82,9 @@ function getAllowedCategoriesForPage(
   pageType: BannerPageType,
   currentPageCategory: BannerCategory,
 ): BannerCategory[] {
-  if (pageType === "homepage") return ["finance"];
-  if (pageType === "loan") return ["finance"];
-  if (pageType === "mortgage") return ["finance"];
+  if (pageType === "homepage") return ["finance", "trading"];
+  if (pageType === "loan") return ["finance", "trading"];
+  if (pageType === "mortgage") return ["finance", "trading"];
   if (pageType === "business") return ["finance", "business_software"];
   if (pageType === "market_blog") return ["finance", "business_software", "trading"];
 
@@ -128,6 +128,7 @@ function selectBlogBanners(
   pageType: BlogPageType,
   currentPageCategory: BannerCategory,
   maxItems: number,
+  slotCompatibleBanners: BannerAdItem[],
 ) {
   if (candidates.length === 0) {
     return [];
@@ -142,12 +143,13 @@ function selectBlogBanners(
       return currentCategoryOnly.sort(sortByPriorityDesc).slice(0, maxItems);
     }
 
-    // If current category has no candidates, finance is the default fallback.
-    const financeFallback = getEnabledBanners().filter(
+    // If current category has no candidates, fall back to finance banners that
+    // are already slot-compatible (use slotCompatibleBanners, not the full
+    // inventory, so a 728x90 leaderboard never ends up in a sidebar slot).
+    const financeFallback = slotCompatibleBanners.filter(
       (banner) =>
         banner.category === "finance" &&
-        banner.allowedPages.includes(pageType) &&
-        banner.enabled,
+        banner.allowedPages.includes(pageType),
     );
     return financeFallback.sort(sortByPriorityDesc).slice(0, maxItems);
   }
@@ -186,7 +188,9 @@ export function selectBannersForPage({
   const candidates = filterCandidatesByPageRules(enabled, pageType, currentPageCategory);
 
   if (pageType === "blog" || pageType === "market_blog") {
-    return selectBlogBanners(candidates, pageType, currentPageCategory, maxItems);
+    // Pass `enabled` (already slot-filtered) so the finance fallback inside
+    // selectBlogBanners never returns a banner incompatible with the current slot.
+    return selectBlogBanners(candidates, pageType, currentPageCategory, maxItems, enabled);
   }
 
   // Homepage and core money pages are deterministic: no behavior-based mixing.
