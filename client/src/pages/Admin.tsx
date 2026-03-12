@@ -14,7 +14,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import TurndownService from "turndown";
 
-type AdminPage = "rates" | "smart-penny";
+type AdminPage = "rates" | "smart-penny" | "shopping-guide";
 
 function escapeCsv(value: string | number) {
   const str = String(value ?? "");
@@ -103,7 +103,7 @@ export default function Admin() {
 
         toast({
           title: "Post published",
-          description: `${page === "rates" ? "News" : "Smart Penny"} post is now live.`,
+          description: `${page === "rates" ? "News" : page === "smart-penny" ? "Smart Penny" : "Shopping Guide"} post is now live.`,
         });
       }
 
@@ -357,6 +357,7 @@ export default function Admin() {
                 <div className="flex flex-wrap gap-2">
                   <Button type="button" variant={page === "rates" ? "default" : "outline"} onClick={() => setPage("rates")}>News Page</Button>
                   <Button type="button" variant={page === "smart-penny" ? "default" : "outline"} onClick={() => setPage("smart-penny")}>Smart Penny Page</Button>
+                  <Button type="button" variant={page === "shopping-guide" ? "default" : "outline"} onClick={() => setPage("shopping-guide")}>Shopping Guide Page</Button>
                 </div>
 
                 <div className="space-y-2">

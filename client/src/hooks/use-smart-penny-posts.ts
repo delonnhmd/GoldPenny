@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { api, type CreateSmartPennyPostRequest, type SmartPennyPostResponse } from "@shared/routes";
 import { queryClient } from "@/lib/queryClient";
 
-type SmartPennyPage = "rates" | "smart-penny";
+type SmartPennyPage = "rates" | "smart-penny" | "shopping-guide";
 
 export function useSmartPennyPosts(page: SmartPennyPage) {
   return useQuery<SmartPennyPostResponse>({

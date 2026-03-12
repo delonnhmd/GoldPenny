@@ -43,7 +43,7 @@ export const insertLeadSchema = createInsertSchema(leads).omit({
   phone: true // no longer collected from website forms
 });
 
-export const smartPennyPageSchema = z.enum(["rates", "smart-penny"]);
+export const smartPennyPageSchema = z.enum(["rates", "smart-penny", "shopping-guide"]);
 
 export const upsertSmartPennyUpdateSchema = z.object({
   page: smartPennyPageSchema,

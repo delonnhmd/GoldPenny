@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import {
   CheckCircle2,
@@ -23,6 +23,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { setPageSeo } from "@/lib/seo";
+import { useSmartPennyPosts } from "@/hooks/use-smart-penny-posts";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const PAGE_TITLE = "Loan Shopping Guide: How to Compare & Choose the Right Loan | PennyFloat";
 const PAGE_DESCRIPTION = "Learn how to shop for personal, auto, and mortgage loans the smart way. Compare APR, fees, terms, and lender reputation before you commit.";
@@ -218,6 +221,22 @@ export default function ShoppingGuide() {
       robots: "index, follow, max-image-preview:large",
     });
   }, []);
+
+  const { data: posts, isLoading: postsLoading } = useSmartPennyPosts("shopping-guide");
+  const [expandedPosts, setExpandedPosts] = useState<Record<number, boolean>>({});
+
+  function getWordPreview(content: string, limit = 100) {
+    const plainText = content
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+      .replace(/\[[^\]]+\]\([^)]*\)/g, "$1")
+      .replace(/[*_`>#~-]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    const words = plainText.split(/\s+/);
+    const isTruncated = words.length > limit;
+    const preview = isTruncated ? `${words.slice(0, limit).join(" ")}...` : plainText;
+    return { preview, isTruncated };
+  }
 
   return (
     <div className="min-h-screen bg-[#f4fafc] font-sans">
@@ -452,6 +471,84 @@ export default function ShoppingGuide() {
             </div>
           </div>
         </section>
+
+        {/* Shopping Guide Posts */}
+        {(postsLoading || (posts && posts.length > 0)) && (
+          <section className="py-16 md:py-20 bg-[#f4fafc]">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <div className="text-center mb-10">
+                <h2 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Shopping Guide Posts</h2>
+                <p className="text-slate-600 mt-3">Expert tips and updates from the PennyFloat team.</p>
+              </div>
+
+              {postsLoading ? (
+                <Card className="p-6 md:p-8 border-slate-200 bg-white">
+                  <p className="text-slate-500">Loading posts…</p>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {(posts ?? []).map((post) => {
+                    const isExpanded = Boolean(expandedPosts[post.id]);
+                    const { preview, isTruncated } = getWordPreview(post.content, 120);
+                    const fullContentId = `shopping-guide-post-full-${post.id}`;
+
+                    return (
+                      <Card key={post.id} className="p-6 md:p-8 border-slate-200 bg-white">
+                        <h3 className="text-2xl font-bold text-slate-900 mb-2">{post.title}</h3>
+                        <p className="text-xs text-slate-500 mb-4">Published: {new Date(post.createdAt).toLocaleString()}</p>
+
+                        <p className={isExpanded ? "hidden" : "text-slate-700 leading-relaxed whitespace-pre-line"}>{preview}</p>
+
+                        <div id={fullContentId} className={isExpanded ? "block" : "hidden"}>
+                          <div className="prose prose-slate max-w-none prose-p:leading-relaxed">
+                            <ReactMarkdown
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                img: ({ node: _node, ...props }) => {
+                                  const align = (props.title ?? "").toLowerCase().trim();
+                                  const floatClass = align === "left"
+                                    ? "md:float-left md:mr-4"
+                                    : "md:float-right md:ml-4";
+                                  return (
+                                    <img
+                                      {...props}
+                                      className={`not-prose ${floatClass} md:mb-3 md:mt-1 rounded-md max-w-full h-auto md:w-[220px]`}
+                                      loading="lazy"
+                                    />
+                                  );
+                                },
+                              }}
+                            >
+                              {post.content}
+                            </ReactMarkdown>
+                          </div>
+                          <div className="clear-both" />
+                        </div>
+
+                        {isTruncated ? (
+                          <button
+                            type="button"
+                            className="mt-3 text-sm font-semibold text-primary hover:underline"
+                            aria-expanded={isExpanded}
+                            aria-controls={fullContentId}
+                            onClick={() =>
+                              setExpandedPosts((current) => ({
+                                ...current,
+                                [post.id]: !current[post.id],
+                              }))
+                            }
+                          >
+                            {isExpanded ? "Show less" : "Show more"}
+                          </button>
+                        ) : null}
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* CTA */}
         <section className="py-16 md:py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900">
