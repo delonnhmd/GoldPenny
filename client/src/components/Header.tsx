@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Menu } from "lucide-react";
+import { ChevronDown, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -7,6 +7,12 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
+
+const calculatorSubpages = [
+  { label: "Loan Calculators", href: "/loan-calculators" },
+  { label: "Mortgage Underwriting", href: "/mortgage-underwriting" },
+  { label: "Money Tools", href: "/money-tools" },
+] as const;
 
 export function Header() {
   return (
@@ -33,7 +39,29 @@ export function Header() {
             <a href="/#benefits" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Benefits</a>
             <Link href="/rates" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">News</Link>
             <Link href="/smart-penny" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Smart Penny</Link>
-            <Link href="/loan-calculators" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Loan Calculators</Link>
+            <div className="relative group">
+              <Link href="/loan-calculators" className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-primary transition-colors">
+                Calculator
+                <ChevronDown className="h-4 w-4" />
+              </Link>
+
+              <div className="pointer-events-none invisible opacity-0 translate-y-2 absolute left-1/2 top-full z-50 mt-3 w-72 -translate-x-1/2 transition-all duration-150 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-0 group-focus-within:pointer-events-auto">
+                <div className="rounded-xl border border-slate-200 bg-white p-3 shadow-xl">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Calculator</p>
+                  <div className="relative mt-3 pl-5">
+                    <div className="absolute left-1 top-1 bottom-1 w-px bg-slate-200" />
+                    <div className="space-y-2">
+                      {calculatorSubpages.map((item) => (
+                        <Link key={item.href} href={item.href} className="relative block rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-primary">
+                          <span className="absolute -left-[13px] top-1/2 h-px w-3 -translate-y-1/2 bg-slate-300" />
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <Link href="/shopping-guide" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Shopping Guide</Link>
             <a href="/#faq" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">FAQ</a>
           </>
@@ -71,8 +99,18 @@ export function Header() {
                     <Link href="/smart-penny" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Smart Penny</Link>
                   </SheetClose>
                   <SheetClose asChild>
-                    <Link href="/loan-calculators" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Loan Calculators</Link>
+                    <Link href="/loan-calculators" className="rounded-md px-2 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100">Calculator</Link>
                   </SheetClose>
+                  <div className="ml-3 border-l border-slate-200 pl-3 space-y-1">
+                    {calculatorSubpages.map((item) => (
+                      <SheetClose asChild key={item.href}>
+                        <Link href={item.href} className="relative block rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">
+                          <span className="absolute -left-3 top-1/2 h-px w-2 -translate-y-1/2 bg-slate-300" />
+                          {item.label}
+                        </Link>
+                      </SheetClose>
+                    ))}
+                  </div>
                   <SheetClose asChild>
                     <Link href="/shopping-guide" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Shopping Guide</Link>
                   </SheetClose>

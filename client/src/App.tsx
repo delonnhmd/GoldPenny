@@ -11,6 +11,8 @@ import News from "./pages/News";
 import SmartPenny from "./pages/SmartPenny";
 import Admin from "./pages/Admin";
 import LoanCalculators from "./pages/LoanCalculators";
+import MortgageUnderwriting from "./pages/MortgageUnderwriting";
+import MoneyTools from "./pages/MoneyTools";
 import ShoppingGuide from "./pages/ShoppingGuide";
 import AffiliateDisclosure from "./pages/AffiliateDisclosure";
 import TexasCashAdvanceApps2026 from "./pages/TexasCashAdvanceApps2026";
@@ -24,6 +26,8 @@ function Router() {
       <Route path="/smart-penny" component={SmartPenny} />
       <Route path="/texas-cash-advance-apps-2026" component={TexasCashAdvanceApps2026} />
       <Route path="/loan-calculators" component={LoanCalculators} />
+      <Route path="/mortgage-underwriting" component={MortgageUnderwriting} />
+      <Route path="/money-tools" component={MoneyTools} />
       <Route path="/shopping-guide" component={ShoppingGuide} />
       <Route path="/affiliate-disclosure" component={AffiliateDisclosure} />
       <Route path="/admin" component={Admin} />

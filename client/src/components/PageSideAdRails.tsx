@@ -24,6 +24,14 @@ function getPageBannerContext(pathname: string): PageBannerContext | null {
     return { pageType: "mortgage", currentPageCategory: "finance" };
   }
 
+  if (pathname.startsWith("/mortgage-underwriting")) {
+    return { pageType: "mortgage", currentPageCategory: "finance" };
+  }
+
+  if (pathname.startsWith("/money-tools")) {
+    return { pageType: "blog", currentPageCategory: "finance" };
+  }
+
   if (pathname.startsWith("/smart-penny")) {
     return { pageType: "blog", currentPageCategory: "business_software" };
   }
