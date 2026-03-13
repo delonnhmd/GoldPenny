@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,7 +36,7 @@ import { setPageSeo } from "@/lib/seo";
 
 const PAGE_TITLE = "Loan Calculators: Mortgage, Auto, Personal & Business | PennyFloat";
 const PAGE_DESCRIPTION = "Use loan calculators to estimate monthly payments, APR impact, interest cost, and total repayment across mortgage, auto, personal, and business scenarios.";
-const PAGE_KEYWORDS = "loan calculators, mortgage calculator, mortgage payment calculator, amortization schedule calculator, refinance calculator, buydown mortgage calculator, auto loan calculator, car payment calculator, personal loan calculator, business loan calculator, APR calculator, loan interest calculator";
+const PAGE_KEYWORDS = "loan calculators, mortgage payment calculator, home loan calculator, FHA loan calculator, VA loan calculator, conventional loan calculator, mortgage affordability calculator, DTI calculator for mortgage, how much house can I afford, amortization schedule calculator, refinance calculator, auto loan calculator, personal loan calculator, business loan calculator";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/loan-calculators";
 
 const MAX_RATE = 100;
@@ -42,6 +44,194 @@ const MAX_RATE = 100;
 type FeesMode = "percent" | "flat";
 type TermUnit = "years" | "months";
 type BusinessMode = "term" | "mca";
+type DownPaymentInputMode = "amount" | "percent";
+type MortgageLoanType = "conventional" | "fha" | "va";
+type QualificationStatus = "Strong" | "Possible" | "Needs Review" | "Unlikely";
+
+interface DownPaymentSyncResult {
+  downPaymentAmount: number;
+  downPaymentPercent: number;
+  loanAmount: number;
+}
+
+interface DtiRatioResult {
+  frontEnd: number;
+  backEnd: number;
+}
+
+interface LoanTypeGuidanceInput {
+  loanType: MortgageLoanType;
+  ficoScore: number;
+  frontEndDti: number;
+  backEndDti: number;
+}
+
+const MORTGAGE_PROGRAM_COMPARISON = [
+  {
+    loanType: "Conventional",
+    preferred: "36% preferred",
+    maximum: "Up to 50%",
+    minFico: "620",
+  },
+  {
+    loanType: "FHA",
+    preferred: "43% standard",
+    maximum: "Up to ~57% possible",
+    minFico: "500 agency / 580+ common lender",
+  },
+  {
+    loanType: "VA",
+    preferred: "41% benchmark",
+    maximum: "No strict cap",
+    minFico: "No official minimum / 580+ common lender",
+  },
+] as const;
+
+function clampNumber(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
+
+function toWholeNumber(value: number, fallback = 0): number {
+  if (!Number.isFinite(value)) return fallback;
+  return Math.round(value);
+}
+
+function roundPercentToOneDecimal(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.round(value * 10) / 10;
+}
+
+function syncDownPaymentByAmount(propertyValue: number, downPaymentAmount: number): DownPaymentSyncResult {
+  const safePropertyValue = toNonNegativeNumber(propertyValue);
+  const clampedAmount = clampNumber(toNonNegativeNumber(downPaymentAmount), 0, safePropertyValue);
+  const percent = safePropertyValue > 0 ? (clampedAmount / safePropertyValue) * 100 : 0;
+
+  return {
+    downPaymentAmount: clampedAmount,
+    downPaymentPercent: roundPercentToOneDecimal(percent),
+    loanAmount: Math.max(0, safePropertyValue - clampedAmount),
+  };
+}
+
+function syncDownPaymentByPercent(propertyValue: number, downPaymentPercent: number): DownPaymentSyncResult {
+  const safePropertyValue = toNonNegativeNumber(propertyValue);
+  const clampedPercent = clampNumber(toNonNegativeNumber(downPaymentPercent), 0, 100);
+  const amount = safePropertyValue * (clampedPercent / 100);
+
+  return {
+    downPaymentAmount: amount,
+    downPaymentPercent: roundPercentToOneDecimal(clampedPercent),
+    loanAmount: Math.max(0, safePropertyValue - amount),
+  };
+}
+
+function calculateDtiRatios(input: {
+  monthlyIncome: number;
+  monthlyDebts: number;
+  monthlyHousingPayment: number;
+}): DtiRatioResult | null {
+  const monthlyIncome = toNonNegativeNumber(input.monthlyIncome);
+  if (monthlyIncome <= 0) return null;
+
+  const monthlyDebts = toNonNegativeNumber(input.monthlyDebts);
+  const monthlyHousingPayment = toNonNegativeNumber(input.monthlyHousingPayment);
+  const frontEnd = roundPercentToOneDecimal((monthlyHousingPayment / monthlyIncome) * 100);
+  const backEnd = roundPercentToOneDecimal(((monthlyDebts + monthlyHousingPayment) / monthlyIncome) * 100);
+
+  return { frontEnd, backEnd };
+}
+
+function getLoanTypeGuidance({ loanType, ficoScore, frontEndDti, backEndDti }: LoanTypeGuidanceInput): string[] {
+  const guidance: string[] = [];
+
+  if (loanType === "conventional") {
+    if (ficoScore < 620) {
+      guidance.push("FICO is below common conventional minimum.");
+    }
+    if (frontEndDti > 28) {
+      guidance.push("Front-end DTI is above the commonly recommended conventional range (~28%).");
+    }
+    if (backEndDti <= 36) {
+      guidance.push("Within preferred conventional DTI range.");
+    } else if (backEndDti <= 45) {
+      guidance.push("May qualify for conventional financing depending on full file strength.");
+    } else if (backEndDti <= 50) {
+      guidance.push("Possible with strong credit, reserves, or AUS approval.");
+    } else {
+      guidance.push("Above common conventional DTI limits.");
+    }
+    return guidance;
+  }
+
+  if (loanType === "fha") {
+    if (ficoScore < 500) {
+      guidance.push("FICO is below FHA minimum.");
+    } else if (ficoScore < 580) {
+      guidance.push("Meets agency minimum but may not meet many lender overlays.");
+    }
+
+    if (frontEndDti > 31) {
+      guidance.push("Front-end DTI is above the standard FHA benchmark (31%).");
+    }
+
+    if (backEndDti <= 43) {
+      guidance.push("Within standard FHA DTI guideline.");
+    } else if (backEndDti <= 50) {
+      guidance.push("May still qualify with AUS approval.");
+    } else if (backEndDti <= 57) {
+      guidance.push("Possible with strong compensating factors.");
+    } else {
+      guidance.push("Above common FHA approval range.");
+    }
+    return guidance;
+  }
+
+  if (ficoScore < 580) {
+    guidance.push("VA has no official minimum, but many lenders require higher scores.");
+  }
+  if (backEndDti <= 41) {
+    guidance.push("Within VA benchmark ratio.");
+  } else {
+    guidance.push("Above VA benchmark; approval may still be possible if residual income is strong.");
+  }
+  guidance.push("VA loans do not use a strict DTI cap like other programs.");
+  return guidance;
+}
+
+function getQualificationStatus(input: {
+  loanType: MortgageLoanType;
+  ficoScore: number;
+  backEndDti: number;
+}): QualificationStatus {
+  const fico = input.ficoScore;
+  const backEndDti = input.backEndDti;
+
+  if (input.loanType === "conventional") {
+    if (fico >= 680 && backEndDti <= 36) return "Strong";
+    if (fico >= 620 && backEndDti <= 45) return "Possible";
+    if (fico >= 620 && backEndDti <= 50) return "Needs Review";
+    return "Unlikely";
+  }
+
+  if (input.loanType === "fha") {
+    if (fico >= 620 && backEndDti <= 43) return "Strong";
+    if (fico >= 580 && backEndDti <= 50) return "Possible";
+    if (fico >= 500 && backEndDti <= 57) return "Needs Review";
+    return "Unlikely";
+  }
+
+  if (fico >= 620 && backEndDti <= 41) return "Strong";
+  if (fico >= 580 && backEndDti <= 50) return "Possible";
+  if (fico < 500 && backEndDti > 65) return "Unlikely";
+  return "Needs Review";
+}
+
+function getQualificationBadgeClasses(status: QualificationStatus): string {
+  if (status === "Strong") return "bg-emerald-100 text-emerald-800 border-emerald-200";
+  if (status === "Possible") return "bg-blue-100 text-blue-800 border-blue-200";
+  if (status === "Needs Review") return "bg-amber-100 text-amber-800 border-amber-200";
+  return "bg-red-100 text-red-800 border-red-200";
+}
 
 function clampRate(value: number): number {
   return Math.min(MAX_RATE, toNonNegativeNumber(value));
@@ -100,17 +290,67 @@ export default function LoanCalculators() {
 
   const [activeTab, setActiveTab] = useState("mortgage");
 
-  const [mortgageAmount, setMortgageAmount] = useState(300000);
+  const initialMortgageSync = syncDownPaymentByPercent(400000, 20);
+  const [propertyValue, setPropertyValue] = useState(400000);
+  const [downPaymentInputMode, setDownPaymentInputMode] = useState<DownPaymentInputMode>("percent");
+  const [downPaymentAmount, setDownPaymentAmount] = useState(initialMortgageSync.downPaymentAmount);
+  const [downPaymentPercent, setDownPaymentPercent] = useState(initialMortgageSync.downPaymentPercent);
+  const [mortgageLoanType, setMortgageLoanType] = useState<MortgageLoanType>("conventional");
+  const [ficoScore, setFicoScore] = useState(680);
+  const [monthlyIncome, setMonthlyIncome] = useState(9000);
+  const [otherMonthlyDebts, setOtherMonthlyDebts] = useState(500);
   const [mortgageRate, setMortgageRate] = useState(6.5);
   const [mortgageTermChoice, setMortgageTermChoice] = useState("30");
   const [mortgageCustomYears, setMortgageCustomYears] = useState(25);
-  const [propertyTaxMonthly, setPropertyTaxMonthly] = useState(0);
-  const [insuranceMonthly, setInsuranceMonthly] = useState(0);
+  const [propertyTaxAnnual, setPropertyTaxAnnual] = useState(4800);
+  const [insuranceAnnual, setInsuranceAnnual] = useState(1800);
   const [hoaMonthly, setHoaMonthly] = useState(0);
   const [miMonthly, setMiMonthly] = useState(0);
 
+  const syncMortgageByAmount = (nextPropertyValue: number, nextDownPaymentAmount: number) => {
+    const synced = syncDownPaymentByAmount(nextPropertyValue, nextDownPaymentAmount);
+    setDownPaymentAmount(synced.downPaymentAmount);
+    setDownPaymentPercent(synced.downPaymentPercent);
+  };
+
+  const syncMortgageByPercent = (nextPropertyValue: number, nextDownPaymentPercent: number) => {
+    const synced = syncDownPaymentByPercent(nextPropertyValue, nextDownPaymentPercent);
+    setDownPaymentAmount(synced.downPaymentAmount);
+    setDownPaymentPercent(synced.downPaymentPercent);
+  };
+
+  const handlePropertyValueChange = (value: number) => {
+    const nextPropertyValue = toNonNegativeNumber(value);
+    setPropertyValue(nextPropertyValue);
+    if (downPaymentInputMode === "amount") {
+      syncMortgageByAmount(nextPropertyValue, downPaymentAmount);
+    } else {
+      syncMortgageByPercent(nextPropertyValue, downPaymentPercent);
+    }
+  };
+
+  const handleDownPaymentModeChange = (value: DownPaymentInputMode) => {
+    setDownPaymentInputMode(value);
+    if (value === "amount") {
+      syncMortgageByAmount(propertyValue, downPaymentAmount);
+    } else {
+      syncMortgageByPercent(propertyValue, downPaymentPercent);
+    }
+  };
+
+  const handleDownPaymentAmountChange = (value: number) => {
+    syncMortgageByAmount(propertyValue, value);
+  };
+
+  const handleDownPaymentPercentChange = (value: number) => {
+    syncMortgageByPercent(propertyValue, value);
+  };
+
   const mortgageTermYears = mortgageTermChoice === "custom" ? mortgageCustomYears : Number(mortgageTermChoice);
   const mortgageTermMonths = toPositiveInt(mortgageTermYears, 1) * 12;
+  const mortgageAmount = Math.max(0, toNonNegativeNumber(propertyValue) - toNonNegativeNumber(downPaymentAmount));
+  const propertyTaxMonthly = toNonNegativeNumber(propertyTaxAnnual) / 12;
+  const insuranceMonthly = toNonNegativeNumber(insuranceAnnual) / 12;
 
   const mortgageResult = useMemo(
     () =>
@@ -244,15 +484,85 @@ export default function LoanCalculators() {
     [businessAmount, businessRate, businessTermMonths],
   );
 
-  const mortgageMetrics: SummaryMetric[] = [
+  const totalMonthlyMortgagePayment = mortgageResult.monthlyPayment + mortgageExtras;
+  const ficoScoreWhole = toWholeNumber(ficoScore, 0);
+  const ficoForGuidance = clampNumber(ficoScoreWhole, 300, 850);
+  const isFicoInRange = ficoScoreWhole >= 300 && ficoScoreWhole <= 850;
+
+  const dtiRatios = useMemo(
+    () =>
+      calculateDtiRatios({
+        monthlyIncome: toNonNegativeNumber(monthlyIncome),
+        monthlyDebts: toNonNegativeNumber(otherMonthlyDebts),
+        monthlyHousingPayment: totalMonthlyMortgagePayment,
+      }),
+    [monthlyIncome, otherMonthlyDebts, totalMonthlyMortgagePayment],
+  );
+
+  const qualificationStatus: QualificationStatus = useMemo(() => {
+    if (!dtiRatios || !isFicoInRange) return "Needs Review";
+    return getQualificationStatus({
+      loanType: mortgageLoanType,
+      ficoScore: ficoForGuidance,
+      backEndDti: dtiRatios.backEnd,
+    });
+  }, [dtiRatios, ficoForGuidance, isFicoInRange, mortgageLoanType]);
+
+  const mortgageGuidance = useMemo(() => {
+    if (!dtiRatios) {
+      return ["Enter monthly income to calculate front-end and back-end DTI guidance."];
+    }
+
+    const messages = getLoanTypeGuidance({
+      loanType: mortgageLoanType,
+      ficoScore: ficoForGuidance,
+      frontEndDti: dtiRatios.frontEnd,
+      backEndDti: dtiRatios.backEnd,
+    });
+
+    if (!isFicoInRange) {
+      messages.unshift("Enter a FICO score between 300 and 850 for more accurate guidance.");
+    }
+
+    return messages;
+  }, [dtiRatios, ficoForGuidance, isFicoInRange, mortgageLoanType]);
+
+  const homeLoanSummaryMetrics: SummaryMetric[] = [
+    { label: "Property Value", value: formatCurrency(propertyValue) },
+    { label: "Down Payment ($)", value: formatCurrency(downPaymentAmount) },
+    { label: "Down Payment (%)", value: formatPercent(downPaymentPercent, 1) },
+    { label: "Estimated Loan Amount", value: formatCurrency(mortgageAmount) },
+  ];
+
+  const monthlyPaymentBreakdownMetrics: SummaryMetric[] = [
+    { label: "Principal & Interest", value: formatCurrency(mortgageResult.monthlyPayment) },
+    { label: "Property Tax (Monthly Est.)", value: formatCurrency(propertyTaxMonthly) },
+    { label: "Insurance (Monthly Est.)", value: formatCurrency(insuranceMonthly) },
+    { label: "Monthly MI / MIP", value: formatCurrency(miMonthly) },
+    { label: "HOA (Monthly)", value: formatCurrency(hoaMonthly) },
+    { label: "Total Monthly Mortgage Payment", value: formatCurrency(totalMonthlyMortgagePayment) },
+    { label: "Total Interest Over Full Term", value: formatCurrency(mortgageResult.totalInterest) },
+  ];
+
+  const dtiSummaryMetrics: SummaryMetric[] = [
+    { label: "Front-end DTI", value: dtiRatios ? formatPercent(dtiRatios.frontEnd, 1) : "N/A" },
+    { label: "Back-end DTI", value: dtiRatios ? formatPercent(dtiRatios.backEnd, 1) : "N/A" },
+    {
+      label: "Monthly Income",
+      value: formatCurrency(monthlyIncome),
+    },
+    {
+      label: "Other Monthly Debts",
+      value: formatCurrency(otherMonthlyDebts),
+    },
+  ];
+
+  const mortgageAmortizationMetrics: SummaryMetric[] = [
+    { label: "Loan Amount", value: formatCurrency(mortgageAmount) },
     { label: "Monthly Payment (P&I)", value: formatCurrency(mortgageResult.monthlyPayment) },
     { label: "Total Interest", value: formatCurrency(mortgageResult.totalInterest) },
     { label: "Total Paid", value: formatCurrency(mortgageResult.totalPaid) },
-    {
-      label: "Total Monthly with Optional Items",
-      value: formatCurrency(mortgageResult.monthlyPayment + mortgageExtras),
-      hint: "Adds property tax, insurance, HOA, and MI only when entered.",
-    },
+    { label: "Total Monthly Mortgage", value: formatCurrency(totalMonthlyMortgagePayment) },
   ];
 
   const refinanceMetrics: SummaryMetric[] = [
@@ -324,10 +634,130 @@ export default function LoanCalculators() {
             </TabsList>
 
             <TabsContent value="mortgage" className="space-y-4">
+              <Card className="p-5 border-slate-200 bg-white space-y-3">
+                <h2 className="text-2xl font-semibold text-slate-900">Mortgage Payment &amp; Qualification Calculator</h2>
+                <p className="text-sm text-slate-600">
+                  Use this mortgage payment calculator to estimate your monthly payment, loan amount, down payment, DTI ratio, and basic eligibility for FHA, VA, and conventional loans.
+                  Enter the property value, down payment, interest rate, loan term, taxes, insurance, income, debts, loan type, and FICO score to view your estimated mortgage scenario.
+                  This combines a mortgage payment calculator, home loan calculator, FHA loan calculator, VA loan calculator, conventional loan calculator, mortgage affordability calculator,
+                  and DTI calculator for mortgage scenarios to help answer how much house can I afford.
+                </p>
+              </Card>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Card className="p-5 border-slate-200 bg-white space-y-4">
                   <h2 className="text-xl font-semibold text-slate-900">Mortgage Inputs</h2>
-                  <NumberField id="mortgage-amount" label="Loan Amount" value={mortgageAmount} onChange={(value) => setMortgageAmount(toNonNegativeNumber(value))} step={1000} />
+                  <NumberField
+                    id="property-value"
+                    label="Property Value"
+                    value={propertyValue}
+                    onChange={handlePropertyValueChange}
+                    step={1000}
+                  />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="down-payment-type">Down Payment Input Type</Label>
+                      <Select value={downPaymentInputMode} onValueChange={(value) => handleDownPaymentModeChange(value as DownPaymentInputMode)}>
+                        <SelectTrigger id="down-payment-type">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="amount">Dollar Amount</SelectItem>
+                          <SelectItem value="percent">Percentage</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {downPaymentInputMode === "amount" ? (
+                      <NumberField
+                        id="down-payment-amount"
+                        label="Down Payment ($)"
+                        value={downPaymentAmount}
+                        onChange={handleDownPaymentAmountChange}
+                        step={500}
+                      />
+                    ) : (
+                      <NumberField
+                        id="down-payment-percent"
+                        label="Down Payment (%)"
+                        value={downPaymentPercent}
+                        onChange={handleDownPaymentPercentChange}
+                        step={0.1}
+                        max={100}
+                        suffix="%"
+                      />
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="down-payment-auto">
+                        {downPaymentInputMode === "amount" ? "Down Payment (%)" : "Down Payment ($)"}
+                      </Label>
+                      <Input
+                        id="down-payment-auto"
+                        readOnly
+                        value={downPaymentInputMode === "amount" ? formatPercent(downPaymentPercent, 1) : formatCurrency(downPaymentAmount)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="loan-amount-auto">Loan Amount (Auto)</Label>
+                      <Input id="loan-amount-auto" readOnly value={formatCurrency(mortgageAmount)} />
+                    </div>
+                  </div>
+                  {propertyValue <= 0 ? (
+                    <p className="text-xs text-red-700">Enter a property value greater than $0.</p>
+                  ) : null}
+                  {downPaymentAmount >= propertyValue && propertyValue > 0 ? (
+                    <p className="text-xs text-amber-700">Down payment is at or above property value. Loan amount is zero.</p>
+                  ) : null}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="mortgage-loan-type">Loan Type</Label>
+                      <Select value={mortgageLoanType} onValueChange={(value) => setMortgageLoanType(value as MortgageLoanType)}>
+                        <SelectTrigger id="mortgage-loan-type">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="conventional">Conventional</SelectItem>
+                          <SelectItem value="fha">FHA</SelectItem>
+                          <SelectItem value="va">VA</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <NumberField
+                      id="fico-score"
+                      label="FICO Score"
+                      value={ficoScore}
+                      onChange={(value) => setFicoScore(toWholeNumber(value, 0))}
+                      min={0}
+                      max={900}
+                      step={1}
+                    />
+                  </div>
+                  {!isFicoInRange ? (
+                    <p className="text-xs text-red-700">Enter a whole-number FICO score between 300 and 850.</p>
+                  ) : null}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <NumberField
+                      id="monthly-income"
+                      label="Monthly Income (Gross)"
+                      value={monthlyIncome}
+                      onChange={(value) => setMonthlyIncome(toNonNegativeNumber(value))}
+                      step={100}
+                    />
+                    <NumberField
+                      id="monthly-debts"
+                      label="Other Monthly Debts"
+                      value={otherMonthlyDebts}
+                      onChange={(value) => setOtherMonthlyDebts(toNonNegativeNumber(value))}
+                      step={50}
+                    />
+                  </div>
+
                   <NumberField id="mortgage-rate" label="Interest Rate" value={mortgageRate} onChange={(value) => setMortgageRate(clampRate(value))} step={0.01} max={MAX_RATE} suffix="%" />
 
                   <div className="space-y-2">
@@ -352,13 +782,13 @@ export default function LoanCalculators() {
 
                   <Accordion type="single" collapsible>
                     <AccordionItem value="mortgage-advanced">
-                      <AccordionTrigger>Advanced (Optional Monthly Items)</AccordionTrigger>
+                      <AccordionTrigger>Advanced (Taxes, Insurance, HOA, MI / MIP)</AccordionTrigger>
                       <AccordionContent>
                         <div className="space-y-3">
-                          <NumberField id="property-tax" label="Property Tax (Monthly)" value={propertyTaxMonthly} onChange={(value) => setPropertyTaxMonthly(toNonNegativeNumber(value))} step={1} />
-                          <NumberField id="home-insurance" label="Home Insurance (Monthly)" value={insuranceMonthly} onChange={(value) => setInsuranceMonthly(toNonNegativeNumber(value))} step={1} />
+                          <NumberField id="property-tax-annual" label="Annual Property Tax" value={propertyTaxAnnual} onChange={(value) => setPropertyTaxAnnual(toNonNegativeNumber(value))} step={100} />
+                          <NumberField id="home-insurance-annual" label="Annual Homeowners Insurance" value={insuranceAnnual} onChange={(value) => setInsuranceAnnual(toNonNegativeNumber(value))} step={100} />
                           <NumberField id="hoa" label="HOA (Monthly)" value={hoaMonthly} onChange={(value) => setHoaMonthly(toNonNegativeNumber(value))} step={1} />
-                          <NumberField id="mi" label="MI (Monthly)" value={miMonthly} onChange={(value) => setMiMonthly(toNonNegativeNumber(value))} step={1} />
+                          <NumberField id="mi" label="Monthly MI / MIP (Optional)" value={miMonthly} onChange={(value) => setMiMonthly(toNonNegativeNumber(value))} step={1} />
                         </div>
                       </AccordionContent>
                     </AccordionItem>
@@ -367,22 +797,102 @@ export default function LoanCalculators() {
 
                 <div className="space-y-4">
                   <Card className="p-4 border-slate-200 bg-blue-50/50">
-                    <p className="text-sm font-medium text-blue-900">Principal & Interest only: base payment excludes taxes, insurance, HOA, and MI unless entered above.</p>
+                    <p className="text-sm font-medium text-blue-900">Calculated loan amount and payment update automatically from property value and down payment.</p>
                   </Card>
-                  <ResultMetrics metrics={mortgageMetrics} />
+
+                  <Card className="p-4 border-slate-200 bg-white space-y-3">
+                    <h3 className="text-base font-semibold text-slate-900">1. Home / Loan Summary</h3>
+                    <ResultMetrics metrics={homeLoanSummaryMetrics} />
+                  </Card>
+
+                  <Card className="p-4 border-slate-200 bg-white space-y-3">
+                    <h3 className="text-base font-semibold text-slate-900">2. Monthly Payment Breakdown</h3>
+                    <ResultMetrics metrics={monthlyPaymentBreakdownMetrics} />
+                  </Card>
+
+                  <Card className="p-4 border-slate-200 bg-white space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-base font-semibold text-slate-900">3. DTI &amp; Qualification Summary</h3>
+                      <Badge className={`border ${getQualificationBadgeClasses(qualificationStatus)}`}>{qualificationStatus}</Badge>
+                    </div>
+                    <ResultMetrics metrics={dtiSummaryMetrics} />
+                    <p className="text-sm text-slate-600">Front-end DTI = housing expense compared to income.</p>
+                    <p className="text-sm text-slate-600">Back-end DTI = all monthly debt compared to income.</p>
+                    {toNonNegativeNumber(monthlyIncome) <= 0 ? (
+                      <p className="text-xs text-red-700">Enter monthly income greater than $0 to calculate DTI ratios.</p>
+                    ) : null}
+                    <p className="text-xs text-slate-600">This is an estimate only and not a loan approval.</p>
+                  </Card>
+
+                  <Card className="p-4 border-slate-200 bg-white space-y-3">
+                    <h3 className="text-base font-semibold text-slate-900">4. Loan Program Guidance</h3>
+                    <ul className="list-disc pl-5 space-y-1 text-sm text-slate-600">
+                      {mortgageGuidance.map((message) => (
+                        <li key={message}>{message}</li>
+                      ))}
+                    </ul>
+
+                    <div className="pt-2">
+                      <h4 className="text-sm font-semibold text-slate-900 mb-2">Loan Type Comparison</h4>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Loan Type</TableHead>
+                            <TableHead>Preferred / Standard DTI</TableHead>
+                            <TableHead>Maximum Typical</TableHead>
+                            <TableHead>Minimum FICO</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {MORTGAGE_PROGRAM_COMPARISON.map((row) => (
+                            <TableRow key={row.loanType}>
+                              <TableCell>{row.loanType}</TableCell>
+                              <TableCell>{row.preferred}</TableCell>
+                              <TableCell>{row.maximum}</TableCell>
+                              <TableCell>{row.minFico}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </Card>
+
+                  <Card className="p-4 border-slate-200 bg-white space-y-3">
+                    <h3 className="text-base font-semibold text-slate-900">Want exact numbers from a real lender?</h3>
+                    <p className="text-sm text-slate-600">Check your loan options now.</p>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        const leadSection =
+                          document.getElementById("apply") ??
+                          document.getElementById("lead-form");
+
+                        if (leadSection) {
+                          leadSection.scrollIntoView({ behavior: "smooth", block: "start" });
+                          return;
+                        }
+
+                        window.location.href = "/loan";
+                      }}
+                    >
+                      Check Loan Offers
+                    </Button>
+                    <p className="text-xs text-slate-600">
+                      Results are estimates only and not a commitment to lend or a loan approval.
+                    </p>
+                  </Card>
                   <GlobalDisclaimers />
                 </div>
               </div>
 
               <Card className="p-5 border-slate-200 bg-white space-y-3">
                 <h3 className="text-lg font-semibold text-slate-900">Explanation</h3>
-                <p className="text-sm text-slate-600">Your monthly P&I payment covers principal (the amount you borrowed) and interest (the lender’s charge for borrowing). The amortization schedule shows how each payment is split over time.</p>
+                <p className="text-sm text-slate-600">Your monthly P&amp;I payment covers principal (the amount you borrowed) and interest (the lender&apos;s charge for borrowing). Property tax, insurance, HOA, and MI / MIP are added separately to estimate total monthly housing cost.</p>
                 <p className="text-sm text-slate-600">In early months, more of each payment goes to interest because the balance is highest then. As the balance drops, interest decreases and principal payoff accelerates.</p>
               </Card>
 
-              <AmortizationTable rows={mortgageResult.amortization} defaultVisibleRows={60} metrics={mortgageMetrics} calculatorTitle="Mortgage Calculator" />
+              <AmortizationTable rows={mortgageResult.amortization} defaultVisibleRows={60} metrics={mortgageAmortizationMetrics} calculatorTitle="Mortgage Calculator" />
             </TabsContent>
-
             <TabsContent value="refinance" className="space-y-4">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Card className="p-5 border-slate-200 bg-white space-y-4">
@@ -688,3 +1198,4 @@ export default function LoanCalculators() {
     </div>
   );
 }
+
