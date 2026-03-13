@@ -51,6 +51,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatCurrency, formatPercent, toNonNegativeNumber } from "@/lib/finance";
 import {
@@ -458,6 +459,7 @@ export default function MoneyTools() {
   const [extraDebtPayment, setExtraDebtPayment] = useState(350);
   const [debtStrategy, setDebtStrategy] = useState<"minimum" | "snowball" | "avalanche" | "custom">("avalanche");
   const [debtStartDate, setDebtStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [activeMoneyToolTab, setActiveMoneyToolTab] = useState("net-worth");
 
   useEffect(() => {
     setPageSeo({
@@ -490,6 +492,17 @@ export default function MoneyTools() {
     setDarkMode(readLocalStorage<boolean>(DARK_MODE_STORAGE_KEY, false));
     setSavedScenarios(readLocalStorage<SavedScenario[]>(SCENARIO_STORAGE_KEY, []));
 
+    const hash = window.location.hash.replace("#", "");
+    if (SECTION_LINKS.some((item) => item.id === hash)) {
+      setActiveMoneyToolTab(hash);
+      requestAnimationFrame(() => {
+        const section = document.getElementById(hash);
+        if (section) {
+          section.scrollIntoView({ behavior: "auto", block: "start" });
+        }
+      });
+    }
+
     return () => {
       const existing = document.getElementById("money-tools-faq-schema");
       if (existing) existing.remove();
@@ -503,6 +516,16 @@ export default function MoneyTools() {
   useEffect(() => {
     writeLocalStorage(SCENARIO_STORAGE_KEY, savedScenarios);
   }, [savedScenarios]);
+
+  const handleMoneyToolTabChange = (value: string) => {
+    setActiveMoneyToolTab(value);
+    if (typeof window === "undefined") return;
+    const section = document.getElementById(value);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.history.replaceState(null, "", `#${value}`);
+    }
+  };
 
   const taxConfig = useMemo(() => getTaxYearConfig(taxYear), [taxYear]);
 
@@ -814,19 +837,15 @@ export default function MoneyTools() {
           </Card>
 
           <Card className={`sticky top-16 z-20 p-3 ${cardClass}`}>
-            <nav className="flex flex-wrap gap-2" aria-label="Money Tools calculator navigation">
-              {SECTION_LINKS.map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className={`rounded-md px-3 py-1.5 text-xs font-semibold ${
-                    darkMode ? "bg-slate-800 text-slate-100 hover:bg-slate-700" : "bg-slate-100 text-slate-800 hover:bg-slate-200"
-                  }`}
-                >
-                  {item.label}
-                </a>
-              ))}
-            </nav>
+            <Tabs value={activeMoneyToolTab} onValueChange={handleMoneyToolTabChange}>
+              <TabsList className="w-full h-auto p-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1">
+                {SECTION_LINKS.map((item) => (
+                  <TabsTrigger key={item.id} value={item.id}>
+                    {item.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
           </Card>
 
           <Card className={`p-4 ${darkMode ? "border-amber-400 bg-amber-100/10" : "border-amber-200 bg-amber-50"}`}>
