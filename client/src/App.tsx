@@ -28,6 +28,7 @@ function Router() {
       <Route path="/loan-calculators" component={LoanCalculators} />
       <Route path="/mortgage-underwriting" component={MortgageUnderwriting} />
       <Route path="/money-tools" component={MoneyTools} />
+      <Route path="/money-tool" component={MoneyTools} />
       <Route path="/shopping-guide" component={ShoppingGuide} />
       <Route path="/affiliate-disclosure" component={AffiliateDisclosure} />
       <Route path="/admin" component={Admin} />

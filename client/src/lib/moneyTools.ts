@@ -378,7 +378,11 @@ function dateLabelForYear(startDate: string, yearOffset: number): string {
   return yearDate.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
 
-function simulateCompound(input: CompoundInput, delayYears = 0): CompoundResult {
+function simulateCompound(
+  input: CompoundInput,
+  delayYears = 0,
+  includeComparisons = true,
+): CompoundResult {
   const years = Math.max(1, Math.round(nonNegative(input.years)));
   const months = years * 12;
   const monthlyRate = monthlyRateFromNominalAnnual(
@@ -426,30 +430,40 @@ function simulateCompound(input: CompoundInput, delayYears = 0): CompoundResult 
       ? Math.pow(Math.max(balance, EPSILON) / Math.max(contributions, EPSILON), 1 / years) - 1
       : boundedPercent(input.annualReturnRate) / 100;
 
-  const delayed = delayYears > 0 ? simulateCompound({ ...input, principal: nonNegative(input.principal) }, 0) : null;
-  const laterScenario = delayYears > 0 ? simulateCompound(input, delayYears) : null;
+  const delayed =
+    includeComparisons && delayYears > 0
+      ? simulateCompound({ ...input, principal: nonNegative(input.principal) }, 0, false)
+      : null;
+  const laterScenario =
+    includeComparisons && delayYears > 0
+      ? simulateCompound(input, delayYears, false)
+      : null;
 
   const sensitivityIncrements = [0, 100, 250, 500];
-  const sensitivityTable = sensitivityIncrements.map((increment) => {
-    const monthlyContributionBase =
-      input.contributionFrequency === "monthly"
-        ? nonNegative(input.recurringContribution)
-        : (nonNegative(input.recurringContribution) * perYearFromContributionFrequency(input.contributionFrequency)) /
-          12;
-    const adjusted = monthlyContributionBase + increment;
-    const result = simulateCompound(
-      {
-        ...input,
-        recurringContribution: adjusted,
-        contributionFrequency: "monthly",
-      },
-      0,
-    );
-    return {
-      monthlyContribution: adjusted,
-      endingBalance: result.endingBalance,
-    };
-  });
+  const sensitivityTable = includeComparisons
+    ? sensitivityIncrements.map((increment) => {
+        const monthlyContributionBase =
+          input.contributionFrequency === "monthly"
+            ? nonNegative(input.recurringContribution)
+            : (nonNegative(input.recurringContribution) *
+                perYearFromContributionFrequency(input.contributionFrequency)) /
+              12;
+        const adjusted = monthlyContributionBase + increment;
+        const result = simulateCompound(
+          {
+            ...input,
+            recurringContribution: adjusted,
+            contributionFrequency: "monthly",
+          },
+          0,
+          false,
+        );
+        return {
+          monthlyContribution: adjusted,
+          endingBalance: result.endingBalance,
+        };
+      })
+    : [];
 
   return {
     endingBalance: balance,

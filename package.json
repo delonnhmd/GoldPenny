@@ -124,6 +124,7 @@
     "source": "dist/public",
     "include": [
       "/",
+      "/money-tools",
       "/texas-cash-advance-apps-2026"
     ],
     "crawl": false,

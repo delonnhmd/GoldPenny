@@ -283,6 +283,21 @@ interface SavedScenario {
   metrics: Record<string, number | string>;
 }
 
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isSavedScenario(value: unknown): value is SavedScenario {
+  if (!isObjectRecord(value)) return false;
+  const { id, calculator, label, createdAt, metrics } = value;
+  if (typeof id !== "string") return false;
+  if (typeof calculator !== "string") return false;
+  if (typeof label !== "string") return false;
+  if (typeof createdAt !== "string") return false;
+  if (!isObjectRecord(metrics)) return false;
+  return true;
+}
+
 function nonNegative(value: number): number {
   return Number.isFinite(value) ? Math.max(0, value) : 0;
 }
@@ -300,7 +315,17 @@ function readLocalStorage<T>(key: string, fallback: T): T {
 
 function writeLocalStorage<T>(key: string, value: T) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(key, JSON.stringify(value));
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // Ignore storage write errors (private mode, quota limits, blocked storage)
+  }
+}
+
+function readSavedScenariosFromStorage(): SavedScenario[] {
+  const parsed = readLocalStorage<unknown>(SCENARIO_STORAGE_KEY, []);
+  if (!Array.isArray(parsed)) return [];
+  return parsed.filter(isSavedScenario).slice(0, 60);
 }
 
 function normalizeFieldKey(label: string): string {
@@ -489,8 +514,9 @@ export default function MoneyTools() {
     script.text = JSON.stringify(faqSchema);
     document.head.appendChild(script);
 
-    setDarkMode(readLocalStorage<boolean>(DARK_MODE_STORAGE_KEY, false));
-    setSavedScenarios(readLocalStorage<SavedScenario[]>(SCENARIO_STORAGE_KEY, []));
+    const savedDarkMode = readLocalStorage<unknown>(DARK_MODE_STORAGE_KEY, false);
+    setDarkMode(savedDarkMode === true);
+    setSavedScenarios(readSavedScenariosFromStorage());
 
     const hash = window.location.hash.replace("#", "");
     if (SECTION_LINKS.some((item) => item.id === hash)) {
@@ -649,9 +675,10 @@ export default function MoneyTools() {
 
   const scenarioComparison = useMemo(() => {
     const selected = savedScenarios.filter((scenario) => selectedScenarioIds.includes(scenario.id));
-    const metricKeys = Array.from(
-      new Set(selected.flatMap((scenario) => Object.keys(scenario.metrics))),
-    );
+    const metricKeys = Array.from(new Set(selected.reduce<string[]>((acc, scenario) => {
+      acc.push(...Object.keys(scenario.metrics));
+      return acc;
+    }, [])));
     return { selected, metricKeys };
   }, [savedScenarios, selectedScenarioIds]);
 
