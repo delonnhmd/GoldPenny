@@ -34,9 +34,11 @@ import {
 } from "@/lib/finance";
 import { setPageSeo } from "@/lib/seo";
 
-const PAGE_TITLE = "Loan Calculators: Mortgage, Auto, Personal & Business | PennyFloat";
-const PAGE_DESCRIPTION = "Use loan calculators to estimate monthly payments, APR impact, interest cost, and total repayment across mortgage, auto, personal, and business scenarios.";
-const PAGE_KEYWORDS = "loan calculators, mortgage payment calculator, home loan calculator, FHA loan calculator, VA loan calculator, conventional loan calculator, mortgage affordability calculator, DTI calculator for mortgage, how much house can I afford, amortization schedule calculator, refinance calculator, auto loan calculator, personal loan calculator, business loan calculator";
+const PAGE_TITLE = "Loan Calculators: Mortgage Payment, FHA/VA, Auto, Personal & Business | PennyFloat";
+const PAGE_DESCRIPTION =
+  "Use this loan calculator hub to estimate mortgage payments, loan amount, down payment, DTI, and amortization for FHA, VA, and conventional home loans, plus auto, personal, and business loan scenarios.";
+const PAGE_KEYWORDS =
+  "loan calculators, mortgage payment calculator, home loan calculator, FHA loan calculator, VA loan calculator, conventional loan calculator, mortgage affordability calculator, mortgage qualification calculator, DTI calculator for mortgage, how much house can I afford, loan amount calculator, down payment calculator, amortization schedule calculator, refinance calculator, auto loan calculator, personal loan calculator, business loan calculator";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/loan-calculators";
 
 const MAX_RATE = 100;
