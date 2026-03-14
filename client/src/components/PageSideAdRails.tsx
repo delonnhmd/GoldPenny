@@ -37,7 +37,7 @@ function getPageBannerContext(pathname: string): PageBannerContext | null {
   }
 
   if (pathname.startsWith("/rates")) {
-    return { pageType: "market_blog", currentPageCategory: "finance" };
+    return { pageType: "market_blog", currentPageCategory: "business_software" };
   }
 
   if (pathname.startsWith("/texas-cash-advance-apps-2026")) {

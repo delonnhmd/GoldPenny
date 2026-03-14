@@ -54,6 +54,66 @@ const BLOG_RELEVANCE_MATRIX: Record<
   },
 };
 
+const SHOPIFY_BANNER_IDS = new Set([
+  "shopify-728x90-3797165",
+  "shopify-160x600-3797170",
+]);
+
+function isShopifyBanner(banner: BannerAdItem) {
+  return SHOPIFY_BANNER_IDS.has(banner.id);
+}
+
+function isBusinessReadingContext(
+  pageType: BannerPageType,
+  currentPageCategory: BannerCategory,
+) {
+  return pageType === "business" || currentPageCategory === "business_software";
+}
+
+function prioritizeShopifyInSelection(
+  selected: BannerAdItem[],
+  candidates: BannerAdItem[],
+  maxItems: number,
+) {
+  if (selected.length === 0) return selected;
+
+  const selectedWithShopifyFirst = [
+    ...selected.filter(isShopifyBanner),
+    ...selected.filter((banner) => !isShopifyBanner(banner)),
+  ].slice(0, maxItems);
+
+  if (selectedWithShopifyFirst.some(isShopifyBanner)) {
+    return selectedWithShopifyFirst;
+  }
+
+  const fallbackShopify = candidates
+    .filter(isShopifyBanner)
+    .sort(sortByPriorityDesc)[0];
+
+  if (!fallbackShopify) {
+    return selectedWithShopifyFirst;
+  }
+
+  const withoutDuplicate = selectedWithShopifyFirst.filter(
+    (banner) => banner.id !== fallbackShopify.id,
+  );
+  return [fallbackShopify, ...withoutDuplicate].slice(0, maxItems);
+}
+
+function applyBusinessContextOverrides(
+  selected: BannerAdItem[],
+  candidates: BannerAdItem[],
+  pageType: BannerPageType,
+  currentPageCategory: BannerCategory,
+  maxItems: number,
+) {
+  if (!isBusinessReadingContext(pageType, currentPageCategory)) {
+    return selected;
+  }
+
+  return prioritizeShopifyInSelection(selected, candidates, maxItems);
+}
+
 function sortByPriorityDesc(a: BannerAdItem, b: BannerAdItem) {
   if (b.priority !== a.priority) return b.priority - a.priority;
   return a.id.localeCompare(b.id);
@@ -205,17 +265,27 @@ export function selectBannersForPage({
     isBannerCompatibleWithSlot(banner, slotType),
   );
   const candidates = filterCandidatesByPageRules(enabled, pageType, currentPageCategory);
+  const applyOverrides = (selected: BannerAdItem[]) =>
+    applyBusinessContextOverrides(
+      selected,
+      candidates,
+      pageType,
+      currentPageCategory,
+      maxItems,
+    );
 
   if (pageType === "blog" || pageType === "market_blog") {
     // Pass `enabled` (already slot-filtered) so the finance fallback inside
     // selectBlogBanners never returns a banner incompatible with the current slot.
-    return selectBlogBanners(candidates, pageType, currentPageCategory, maxItems, enabled);
+    return applyOverrides(
+      selectBlogBanners(candidates, pageType, currentPageCategory, maxItems, enabled),
+    );
   }
 
   // Homepage and core money pages are deterministic: no behavior-based mixing.
   const sorted = candidates.sort(sortByPriorityDesc).slice(0, maxItems);
   if (sorted.length >= maxItems) {
-    return sorted;
+    return applyOverrides(sorted);
   }
 
   // Fill remaining slots with a deterministic daily rotation from any
@@ -232,19 +302,21 @@ export function selectBannersForPage({
       const daySeed = new Date().toISOString().slice(0, 10);
       const rotationSeed = `${pageType}:${slotType ?? "any"}:${daySeed}`;
       const rotatedFallback = sortBySeededRotation(fallbackPool, rotationSeed).slice(0, remaining);
-      return [...sorted, ...rotatedFallback];
+      return applyOverrides([...sorted, ...rotatedFallback]);
     }
   }
 
   if (sorted.length > 0) {
-    return sorted;
+    return applyOverrides(sorted);
   }
 
   // Global fallback to finance when nothing matches.
-  return enabled
+  return applyOverrides(
+    enabled
     .filter((banner) => banner.category === "finance" && banner.allowedPages.includes(pageType))
     .sort(sortByPriorityDesc)
-    .slice(0, maxItems);
+    .slice(0, maxItems),
+  );
 }
 
 // Future logic: plug in campaign pacing, frequency caps, and runtime rotations here.

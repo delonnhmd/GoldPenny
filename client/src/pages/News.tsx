@@ -144,7 +144,7 @@ export default function News() {
         </div>
         <BlogBannerSection
           pageType="market_blog"
-          currentPageCategory="finance"
+          currentPageCategory="business_software"
           maxItems={2}
         />
       </main>

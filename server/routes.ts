@@ -8,6 +8,34 @@ import { z } from "zod";
 import { createSmartPennyPostSchema, insertLeadSchema, smartPennyPageSchema, updateSmartPennyPostSchema, upsertSmartPennyUpdateSchema } from "@shared/schema"; // Import schema directly
 import { decideLeadRoute } from "./leadRouting";
 
+const PERSONAL_OFFER_REDIRECT_URL = "https://it-media.pxf.io/yZqZLb";
+
+function isPersonalLoanPurpose(loanPurpose: string) {
+  const normalized = loanPurpose.trim().toLowerCase();
+  return [
+    "debt consolidation",
+    "emergency",
+    "cash advance",
+    "medical",
+    "other",
+  ].includes(normalized);
+}
+
+function getLeadRedirectUrl(leadData: z.infer<typeof insertLeadSchema>) {
+  if (isPersonalLoanPurpose(leadData.loanPurpose)) {
+    return PERSONAL_OFFER_REDIRECT_URL;
+  }
+
+  const searchParams = new URLSearchParams({
+    name: leadData.fullName,
+    purpose: leadData.loanPurpose,
+    amount: String(leadData.loanAmount),
+    score: leadData.creditScoreRange,
+  });
+
+  return `/offers?${searchParams.toString()}`;
+}
+
 function validateAdminRequest(req: Request) {
   const configuredKey = process.env.ADMIN_DASHBOARD_KEY || process.env.ADMIN_KEY || "pennyfloat-admin";
   const requestKey = req.headers["x-admin-key"];
@@ -68,14 +96,7 @@ export async function registerRoutes(
         ipAddress: String(ipAddress) // Ensure it's a string
       });
 
-      const searchParams = new URLSearchParams({
-        name: leadData.fullName,
-        purpose: leadData.loanPurpose,
-        amount: String(leadData.loanAmount),
-        score: leadData.creditScoreRange,
-      });
-
-      const redirectUrl = `/offers?${searchParams.toString()}`;
+      const redirectUrl = getLeadRedirectUrl(leadData);
 
       res.status(201).json({ redirectUrl });
     } catch (err) {
