@@ -42,7 +42,7 @@ const PAGE_CANONICAL = "https://www.pennyfloat.com/";
 
 // Form schemas for each step
 const step1Schema = z.object({
-  loanAmount: z.number().min(1000).max(50000),
+  loanAmount: z.number().min(200).max(50000),
   loanPurpose: z.enum(loanPurposes),
 });
 
@@ -63,6 +63,7 @@ type FormValues = z.infer<typeof insertLeadSchema>;
 const personalLoanPurposes = [
   "Debt Consolidation",
   "Emergency",
+  "Cash Advance",
   "Medical",
   "Other",
 ] as const;
@@ -492,10 +493,10 @@ export default function Home() {
                                 <div className="pt-2 pb-6">
                                   <div className="flex items-center justify-between mb-4">
                                     <span className="text-3xl font-bold text-primary">${field.value.toLocaleString()}</span>
-                                    <span className="text-sm text-slate-500">Min: $1,000 — Max: $50,000</span>
+                                    <span className="text-sm text-slate-500">Min: $200 - Max: $50,000</span>
                                   </div>
                                   <Slider
-                                    min={1000}
+                                    min={200}
                                     max={50000}
                                     step={100}
                                     value={[field.value]}
@@ -748,10 +749,10 @@ export default function Home() {
                               <div className="pt-2 pb-6">
                                 <div className="flex items-center justify-between mb-4">
                                   <span className="text-3xl font-bold text-primary">${field.value.toLocaleString()}</span>
-                                  <span className="text-sm text-slate-500">Min: $1,000 — Max: $50,000</span>
+                                  <span className="text-sm text-slate-500">Min: $200 - Max: $50,000</span>
                                 </div>
                                 <Slider
-                                  min={1000}
+                                  min={200}
                                   max={50000}
                                   step={100}
                                   value={[field.value]}

@@ -89,6 +89,7 @@ export const employmentStatuses = [
 export const loanPurposes = [
   "Debt Consolidation",
   "Emergency",
+  "Cash Advance",
   "Medical",
   "Other",
   "Car Buying",
