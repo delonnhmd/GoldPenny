@@ -493,11 +493,11 @@ export default function Home() {
                                 <div className="pt-2 pb-6">
                                   <div className="flex items-center justify-between mb-4">
                                     <span className="text-3xl font-bold text-primary">${field.value.toLocaleString()}</span>
-                                    <span className="text-sm text-slate-500">Min: $200 - Max: $50,000</span>
+                                    <span className="text-sm text-slate-500">Min: $200 - Max: $75,000</span>
                                   </div>
                                   <Slider
                                     min={200}
-                                    max={50000}
+                                    max={75000}
                                     step={100}
                                     value={[field.value]}
                                     onValueChange={(val) => field.onChange(val[0])}
@@ -749,11 +749,11 @@ export default function Home() {
                               <div className="pt-2 pb-6">
                                 <div className="flex items-center justify-between mb-4">
                                   <span className="text-3xl font-bold text-primary">${field.value.toLocaleString()}</span>
-                                  <span className="text-sm text-slate-500">Min: $200 - Max: $50,000</span>
+                                  <span className="text-sm text-slate-500">Min: $200 - Max: $75,000</span>
                                 </div>
                                 <Slider
                                   min={200}
-                                  max={50000}
+                                  max={75000}
                                   step={100}
                                   value={[field.value]}
                                   onValueChange={(val) => field.onChange(val[0])}
@@ -1150,7 +1150,7 @@ export default function Home() {
               <ul className="space-y-4">
                 {[
                   "Competitive rates from 5.99% APR",
-                  "Loan amounts up to $50,000",
+                  "Loan amounts up to $75,000",
                   "No prepayment penalties",
                   "Secure & confidential process"
                 ].map((item, i) => (

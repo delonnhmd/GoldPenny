@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowRight, CheckCircle2, ShieldCheck, Clock, Percent } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Clock, Percent, Info, Star } from "lucide-react";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { setPageSeo } from "@/lib/seo";
 
 const PAGE_TITLE = "Compare Personal, Auto & Business Loan Offers | PennyFloat";
@@ -98,8 +99,13 @@ export default function Offers() {
   const requestedAmount = Number.isFinite(amount) && amount > 0 ? amount : 15000;
   const creditTier = getCreditTier(creditScore);
   const loanType = getLoanType(loanPurpose);
-  const isMaintenanceMode = loanType === "personal" || loanType === "auto";
-  const maintenanceLabel = loanType === "auto" ? "Car Loan Offers" : "Personal Loan Offers";
+
+  const upstartUrl = buildPartnerUrl("https://www.upstart.com/personal-loans", {
+    source: "pennyfloat",
+    loan_type: loanType,
+    amount: String(requestedAmount),
+    score: creditScore,
+  });
 
   return (
     <div className="min-h-screen bg-[#f4fafc] font-sans">
@@ -137,22 +143,110 @@ export default function Offers() {
             </div>
           </Card>
 
-          {isMaintenanceMode ? (
-            <Card className="p-6 md:p-8 border-amber-200 bg-amber-50/60 shadow-sm">
-              <div className="max-w-3xl mx-auto text-center">
-                <Badge className="mb-3 bg-amber-100 text-amber-800 hover:bg-amber-100 border border-amber-200">Temporarily Unavailable</Badge>
-                <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">{maintenanceLabel} are under maintenance</h2>
-                <p className="text-slate-700 leading-relaxed mb-6">
-                  We are updating our lender integrations for this category. Please check back soon, or return to the home page to explore other resources.
-                </p>
-                <Link href="/">
-                  <Button className="h-11 px-6 font-semibold bg-slate-900 hover:bg-slate-800 text-white">
-                    Back to Home <ArrowRight className="ml-2 w-4 h-4" />
-                  </Button>
-                </Link>
-              </div>
-            </Card>
-          ) : null}
+          {/* Recommended Loan Options */}
+          <TooltipProvider>
+            <section aria-label="Recommended Loan Options">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Recommended Loan Options</h2>
+
+              {/* Upstart Featured Card */}
+              <Card className="p-6 md:p-8 mb-4 border-primary/20 shadow-md bg-white overflow-hidden relative">
+                {/* Top accent bar */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-blue-500 rounded-t-xl" />
+
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+                  {/* Left: Lender info */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-4 flex-wrap">
+                      <Badge className="bg-primary/10 text-primary hover:bg-primary/10 border border-primary/20 font-semibold flex items-center gap-1">
+                        <Star className="w-3 h-3" />
+                        Top Pick
+                      </Badge>
+                      <span className="text-xl font-bold text-slate-900">Upstart</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
+                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                        <div className="text-xs text-slate-500 mb-0.5">Loan Amount</div>
+                        <div className="font-semibold text-slate-800">$1,000 – $75,000</div>
+                      </div>
+                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                        <div className="text-xs text-slate-500 mb-0.5">APR Range</div>
+                        <div className="font-semibold text-slate-800">6.40% – 35.99%</div>
+                      </div>
+                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                        <div className="text-xs text-slate-500 mb-0.5">Loan Terms</div>
+                        <div className="font-semibold text-slate-800">36 or 60 months</div>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-2 mb-5 text-sm text-slate-700">
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span className="flex items-center gap-1">
+                          Fast approval process (instant decision for most applicants)
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                aria-label="More info about approval process"
+                                className="inline-flex items-center justify-center text-slate-400 hover:text-primary transition-colors"
+                              >
+                                <Info className="w-3.5 h-3.5" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs text-xs leading-relaxed" side="top">
+                              The majority of borrowers on the Upstart marketplace are able to receive an instant decision upon submitting a completed application. Final approval is conditioned upon passing a hard credit inquiry, and additional documentation may be required.
+                            </TooltipContent>
+                          </Tooltip>
+                        </span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span>No prepayment penalty</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span>Funds as soon as 1 business day after acceptance</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                        <span>Checking your rate won't affect your credit score</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Right: CTA */}
+                  <div className="flex flex-col items-center md:items-end gap-3 md:min-w-[180px]">
+                    <a href={upstartUrl} target="_blank" rel="noopener noreferrer sponsored" className="w-full md:w-auto">
+                      <Button className="w-full h-12 px-6 font-bold bg-primary hover:bg-primary/90 text-white shadow-md rounded-xl text-base">
+                        Check My Rate <ArrowRight className="ml-2 w-4 h-4" />
+                      </Button>
+                    </a>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                      No hard credit pull to check rate
+                    </div>
+                  </div>
+                </div>
+
+                {/* Inline Disclaimers */}
+                <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
+                  <p style={{ fontSize: "12px", color: "#6b7280", lineHeight: "1.5" }}>
+                    Your loan amount will be determined based on your credit, income, and other information provided in your application. Not all applicants will qualify for the full amount. Minimum loan amounts vary by state: GA ($3,100), HI ($2,100), MA ($7,000).
+                  </p>
+                  <p style={{ fontSize: "12px", color: "#6b7280", lineHeight: "1.5" }}>
+                    The majority of borrowers on the Upstart marketplace are able to receive an instant decision upon submitting a completed application. Final approval is conditioned upon passing a hard credit inquiry, and additional documentation may be required.
+                  </p>
+                </div>
+              </Card>
+            </section>
+          </TooltipProvider>
+
+          {/* Global Disclaimer */}
+          <div className="mt-10 px-4 py-5 rounded-xl bg-slate-50 border border-slate-200">
+            <p className="text-xs text-slate-500 text-center leading-relaxed">
+              <strong className="text-slate-600">Disclaimer:</strong> PennyFloat is not a lender. We connect users with third-party financial providers. Loan terms, approval, and funding are determined by the lender based on individual qualifications.
+            </p>
+          </div>
 
           <div className="mt-8 text-center">
             <Link href="/">
