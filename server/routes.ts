@@ -8,24 +8,7 @@ import { z } from "zod";
 import { createSmartPennyPostSchema, insertLeadSchema, smartPennyPageSchema, updateSmartPennyPostSchema, upsertSmartPennyUpdateSchema } from "@shared/schema"; // Import schema directly
 import { decideLeadRoute } from "./leadRouting";
 
-const PERSONAL_OFFER_REDIRECT_URL = "https://it-media.pxf.io/yZqZLb";
-
-function isPersonalLoanPurpose(loanPurpose: string) {
-  const normalized = loanPurpose.trim().toLowerCase();
-  return [
-    "debt consolidation",
-    "emergency",
-    "cash advance",
-    "medical",
-    "other",
-  ].includes(normalized);
-}
-
 function getLeadRedirectUrl(leadData: z.infer<typeof insertLeadSchema>) {
-  if (isPersonalLoanPurpose(leadData.loanPurpose)) {
-    return PERSONAL_OFFER_REDIRECT_URL;
-  }
-
   const searchParams = new URLSearchParams({
     name: leadData.fullName,
     purpose: leadData.loanPurpose,

@@ -2,24 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { api, type LeadInput, type LeadResponse } from "@shared/routes"; // Import from shared routes
 import { useToast } from "@/hooks/use-toast";
 
-const PERSONAL_OFFER_REDIRECT_URL = "https://it-media.pxf.io/yZqZLb";
-
-function isPersonalLoanPurpose(loanPurpose: string) {
-  const normalized = loanPurpose.trim().toLowerCase();
-  return [
-    "debt consolidation",
-    "emergency",
-    "cash advance",
-    "medical",
-    "other",
-  ].includes(normalized);
-}
-
 function buildOffersUrl(data: LeadInput) {
-  if (isPersonalLoanPurpose(data.loanPurpose)) {
-    return PERSONAL_OFFER_REDIRECT_URL;
-  }
-
   const searchParams = new URLSearchParams({
     name: data.fullName,
     purpose: data.loanPurpose,

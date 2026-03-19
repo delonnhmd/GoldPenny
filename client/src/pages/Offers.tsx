@@ -167,11 +167,11 @@ export default function Offers() {
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
                       <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
                         <div className="text-xs text-slate-500 mb-0.5">Loan Amount</div>
-                        <div className="font-semibold text-slate-800">$1,000 – $75,000</div>
+                        <div className="font-semibold text-slate-800">$1,000 - $75,000</div>
                       </div>
                       <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
                         <div className="text-xs text-slate-500 mb-0.5">APR Range</div>
-                        <div className="font-semibold text-slate-800">6.40% – 35.99%</div>
+                        <div className="font-semibold text-slate-800">6.40% - 35.99%</div>
                       </div>
                       <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
                         <div className="text-xs text-slate-500 mb-0.5">Loan Terms</div>
