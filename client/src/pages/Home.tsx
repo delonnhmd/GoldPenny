@@ -42,7 +42,7 @@ const PAGE_CANONICAL = "https://www.pennyfloat.com/";
 
 // Form schemas for each step
 const step1Schema = z.object({
-  loanAmount: z.number().min(200).max(50000),
+  loanAmount: z.number().min(1000).max(75000),
   loanPurpose: z.enum(loanPurposes),
 });
 
@@ -273,7 +273,7 @@ export default function Home() {
   const form = useForm<FormValues>({
     resolver: zodResolver(insertLeadSchema),
     defaultValues: {
-      loanAmount: 5000,
+      loanAmount: 1000,
       loanPurpose: "Debt Consolidation",
       creditScoreRange: "650-719",
       employmentStatus: "Employed",
@@ -287,7 +287,7 @@ export default function Home() {
   const carForm = useForm<FormValues>({
     resolver: zodResolver(insertLeadSchema),
     defaultValues: {
-      loanAmount: 15000,
+      loanAmount: 10000,
       loanPurpose: "Car Buying",
       creditScoreRange: "650-719",
       employmentStatus: "Employed",
@@ -493,10 +493,10 @@ export default function Home() {
                                 <div className="pt-2 pb-6">
                                   <div className="flex items-center justify-between mb-4">
                                     <span className="text-3xl font-bold text-primary">${field.value.toLocaleString()}</span>
-                                    <span className="text-sm text-slate-500">Min: $200 - Max: $75,000</span>
+                                    <span className="text-sm text-slate-500">Min: $1,000 - Max: $75,000</span>
                                   </div>
                                   <Slider
-                                    min={200}
+                                    min={1000}
                                     max={75000}
                                     step={100}
                                     value={[field.value]}
@@ -749,11 +749,11 @@ export default function Home() {
                               <div className="pt-2 pb-6">
                                 <div className="flex items-center justify-between mb-4">
                                   <span className="text-3xl font-bold text-primary">${field.value.toLocaleString()}</span>
-                                  <span className="text-sm text-slate-500">Min: $200 - Max: $75,000</span>
+                                  <span className="text-sm text-slate-500">Min: $10,000 - Max: $200,000</span>
                                 </div>
                                 <Slider
-                                  min={200}
-                                  max={75000}
+                                  min={10000}
+                                  max={200000}
                                   step={100}
                                   value={[field.value]}
                                   onValueChange={(val) => field.onChange(val[0])}
