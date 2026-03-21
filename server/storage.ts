@@ -3,11 +3,13 @@ import { and, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { db } from "./db";
 import {
   leads,
+  mediaUploads,
   smartPennyPosts,
   smartPennyUpdates,
   type CreateSmartPennyPostInput,
   type InsertLead,
   type Lead,
+  type MediaUpload,
   type SmartPennyPage,
   type SmartPennyPost,
   type SmartPennyUpdate,
@@ -39,6 +41,10 @@ export interface IStorage {
   createSmartPennyPost(payload: CreateSmartPennyPostInput): Promise<SmartPennyPost>;
   updateSmartPennyPost(id: number, payload: UpdateSmartPennyPostInput): Promise<SmartPennyPost | null>;
   deleteSmartPennyPost(id: number): Promise<boolean>;
+  saveMediaUpload(payload: { filename: string; mimeType: string; data: string; sizeBytes: number }): Promise<MediaUpload>;
+  getMediaUpload(id: number): Promise<MediaUpload | null>;
+  listMediaUploads(limit?: number): Promise<Omit<MediaUpload, "data">[]>;
+  deleteMediaUpload(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -51,6 +57,19 @@ export class DatabaseStorage implements IStorage {
         content text NOT NULL,
         created_at timestamp NOT NULL DEFAULT now(),
         updated_at timestamp NOT NULL DEFAULT now()
+      )
+    `);
+  }
+
+  private async ensureMediaUploadsTable(): Promise<void> {
+    await db!.execute(sql`
+      CREATE TABLE IF NOT EXISTS media_uploads (
+        id serial PRIMARY KEY,
+        filename text NOT NULL,
+        mime_type text NOT NULL,
+        data text NOT NULL,
+        size_bytes integer NOT NULL,
+        created_at timestamp NOT NULL DEFAULT now()
       )
     `);
   }
@@ -221,6 +240,36 @@ export class DatabaseStorage implements IStorage {
     await this.ensureSmartPennyPostsTable();
 
     const result = await db!.delete(smartPennyPosts).where(eq(smartPennyPosts.id, id)).returning({ id: smartPennyPosts.id });
+    return result.length > 0;
+  }
+
+  async saveMediaUpload(payload: { filename: string; mimeType: string; data: string; sizeBytes: number }): Promise<MediaUpload> {
+    await this.ensureMediaUploadsTable();
+    const [item] = await db!
+      .insert(mediaUploads)
+      .values({ filename: payload.filename, mimeType: payload.mimeType, data: payload.data, sizeBytes: payload.sizeBytes })
+      .returning();
+    return item;
+  }
+
+  async getMediaUpload(id: number): Promise<MediaUpload | null> {
+    await this.ensureMediaUploadsTable();
+    const [item] = await db!.select().from(mediaUploads).where(eq(mediaUploads.id, id)).limit(1);
+    return item ?? null;
+  }
+
+  async listMediaUploads(limit = 50): Promise<Omit<MediaUpload, "data">[]> {
+    await this.ensureMediaUploadsTable();
+    return db!
+      .select({ id: mediaUploads.id, filename: mediaUploads.filename, mimeType: mediaUploads.mimeType, sizeBytes: mediaUploads.sizeBytes, createdAt: mediaUploads.createdAt })
+      .from(mediaUploads)
+      .orderBy(desc(mediaUploads.createdAt))
+      .limit(limit);
+  }
+
+  async deleteMediaUpload(id: number): Promise<boolean> {
+    await this.ensureMediaUploadsTable();
+    const result = await db!.delete(mediaUploads).where(eq(mediaUploads.id, id)).returning({ id: mediaUploads.id });
     return result.length > 0;
   }
 }
@@ -429,6 +478,32 @@ export class InMemoryStorage implements IStorage {
     const before = this.smartPennyPosts.length;
     this.smartPennyPosts = this.smartPennyPosts.filter((post) => post.id !== id);
     return this.smartPennyPosts.length < before;
+  }
+
+  private mediaUploadsStore: MediaUpload[] = [];
+  private nextMediaId = 1;
+
+  async saveMediaUpload(payload: { filename: string; mimeType: string; data: string; sizeBytes: number }): Promise<MediaUpload> {
+    const item: MediaUpload = { id: this.nextMediaId++, filename: payload.filename, mimeType: payload.mimeType, data: payload.data, sizeBytes: payload.sizeBytes, createdAt: new Date() };
+    this.mediaUploadsStore.push(item);
+    return item;
+  }
+
+  async getMediaUpload(id: number): Promise<MediaUpload | null> {
+    return this.mediaUploadsStore.find((item) => item.id === id) ?? null;
+  }
+
+  async listMediaUploads(limit = 50): Promise<Omit<MediaUpload, "data">[]> {
+    return [...this.mediaUploadsStore]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit)
+      .map(({ data: _data, ...rest }) => rest);
+  }
+
+  async deleteMediaUpload(id: number): Promise<boolean> {
+    const before = this.mediaUploadsStore.length;
+    this.mediaUploadsStore = this.mediaUploadsStore.filter((item) => item.id !== id);
+    return this.mediaUploadsStore.length < before;
   }
 }
 

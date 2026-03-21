@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -9,11 +9,51 @@ import { useCreateSmartPennyPost, useDeleteSmartPennyPost, useSmartPennyPosts, u
 import { useAdminLeads, useAdminReport } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Bold, Code2, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, Pencil, Quote, Strikethrough, Trash2 } from "lucide-react";
+import { Bold, Code2, Heading2, ImagePlus, Italic, Link2, List, ListOrdered, Loader2, Pencil, Quote, Strikethrough, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import TurndownService from "turndown";
 import { setPageSeo } from "@/lib/seo";
+
+type MediaItem = { id: number; filename: string; mimeType: string; sizeBytes: number; createdAt: string; url: string };
+
+async function compressImageToBase64(
+  file: File,
+  maxWidth = 1200,
+  quality = 0.85
+): Promise<{ base64: string; mimeType: string; filename: string }> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { reject(new Error("Canvas unavailable")); return; }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { reject(new Error("Compression failed")); return; }
+          const reader = new FileReader();
+          reader.onload = () => {
+            const dataUrl = reader.result as string;
+            const base64 = dataUrl.split(",")[1];
+            resolve({ base64, mimeType: "image/jpeg", filename: file.name.replace(/\.[^.]+$/, ".jpg") });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        },
+        "image/jpeg",
+        quality
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Image load failed")); };
+    img.src = objectUrl;
+  });
+}
 
 type AdminPage = "rates" | "smart-penny" | "shopping-guide";
 
@@ -43,6 +83,11 @@ export default function Admin() {
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [reportPeriod, setReportPeriod] = useState<"day" | "week">("day");
   const postContentRef = useRef<HTMLTextAreaElement | null>(null);
+  const fileInputLeftRef = useRef<HTMLInputElement | null>(null);
+  const fileInputRightRef = useRef<HTMLInputElement | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [mediaLibrary, setMediaLibrary] = useState<MediaItem[]>([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
   const turndownService = useMemo(
     () =>
       new TurndownService({
@@ -222,33 +267,31 @@ export default function Admin() {
     });
   };
 
-  const insertImageMarkdown = (alignment: "left" | "right") => {
-    const textarea = postContentRef.current;
-    if (!textarea) {
-      return;
+  const loadMediaLibrary = useCallback(async () => {
+    if (!adminKey.trim()) return;
+    setMediaLoading(true);
+    try {
+      const res = await fetch("/api/admin/media", { headers: { "x-admin-key": adminKey.trim() } });
+      if (!res.ok) throw new Error("Failed to load media");
+      const data: MediaItem[] = await res.json();
+      setMediaLibrary(data);
+    } catch {
+      // silently ignore — user can retry
+    } finally {
+      setMediaLoading(false);
     }
+  }, [adminKey]);
 
-    const imageUrl = window.prompt("Image URL");
-    if (!imageUrl || !imageUrl.trim()) {
-      return;
+  const handleDeleteMedia = async (id: number) => {
+    if (!window.confirm("Delete this image? Posts using it will show a broken image.")) return;
+    try {
+      const res = await fetch(`/api/admin/media/${id}`, { method: "DELETE", headers: { "x-admin-key": adminKey.trim() } });
+      if (!res.ok) throw new Error("Delete failed");
+      setMediaLibrary((prev) => prev.filter((item) => item.id !== id));
+      toast({ title: "Image deleted" });
+    } catch (err) {
+      toast({ title: "Delete failed", description: err instanceof Error ? err.message : "Unknown error", variant: "destructive" });
     }
-
-    const altText = window.prompt("Image alt text", "image") || "image";
-    const markdown = `![${altText.trim() || "image"}](${imageUrl.trim()} "${alignment}")`;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const before = postContent.slice(0, start);
-    const after = postContent.slice(end);
-    const nextValue = `${before}${markdown}${after}`;
-
-    setPostContent(nextValue);
-
-    requestAnimationFrame(() => {
-      const cursor = start + markdown.length;
-      textarea.focus();
-      textarea.setSelectionRange(cursor, cursor);
-    });
   };
 
   const insertAtSelection = (text: string) => {
@@ -270,6 +313,32 @@ export default function Admin() {
       textarea.focus();
       textarea.setSelectionRange(cursor, cursor);
     });
+  };
+
+  const insertImageMarkdown = (url: string, alignment: "left" | "right", altText = "image") => {
+    insertAtSelection(`![${altText}](${url} "${alignment}")`);
+  };
+
+  const handleUploadImage = async (file: File, alignment: "left" | "right") => {
+    setUploadingImage(true);
+    try {
+      const compressed = await compressImageToBase64(file);
+      const res = await fetch("/api/admin/upload-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-key": adminKey.trim() },
+        body: JSON.stringify({ filename: compressed.filename, mimeType: compressed.mimeType, data: compressed.base64 }),
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const json: { id: number; url: string; filename: string; sizeBytes: number } = await res.json();
+      const altText = window.prompt("Image alt text", file.name.replace(/\.[^.]+$/, "")) || "image";
+      insertImageMarkdown(json.url, alignment, altText);
+      toast({ title: "Image uploaded", description: `${json.filename} (${Math.round(json.sizeBytes / 1024)} KB)` });
+      await loadMediaLibrary();
+    } catch (err) {
+      toast({ title: "Upload failed", description: err instanceof Error ? err.message : "Unknown error", variant: "destructive" });
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handlePostContentPaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -407,12 +476,14 @@ export default function Admin() {
                       <Link2 className="h-4 w-4" />
                     </Button>
                     <span className="mx-1 h-5 w-px bg-slate-300" aria-hidden="true" />
-                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => insertImageMarkdown("left")} title="Insert left image">
-                      <ImagePlus className="h-4 w-4" />
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => fileInputLeftRef.current?.click()} disabled={uploadingImage} title="Upload & insert image (left)">
+                      {uploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
                     </Button>
-                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => insertImageMarkdown("right")} title="Insert right image">
-                      <ImagePlus className="h-4 w-4 -scale-x-100" />
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => fileInputRightRef.current?.click()} disabled={uploadingImage} title="Upload & insert image (right)">
+                      {uploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4 -scale-x-100" />}
                     </Button>
+                    <input ref={fileInputLeftRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadImage(f, "left"); e.target.value = ""; }} />
+                    <input ref={fileInputRightRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadImage(f, "right"); e.target.value = ""; }} />
                   </div>
                   <Textarea
                     ref={postContentRef}
@@ -518,6 +589,42 @@ export default function Admin() {
                     </div>
                   )}
                 </div>
+              </Card>
+
+              <Card className="p-6 border-slate-200 bg-white space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <h2 className="text-xl font-bold text-slate-900">Media Library</h2>
+                  <Button type="button" variant="outline" size="sm" onClick={loadMediaLibrary} disabled={mediaLoading}>
+                    {mediaLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null} Refresh
+                  </Button>
+                </div>
+                <p className="text-sm text-slate-500">Upload images using the image buttons in the post editor above. Click any image here to insert it into your post at your cursor position.</p>
+                {mediaLibrary.length === 0 && !mediaLoading ? (
+                  <p className="text-sm text-slate-400">No images uploaded yet. Use the toolbar above to upload your first image.</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {mediaLibrary.map((item) => (
+                      <div key={item.id} className="rounded-lg border border-slate-200 bg-slate-50 overflow-hidden">
+                        <img src={item.url} alt={item.filename} className="w-full h-32 object-cover" loading="lazy" />
+                        <div className="p-2 space-y-1">
+                          <p className="text-xs text-slate-600 truncate" title={item.filename}>{item.filename}</p>
+                          <p className="text-xs text-slate-400">{Math.round(item.sizeBytes / 1024)} KB</p>
+                          <div className="flex gap-1">
+                            <Button type="button" variant="outline" size="sm" className="flex-1 text-xs h-7" onClick={() => { const alt = window.prompt("Alt text", item.filename.replace(/\.jpg$/, "")) || "image"; insertImageMarkdown(item.url, "left", alt); }}>
+                              ← Insert
+                            </Button>
+                            <Button type="button" variant="outline" size="sm" className="flex-1 text-xs h-7" onClick={() => { const alt = window.prompt("Alt text", item.filename.replace(/\.jpg$/, "")) || "image"; insertImageMarkdown(item.url, "right", alt); }}>
+                              Insert →
+                            </Button>
+                            <Button type="button" variant="outline" size="sm" className="h-7 w-7 p-0 text-red-600 border-red-200 hover:bg-red-50" onClick={() => handleDeleteMedia(item.id)}>
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </Card>
 
               <Card className="p-6 border-slate-200 bg-white space-y-5">

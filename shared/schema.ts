@@ -36,6 +36,17 @@ export const smartPennyPosts = pgTable("market_posts", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const mediaUploads = pgTable("media_uploads", {
+  id: serial("id").primaryKey(),
+  filename: text("filename").notNull(),
+  mimeType: text("mime_type").notNull(),
+  data: text("data").notNull(),
+  sizeBytes: integer("size_bytes").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type MediaUpload = typeof mediaUploads.$inferSelect;
+
 export const insertLeadSchema = createInsertSchema(leads).omit({ 
   id: true, 
   createdAt: true,

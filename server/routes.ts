@@ -346,5 +346,82 @@ export async function registerRoutes(
     }
   });
 
+  // Upload image (base64 JSON, no multipart needed)
+  app.post("/api/admin/upload-image", async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      const schema = z.object({
+        filename: z.string().min(1).max(255),
+        mimeType: z.enum(["image/jpeg", "image/png", "image/gif", "image/webp"]),
+        data: z.string().min(10).max(4_000_000), // ~3 MB binary max
+      });
+
+      const payload = schema.parse(req.body);
+      const sizeBytes = Math.round((payload.data.replace(/=/g, "").length * 3) / 4);
+      const saved = await storage.saveMediaUpload({ ...payload, sizeBytes });
+
+      return res.status(201).json({ id: saved.id, url: `/api/media/${saved.id}`, filename: saved.filename, sizeBytes: saved.sizeBytes });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation failed", errors: err.errors });
+      }
+      console.error("Error uploading image:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Serve uploaded image
+  app.get("/api/media/:id", async (req, res) => {
+    try {
+      const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
+      const item = await storage.getMediaUpload(id);
+      if (!item) return res.status(404).end();
+
+      const buf = Buffer.from(item.data, "base64");
+      res.setHeader("Content-Type", item.mimeType);
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      res.setHeader("Content-Length", String(buf.length));
+      return res.end(buf);
+    } catch (err) {
+      if (err instanceof z.ZodError) return res.status(400).end();
+      console.error("Error serving media:", err);
+      return res.status(500).end();
+    }
+  });
+
+  // List uploaded images (admin only)
+  app.get("/api/admin/media", async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const items = await storage.listMediaUploads();
+      return res.status(200).json(items.map((item) => ({ ...item, url: `/api/media/${item.id}` })));
+    } catch (err) {
+      console.error("Error listing media:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Delete uploaded image (admin only)
+  app.delete("/api/admin/media/:id", async (req, res) => {
+    try {
+      if (!validateAdminRequest(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      const { id } = z.object({ id: z.coerce.number().int().positive() }).parse(req.params);
+      const deleted = await storage.deleteMediaUpload(id);
+      if (!deleted) return res.status(404).json({ message: "Not found" });
+      return res.status(200).json({ success: true });
+    } catch (err) {
+      if (err instanceof z.ZodError) return res.status(400).json({ message: "Validation failed" });
+      console.error("Error deleting media:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   return httpServer;
 }
