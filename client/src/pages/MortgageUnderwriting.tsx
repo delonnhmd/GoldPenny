@@ -1,4 +1,6 @@
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -1087,142 +1089,127 @@ export default function MortgageUnderwriting() {
 
   const handleDownloadChecklist = () => {
     if (typeof window === "undefined") return;
-    const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "letter" });
-    const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
-    const margin = 48;
-    const usableW = pageW - margin * 2;
-    let y = margin;
-
-    const addPage = () => {
-      doc.addPage();
-      y = margin;
-    };
-
-    const checkY = (needed: number) => {
-      if (y + needed > pageH - margin) addPage();
-    };
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const exportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
     // Title
-    doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.setTextColor(15, 40, 80);
-    doc.text("Mortgage Scenario Checker", margin, y);
-    y += 22;
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(80, 80, 80);
-    doc.text(`Generated: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}`, margin, y);
-    y += 14;
-    doc.setDrawColor(200, 200, 200);
-    doc.line(margin, y, pageW - margin, y);
-    y += 16;
-
-    // Summary box
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.setTextColor(40, 40, 40);
-    doc.text(`Status: ${scenarioStatus}`, margin, y); y += 14;
-    doc.text(`Program: ${PROGRAM_LABELS[selectedProgram]}`, margin, y); y += 14;
+    doc.text("Mortgage Scenario Checker", 14, 18);
+    doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    const recLines = doc.splitTextToSize(`Recommendation: ${recommendationText}`, usableW);
-    doc.text(recLines, margin, y);
-    y += recLines.length * 13 + 12;
-    doc.line(margin, y, pageW - margin, y);
-    y += 16;
+    doc.setTextColor(120, 120, 120);
+    doc.text(`Generated on ${exportDate}  |  PennyFloat.com`, 14, 25);
+    doc.setTextColor(0, 0, 0);
+
+    let currentY = 32;
+
+    // Summary table
+    autoTable(doc, {
+      startY: currentY,
+      head: [["Scenario Summary", ""]],
+      body: [
+        ["Status", scenarioStatus],
+        ["Recommended Program", PROGRAM_LABELS[selectedProgram]],
+        ["Recommendation", recommendationText],
+      ],
+      theme: "grid",
+      headStyles: { fillColor: [30, 100, 180], textColor: 255, fontStyle: "bold" },
+      styles: { fontSize: 9, cellPadding: 2.5 },
+      columnStyles: { 0: { fontStyle: "bold", cellWidth: 55 }, 1: { cellWidth: "auto" } },
+      margin: { left: 14, right: 14 },
+    });
+    currentY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
 
     // Documents section
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.setTextColor(15, 40, 80);
-    checkY(24);
-    doc.text("Documents You Will Likely Need", margin, y);
-    y += 18;
+    doc.text("Documents You Will Likely Need", 14, currentY);
+    currentY += 4;
 
     for (const category of documentCategories) {
-      checkY(30);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.setTextColor(40, 40, 40);
-      doc.text(`▶ ${category.title}`, margin, y);
-      y += 14;
-      for (const item of category.items) {
-        checkY(14);
-        const symbol = item.status === "required" ? "[REQUIRED]" : item.status === "likely" ? "[LIKELY]" : "[IF APPLICABLE]";
-        const itemLine = doc.splitTextToSize(`  ${symbol} ${item.title}${item.note ? ` — ${item.note}` : ""}`, usableW - 12);
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(9);
-        doc.setTextColor(
-          item.status === "required" ? 180 : item.status === "likely" ? 100 : 120,
-          item.status === "required" ? 40 : 100,
-          item.status === "required" ? 40 : 40
-        );
-        doc.text(itemLine, margin + 8, y);
-        y += itemLine.length * 12;
-      }
-      y += 4;
+      const rows = category.items.map((item) => {
+        const tag = item.status === "required" ? "REQUIRED" : item.status === "likely" ? "LIKELY" : "IF APPLICABLE";
+        return [tag, item.title + (item.note ? `  --  ${item.note}` : "")];
+      });
+
+      autoTable(doc, {
+        startY: currentY,
+        head: [[{ content: category.title, colSpan: 2 }]],
+        body: rows,
+        theme: "striped",
+        headStyles: { fillColor: [60, 80, 120], textColor: 255, fontStyle: "bold", fontSize: 9 },
+        bodyStyles: { fontSize: 8, cellPadding: 2 },
+        columnStyles: {
+          0: { cellWidth: 32, fontStyle: "bold" },
+          1: { cellWidth: "auto" },
+        },
+        didParseCell: (data) => {
+          if (data.section === "body" && data.column.index === 0) {
+            const tag = data.cell.text[0];
+            if (tag === "REQUIRED") data.cell.styles.textColor = [160, 30, 30];
+            else if (tag === "LIKELY") data.cell.styles.textColor = [30, 100, 30];
+            else data.cell.styles.textColor = [100, 80, 20];
+          }
+        },
+        margin: { left: 14, right: 14 },
+      });
+      currentY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 4;
     }
 
-    y += 8;
-    doc.line(margin, y, pageW - margin, y);
-    y += 16;
+    currentY += 4;
 
     // Underwriting conditions
-    checkY(24);
+    if (currentY > 250) { doc.addPage(); currentY = 18; }
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.setTextColor(15, 40, 80);
-    doc.text("Possible Underwriting Conditions", margin, y);
-    y += 18;
+    doc.text("Possible Underwriting Conditions", 14, currentY);
+    currentY += 4;
 
-    for (const condition of possibleConditionItems) {
-      checkY(26);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(9);
-      doc.setTextColor(40, 40, 40);
-      doc.text(`[■] ${condition.title}`, margin, y);
-      y += 12;
-      const reasonLines = doc.splitTextToSize(`   Reason: ${condition.reason}`, usableW - 12);
-      doc.setFont("helvetica", "normal");
-      doc.setTextColor(100, 100, 100);
-      doc.text(reasonLines, margin + 8, y);
-      y += reasonLines.length * 11 + 4;
-    }
-
-    y += 8;
-    doc.line(margin, y, pageW - margin, y);
-    y += 16;
+    autoTable(doc, {
+      startY: currentY,
+      head: [["Condition", "Reason"]],
+      body: possibleConditionItems.map((c) => [c.title, c.reason]),
+      theme: "striped",
+      headStyles: { fillColor: [30, 100, 180], textColor: 255, fontStyle: "bold" },
+      styles: { fontSize: 8, cellPadding: 2.5 },
+      columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: "auto" } },
+      margin: { left: 14, right: 14 },
+    });
+    currentY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
 
     // Decision factors
-    checkY(24);
+    if (currentY > 250) { doc.addPage(); currentY = 18; }
+    doc.setFontSize(11);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.setTextColor(15, 40, 80);
-    doc.text("Decision Factors", margin, y);
-    y += 18;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(60, 60, 60);
-    for (const factor of decisionFactors) {
-      checkY(13);
-      const lines = doc.splitTextToSize(`•  ${factor}`, usableW - 8);
-      doc.text(lines, margin, y);
-      y += lines.length * 12;
-    }
+    doc.text("Decision Factors", 14, currentY);
+    currentY += 4;
 
-    // Footer disclaimer
+    autoTable(doc, {
+      startY: currentY,
+      body: decisionFactors.map((f) => [`-  ${f}`]),
+      theme: "plain",
+      styles: { fontSize: 8, cellPadding: 2 },
+      margin: { left: 14, right: 14 },
+    });
+
+    // Footer on every page
     const totalPages = doc.getNumberOfPages();
     for (let i = 1; i <= totalPages; i++) {
       doc.setPage(i);
-      doc.setFont("helvetica", "italic");
       doc.setFontSize(7);
+      doc.setFont("helvetica", "italic");
       doc.setTextColor(150, 150, 150);
       doc.text(
         "For educational purposes only. Not a lending commitment. Subject to full underwriting. PennyFloat.com",
-        margin,
-        pageH - 24
+        14,
+        doc.internal.pageSize.getHeight() - 8
       );
-      doc.text(`Page ${i} of ${totalPages}`, pageW - margin - 40, pageH - 24);
+      doc.text(
+        `Page ${i} of ${totalPages}`,
+        doc.internal.pageSize.getWidth() - 28,
+        doc.internal.pageSize.getHeight() - 8
+      );
     }
 
     doc.save("mortgage-scenario-checklist.pdf");
