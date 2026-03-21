@@ -1933,18 +1933,10 @@ export default function MortgageUnderwriting() {
                   <BadgeCheck className="h-4 w-4 text-slate-700" />
                   <h3 className="text-sm font-semibold text-slate-900">D. Recommended Next Steps</h3>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   <Button onClick={handleDownloadChecklist} className="w-full">
                     <Download className="h-4 w-4 mr-2" />
                     Download My Checklist
-                  </Button>
-                  <Button onClick={handleEmailChecklist} variant="outline" className="w-full">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email My Checklist
-                  </Button>
-                  <Button onClick={handleSpeakWithLoanOfficer} variant="outline" className="w-full">
-                    <PhoneCall className="h-4 w-4 mr-2" />
-                    Speak With a Loan Officer
                   </Button>
                 </div>
                 {improvementSuggestions.length > 0 ? (
