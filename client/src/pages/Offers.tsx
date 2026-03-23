@@ -100,12 +100,7 @@ export default function Offers() {
   const creditTier = getCreditTier(creditScore);
   const loanType = getLoanType(loanPurpose);
 
-  const upstartUrl = buildPartnerUrl("https://www.upstart.com/personal-loans", {
-    source: "pennyfloat",
-    loan_type: loanType,
-    amount: String(requestedAmount),
-    score: creditScore,
-  });
+  const upstartUrl = "https://upstart.9c65.net/c/7021230/3807099/9083";
 
   return (
     <div className="min-h-screen bg-[#f4fafc] font-sans">
@@ -161,7 +156,7 @@ export default function Offers() {
                         <Star className="w-3 h-3" />
                         Top Pick
                       </Badge>
-                      <span className="text-xl font-bold text-slate-900">Upstart</span>
+                      <a href={upstartUrl} target="_blank" rel="noopener noreferrer sponsored" className="text-xl font-bold text-slate-900 hover:text-primary transition-colors">Upstart</a>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
@@ -171,7 +166,7 @@ export default function Offers() {
                       </div>
                       <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
                         <div className="text-xs text-slate-500 mb-0.5">APR Range</div>
-                        <div className="font-semibold text-slate-800">6.40% - 35.99%</div>
+                        <div className="font-semibold text-slate-800">6.5% - 35.99%</div>
                       </div>
                       <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
                         <div className="text-xs text-slate-500 mb-0.5">Loan Terms</div>
