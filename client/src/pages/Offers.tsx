@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowRight, CheckCircle2, ShieldCheck, Clock, Percent, Info, Star } from "lucide-react";
+import { CheckCircle2, Clock, Percent, Info, Star } from "lucide-react";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { setPageSeo } from "@/lib/seo";
@@ -160,18 +159,18 @@ export default function Offers() {
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                      <a href={upstartUrl} target="_blank" rel="noopener noreferrer sponsored" className="bg-slate-50 rounded-lg p-3 border border-slate-100 hover:border-primary/40 hover:bg-primary/5 transition-colors cursor-pointer">
                         <div className="text-xs text-slate-500 mb-0.5">Loan Amount</div>
                         <div className="font-semibold text-slate-800">$1,000 - $75,000</div>
-                      </div>
-                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                      </a>
+                      <a href={upstartUrl} target="_blank" rel="noopener noreferrer sponsored" className="bg-slate-50 rounded-lg p-3 border border-slate-100 hover:border-primary/40 hover:bg-primary/5 transition-colors cursor-pointer">
                         <div className="text-xs text-slate-500 mb-0.5">APR Range</div>
                         <div className="font-semibold text-slate-800">6.5% - 35.99%</div>
-                      </div>
-                      <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                      </a>
+                      <a href={upstartUrl} target="_blank" rel="noopener noreferrer sponsored" className="bg-slate-50 rounded-lg p-3 border border-slate-100 hover:border-primary/40 hover:bg-primary/5 transition-colors cursor-pointer">
                         <div className="text-xs text-slate-500 mb-0.5">Loan Terms</div>
                         <div className="font-semibold text-slate-800">36 or 60 months</div>
-                      </div>
+                      </a>
                     </div>
 
                     <ul className="space-y-2 mb-5 text-sm text-slate-700">
@@ -209,18 +208,7 @@ export default function Offers() {
                     </ul>
                   </div>
 
-                  {/* Right: CTA */}
-                  <div className="flex flex-col items-center md:items-end gap-3 md:min-w-[180px]">
-                    <a href={upstartUrl} target="_blank" rel="noopener noreferrer sponsored" className="w-full md:w-auto">
-                      <Button className="w-full h-12 px-6 font-bold bg-primary hover:bg-primary/90 text-white shadow-md rounded-xl text-base">
-                        Check My Rate <ArrowRight className="ml-2 w-4 h-4" />
-                      </Button>
-                    </a>
-                    <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                      No hard credit pull to check rate
-                    </div>
-                  </div>
+
                 </div>
 
                 {/* Inline Disclaimers */}
