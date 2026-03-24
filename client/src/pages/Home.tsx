@@ -443,9 +443,9 @@ export default function Home() {
                   type="button"
                   variant="outline"
                   className="border-primary/30 text-primary hover:bg-primary/5"
-                  onClick={() => document.getElementById("car-loan")?.scrollIntoView({ behavior: "smooth" })}
+                  onClick={() => document.getElementById("mortgage")?.scrollIntoView({ behavior: "smooth" })}
                 >
-                  Explore Car Loan Options
+                  Explore Mortgage
                 </Button>
                 <div className="flex items-center gap-2 text-slate-500 text-sm">
                   <ShieldCheck className="w-5 h-5 text-primary" />
