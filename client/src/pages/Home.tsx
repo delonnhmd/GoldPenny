@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -930,6 +930,112 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+
+      {/* ────────────── Mortgage Section ────────────── */}
+      <section id="mortgage" className="relative py-20 overflow-hidden border-t border-slate-100" style={{ background: "linear-gradient(135deg, #0a1628 0%, #0f2044 55%, #1a3a6b 100%)" }}>
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] opacity-10 rounded-full blur-3xl pointer-events-none" style={{ background: "radial-gradient(circle, #c9a84c 0%, transparent 70%)" }} />
+        <div className="container relative z-10 mx-auto px-4 max-w-7xl">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5 border" style={{ background: "rgba(201,168,76,0.12)", borderColor: "rgba(201,168,76,0.35)", color: "#c9a84c" }}>
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
+              Champions Mortgage · NMLS # 2740375
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-tight" style={{ color: "#ffffff" }}>
+              Home Loans <span style={{ color: "#c9a84c" }}>Tailored for You.</span>
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: "#94b4d8" }}>
+              Purchase, Refinance, or Cash-Out in <span className="font-semibold text-white">TX, FL, GA, &amp; NC.</span>
+            </p>
+          </div>
+          <div className="flex flex-col lg:flex-row items-stretch gap-10 max-w-6xl mx-auto">
+            <div className="flex-1">
+              <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.25)" }}>
+                <div className="h-1.5 w-full" style={{ background: "linear-gradient(90deg, #c9a84c, #f0d080, #c9a84c)" }} />
+                <div className="p-6 md:p-8">
+                  <h3 className="text-xl font-bold text-white mb-6">Get Started — It Takes 60 Seconds</h3>
+                  <div className="space-y-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#94b4d8" }}>Loan Purpose</label>
+                        <select id="mort-purpose" className="w-full h-11 rounded-lg px-3 text-sm font-medium focus:outline-none appearance-none" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(201,168,76,0.3)", color: "#ffffff" }}>
+                          <option value="" style={{ background: "#0f2044" }}>Select purpose…</option>
+                          <option value="Purchase" style={{ background: "#0f2044" }}>Purchase</option>
+                          <option value="Refinance" style={{ background: "#0f2044" }}>Refinance</option>
+                          <option value="Cash-Out" style={{ background: "#0f2044" }}>Cash-Out</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#94b4d8" }}>Property State</label>
+                        <select id="mort-state" className="w-full h-11 rounded-lg px-3 text-sm font-medium focus:outline-none appearance-none" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(201,168,76,0.3)", color: "#ffffff" }}>
+                          <option value="" style={{ background: "#0f2044" }}>Select state…</option>
+                          <option value="TX" style={{ background: "#0f2044" }}>Texas (TX)</option>
+                          <option value="FL" style={{ background: "#0f2044" }}>Florida (FL)</option>
+                          <option value="GA" style={{ background: "#0f2044" }}>Georgia (GA)</option>
+                          <option value="NC" style={{ background: "#0f2044" }}>North Carolina (NC)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-2 uppercase tracking-wide" style={{ color: "#94b4d8" }}>Employment Type</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        <label className="flex items-center justify-center text-center text-sm font-medium rounded-lg py-2.5 px-2 cursor-pointer transition-all select-none" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(201,168,76,0.25)", color: "#cbd5e1" }}><input type="radio" name="mort-employment" value="W2 Employee" className="sr-only" />W2 Employee</label>
+                        <label className="flex items-center justify-center text-center text-sm font-medium rounded-lg py-2.5 px-2 cursor-pointer transition-all select-none" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(201,168,76,0.25)", color: "#cbd5e1" }}><input type="radio" name="mort-employment" value="Self-Employed" className="sr-only" />Self-Employed</label>
+                        <label className="flex items-center justify-center text-center text-sm font-medium rounded-lg py-2.5 px-2 cursor-pointer transition-all select-none" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(201,168,76,0.25)", color: "#cbd5e1" }}><input type="radio" name="mort-employment" value="Other" className="sr-only" />Other</label>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: "#94b4d8" }}>Estimated Purchase Price</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-sm" style={{ color: "#c9a84c" }}>$</span>
+                        <input id="mort-price" type="text" placeholder="350,000" className="w-full h-11 pl-7 pr-3 rounded-lg text-sm font-medium focus:outline-none" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(201,168,76,0.3)", color: "#ffffff" }} />
+                      </div>
+                    </div>
+                    <div className="pt-1">
+                      <a href="https://app.arive.com/lo/champions-mortgage" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full rounded-xl text-base font-bold transition-all duration-200" style={{ background: "linear-gradient(135deg, #c9a84c 0%, #e8c46a 50%, #c9a84c 100%)", color: "#0a1628", padding: "14px 24px", textDecoration: "none", boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}>
+                        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                        Apply Now
+                      </a>
+                      <div className="flex items-center justify-center gap-2 mt-3 text-xs" style={{ color: "#94b4d8" }}>
+                        <svg className="w-3.5 h-3.5 shrink-0" style={{ color: "#c9a84c" }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        ⚡ Secure &amp; Encrypted — No Hard Credit Pull to Start
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col gap-5 justify-center">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">🏠</div><div className="font-bold text-sm text-white mb-1">Purchase</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Buy your dream home with competitive rates</div></div>
+                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">🔄</div><div className="font-bold text-sm text-white mb-1">Refinance</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Lower your rate or shorten your term</div></div>
+                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">💵</div><div className="font-bold text-sm text-white mb-1">Cash-Out</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Tap your home equity for what matters</div></div>
+                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">⚡</div><div className="font-bold text-sm text-white mb-1">Fast Closing</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Streamlined process, less stress</div></div>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "#cbd5e1" }}>🔒 256-bit SSL</div>
+                <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "#cbd5e1" }}>✅ Licensed LO</div>
+                <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "#cbd5e1" }}>⚖️ Equal Housing</div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-12 pt-6 border-t" style={{ borderColor: "rgba(201,168,76,0.2)" }}>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4 flex-wrap justify-center md:justify-start">
+                <div className="flex items-center gap-1.5 text-xs font-medium" style={{ color: "#94b4d8" }}>
+                  <svg className="w-6 h-6 shrink-0" style={{ color: "#c9a84c" }} viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                  Equal Housing Lender
+                </div>
+                <div className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(201,168,76,0.15)", color: "#c9a84c", border: "1px solid rgba(201,168,76,0.3)" }}>NMLS # 2740375</div>
+              </div>
+              <p className="text-xs text-center md:text-right max-w-sm" style={{ color: "#64748b" }}>
+                Licensed to originate in TX, FL, GA, and NC only. This is not a commitment to lend. All loan applications are subject to underwriting approval.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* ────────────── End Mortgage Section ────────────── */}
 
       <section id="business-loan" className="py-20 bg-slate-50 border-t border-slate-100">
         <div className="container mx-auto px-4 max-w-7xl">
