@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { Link } from "wouter";
-import { CheckCircle2, Clock, Percent, Info, Star } from "lucide-react";
+import { CheckCircle2, Clock, Percent, Info, Star, ShieldCheck } from "lucide-react";
 
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { setPageSeo } from "@/lib/seo";
