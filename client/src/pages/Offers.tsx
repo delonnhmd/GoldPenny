@@ -10,11 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { setPageSeo } from "@/lib/seo";
 
-const PAGE_TITLE = "Instant Loan Approval & Quick Funding Loans in Houston TX | PennyFloat";
+const PAGE_TITLE = "Personal Loan Online Houston TX | Fast Personal Loan Approval 2026";
 const PAGE_DESCRIPTION =
-  "Compare bad credit loan options, no credit check loan pathways, and quick funding loans in Houston. PennyFloat offers a secure loan application flow with soft credit inquiry only so you can compare lenders safely.";
+  "Compare personal loan online offers in Houston with fast personal loan approval options, unsecured personal loan choices, and low interest personal loan ranges. Check personal loan bad credit pathways with a soft pull personal loan flow and no hidden fees personal loan comparison.";
 const PAGE_KEYWORDS =
-  "instant loan approval, quick funding loans, bad credit loan options, soft credit check loan, no credit check loan, loans in Houston TX, Houston personal loan options, no hidden fees loan, safe loan comparison platform, compare lenders safely";
+  "personal loan online, best personal loan 2026, fast personal loan approval, unsecured personal loan, low interest personal loan, personal loan bad credit, instant personal loan USA, quick personal loan online, personal loan Houston TX, Houston personal loan options, apply personal loan Houston, soft pull personal loan, personal loan no credit impact, no hidden fees personal loan, safe personal loan comparison";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/loan";
 
 type CreditTier = "low" | "mid" | "high";
@@ -117,24 +117,24 @@ export default function Offers() {
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Application Received</span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900 mb-2">Your Houston Loan Comparison Is Ready, {fullName}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900 mb-2">Your Personal Loan Online Options Are Ready, {fullName}</h1>
                 <p className="text-slate-600 leading-relaxed">
-                  Based on your request for a <span className="font-semibold text-slate-800">{loanPurpose}</span> and credit profile <span className="font-semibold text-slate-800">{creditScore}</span>, here are instant loan approval options and quick funding loans to review.
+                  Based on your request for a <span className="font-semibold text-slate-800">{loanPurpose}</span> and credit profile <span className="font-semibold text-slate-800">{creditScore}</span>, here are personal loan Houston TX matches, quick personal loan online options, and instant personal loan USA pathways to review.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-slate-600">
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
                   <Percent className="w-4 h-4 text-primary" />
-                  <span>Bad Credit Loan Options</span>
+                  <span>Fast Personal Loan Approval</span>
                 </div>
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
                   <Clock className="w-4 h-4 text-primary" />
-                  <span>Soft Credit Inquiry Only</span>
+                  <span>Soft Pull Personal Loan</span>
                 </div>
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
                   <ShieldCheck className="w-4 h-4 text-primary" />
-                  <span>Secure Loan Application</span>
+                  <span>Safe Personal Loan Comparison</span>
                 </div>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function Offers() {
           {/* Recommended Loan Options */}
           <TooltipProvider>
             <section aria-label="Recommended Loan Options">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Recommended Loan Options</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Best Personal Loan 2026 Options</h2>
 
               {/* Upstart Featured Card */}
               <Card className="p-6 md:p-8 mb-4 border-primary/20 shadow-md bg-white overflow-hidden relative">
@@ -198,15 +198,15 @@ export default function Offers() {
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>No prepayment penalty</span>
+                        <span>Unsecured personal loan options available</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Funds as soon as 1 business day after acceptance</span>
+                        <span>Low interest personal loan ranges based on profile</span>
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>No impact to credit score when checking rates</span>
+                        <span>Personal loan no credit impact pre-check flow</span>
                       </li>
                     </ul>
                   </div>
@@ -230,14 +230,19 @@ export default function Offers() {
           {/* Global Disclaimer */}
           <div className="mt-10 px-4 py-5 rounded-xl bg-slate-50 border border-slate-200">
             <p className="text-xs text-slate-500 text-center leading-relaxed">
-              <strong className="text-slate-600">Disclaimer:</strong> PennyFloat is not a lender just connection to third-party providers. We are a safe loan comparison platform with no hidden fees loan comparison access from PennyFloat. Loan terms, approval, and funding are determined by the lender based on individual qualifications.
+              <strong className="text-slate-600">Disclaimer:</strong> PennyFloat is not a lender. We help you compare lenders safely. Looking for the best personal loan Houston for personal loan bad credit in 2026? Start with a soft pull personal loan check and review no hidden fees personal loan terms before applying.
             </p>
           </div>
 
           <div className="mt-8 text-center">
-            <Link href="/">
-              <Button variant="outline" className="font-semibold">Back to Home</Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <a href="/#apply">
+                <Button className="font-semibold">Apply Personal Loan Houston</Button>
+              </a>
+              <Link href="/">
+                <Button variant="outline" className="font-semibold">Back to Home</Button>
+              </Link>
+            </div>
           </div>
         </div>
       </main>

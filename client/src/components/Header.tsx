@@ -37,6 +37,9 @@ export function Header() {
           <>
             <a href="/#how-it-works" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">How it Works</a>
             <a href="/#benefits" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Benefits</a>
+            <Link href="/loan" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Personal Loan</Link>
+            <Link href="/business" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Business</Link>
+            <Link href="/crypto" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Crypto</Link>
             <Link href="/rates" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">News</Link>
             <Link href="/smart-penny" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Smart Penny</Link>
             <div className="relative group">
@@ -69,7 +72,7 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <a href="/#apply" className="hidden lg:block">
-            <Button className="font-semibold shadow-md shadow-primary/20">Check Your Rate</Button>
+            <Button className="font-semibold shadow-md shadow-primary/20">Fast Personal Loan Approval</Button>
           </a>
 
           <Sheet>
@@ -91,6 +94,15 @@ export function Header() {
                   </SheetClose>
                   <SheetClose asChild>
                     <a href="/#benefits" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Benefits</a>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/loan" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Personal Loan</Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/business" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Business</Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/crypto" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Crypto</Link>
                   </SheetClose>
                   <SheetClose asChild>
                     <Link href="/rates" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">News</Link>
@@ -121,7 +133,7 @@ export function Header() {
 
                 <SheetClose asChild>
                   <a href="/#apply" className="mt-2">
-                    <Button className="w-full font-semibold shadow-md shadow-primary/20">Check Your Rate</Button>
+                    <Button className="w-full font-semibold shadow-md shadow-primary/20">Fast Personal Loan Approval</Button>
                   </a>
                 </SheetClose>
               </nav>

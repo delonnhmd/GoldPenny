@@ -16,6 +16,8 @@ import MoneyTools from "./pages/MoneyTools";
 import ShoppingGuide from "./pages/ShoppingGuide";
 import AffiliateDisclosure from "./pages/AffiliateDisclosure";
 import TexasCashAdvanceApps2026 from "./pages/TexasCashAdvanceApps2026";
+import Business from "./pages/Business";
+import Crypto from "./pages/Crypto";
 
 function Router() {
   return (
@@ -29,6 +31,8 @@ function Router() {
       <Route path="/loan-calculators" component={LoanCalculators} />
       <Route path="/mortgage" component={MortgageUnderwriting} />
       <Route path="/mortgage-underwriting" component={MortgageUnderwriting} />
+      <Route path="/business" component={Business} />
+      <Route path="/crypto" component={Crypto} />
       <Route path="/money-tools" component={MoneyTools} />
       <Route path="/money-tool" component={MoneyTools} />
       <Route path="/shopping-guide" component={ShoppingGuide} />

@@ -16,16 +16,24 @@ function getPageBannerContext(pathname: string): PageBannerContext | null {
     return { pageType: "homepage", currentPageCategory: "finance" };
   }
 
-  if (pathname.startsWith("/loan") || pathname.startsWith("/offers")) {
-    return { pageType: "loan", currentPageCategory: "finance" };
-  }
-
   if (pathname.startsWith("/loan-calculators")) {
     return { pageType: "mortgage", currentPageCategory: "finance" };
   }
 
+  if (pathname === "/loan" || pathname.startsWith("/loan?") || pathname.startsWith("/offers")) {
+    return { pageType: "loan", currentPageCategory: "finance" };
+  }
+
   if (pathname.startsWith("/mortgage") || pathname.startsWith("/mortgage-underwriting")) {
     return { pageType: "mortgage", currentPageCategory: "finance" };
+  }
+
+  if (pathname.startsWith("/business")) {
+    return { pageType: "business", currentPageCategory: "finance" };
+  }
+
+  if (pathname.startsWith("/crypto")) {
+    return { pageType: "blog", currentPageCategory: "trading" };
   }
 
   if (pathname.startsWith("/money-tools")) {

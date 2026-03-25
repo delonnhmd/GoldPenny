@@ -11,32 +11,74 @@ import { Link } from "wouter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const PAGE_TITLE = "Smart Penny 2026: APR vs Interest Rate Explained & Loan Guides | PennyFloat";
+const PAGE_TITLE = "Smart Penny 2026: Personal, Business, and Crypto Loan Guides";
 const PAGE_DESCRIPTION =
-  "Read Smart Penny guides on APR vs interest rate explained, how to get a loan fast 2026, debt to income ratio explained, and best budgeting tips 2026.";
+  "Smart Penny covers personal loan online comparisons, small business funding Houston insights, and crypto loan without selling guides. Read soft pull personal loan, compare business lenders, and secure crypto lending best-practice content.";
 const PAGE_KEYWORDS =
-  "what is APR and how it works, APR vs interest rate explained, how to get a loan fast 2026, how to improve credit score quickly, best budgeting tips 2026, how much loan can I afford, debt to income ratio explained, best cash advance apps 2026";
+  "personal loan online, fast personal loan approval, personal loan Houston TX, soft pull personal loan, small business loan 2026, business loan Houston TX, compare business lenders, crypto loan without selling, borrow against crypto, best crypto lending platform 2026, secure crypto loan platform, crypto loan vs personal loan";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/smart-penny";
 
-const SMART_PENNY_GUIDE_TOPICS = [
-  "What is APR and how it works",
-  "APR vs interest rate explained",
-  "How to get a loan fast 2026",
-  "How to improve credit score quickly",
-  "Best budgeting tips 2026",
-  "How much loan can I afford",
-  "Debt to income ratio explained",
-  "Best cash advance apps 2026",
+const PERSONAL_LOAN_TOPICS = [
+  "personal loan online",
+  "best personal loan 2026",
+  "fast personal loan approval",
+  "unsecured personal loan",
+  "low interest personal loan",
+  "personal loan bad credit",
+  "instant personal loan USA",
+  "quick personal loan online",
+  "personal loan Houston TX",
+  "apply personal loan Houston",
+  "personal loan no credit impact",
+  "soft pull personal loan",
+  "no hidden fees personal loan",
+  "safe personal loan comparison",
 ] as const;
 
-const SMART_PENNY_LONG_TAIL_TOPICS = [
-  "How to get a loan in Houston with bad credit",
-  "Best mortgage for first time buyer Houston 2026",
-  "Can I get a loan without credit check online",
-  "How to get pre approved mortgage without hurting credit",
-  "What is the cheapest loan option in 2026",
-  "How to buy a house in Houston with low income",
-  "Emergency loan same day approval Houston",
+const BUSINESS_LOAN_TOPICS = [
+  "small business loan 2026",
+  "business funding fast approval",
+  "startup business loan",
+  "working capital loan",
+  "business loan no collateral",
+  "business line of credit",
+  "SBA loan alternatives",
+  "instant business funding",
+  "business loan Houston TX",
+  "small business funding Houston",
+  "startup funding Houston Texas",
+  "Houston business financing",
+  "business loan no credit check",
+  "secure business loan platform",
+  "compare business lenders",
+] as const;
+
+const CRYPTO_LOAN_TOPICS = [
+  "crypto loan without selling",
+  "borrow against crypto",
+  "bitcoin loan 2026",
+  "crypto backed loan",
+  "instant crypto loan",
+  "defi lending platform",
+  "crypto collateral loan",
+  "stablecoin loan",
+  "how to borrow against bitcoin",
+  "crypto loan vs personal loan",
+  "best crypto lending platform 2026",
+  "how to get cash from crypto",
+  "secure crypto loan platform",
+  "no credit check crypto loan",
+  "fast crypto loan approval",
+  "safe crypto lending",
+] as const;
+
+const LONG_TAIL_TOPIC_TITLES = [
+  "Best personal loan Houston for bad credit in 2026",
+  "How to apply personal loan Houston with soft pull personal loan checks",
+  "Best startup business loan Houston Texas 2026",
+  "Working capital loan vs business line of credit in Houston",
+  "How to borrow against bitcoin without selling in 2026",
+  "Crypto loan vs personal loan: which is lower cost for fast cash",
 ] as const;
 
 function getWordPreview(content: string, limit = 100) {
@@ -81,11 +123,19 @@ export default function SmartPenny() {
       <Header />
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
-          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Smart Penny 2026 Loan & APR Guides</h1>
-          <p className="text-slate-600">Daily Smart Penny posts on APR, interest rates, budgeting, and practical borrowing decisions.</p>
-          <Link href="/loan-calculators">
-            <Button className="font-semibold shadow-md shadow-primary/20">Open Loan Calculators</Button>
-          </Link>
+          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Smart Penny 2026 Loan SEO Topics</h1>
+          <p className="text-slate-600">Daily Smart Penny posts across personal, business, and crypto lending comparisons.</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link href="/loan">
+              <Button className="font-semibold shadow-md shadow-primary/20">Compare Personal Loan Online</Button>
+            </Link>
+            <Link href="/business">
+              <Button variant="outline" className="font-semibold">Compare Business Lenders</Button>
+            </Link>
+            <Link href="/crypto">
+              <Button variant="outline" className="font-semibold">Review Crypto Lending Options</Button>
+            </Link>
+          </div>
           <Input
             type="search"
             value={searchTerm}
@@ -95,19 +145,35 @@ export default function SmartPenny() {
             className="max-w-md"
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
             <Card className="p-5 border-slate-200 bg-white">
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">Smart Penny Guide Keywords</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">Personal Loan Keywords</h2>
               <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                {SMART_PENNY_GUIDE_TOPICS.map((topic) => (
+                {PERSONAL_LOAN_TOPICS.map((topic) => (
                   <li key={topic}>{topic}</li>
                 ))}
               </ul>
             </Card>
             <Card className="p-5 border-slate-200 bg-white">
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">Smart Penny Long-Tail Titles</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">Business Loan Keywords</h2>
               <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                {SMART_PENNY_LONG_TAIL_TOPICS.map((topic) => (
+                {BUSINESS_LOAN_TOPICS.map((topic) => (
+                  <li key={topic}>{topic}</li>
+                ))}
+              </ul>
+            </Card>
+            <Card className="p-5 border-slate-200 bg-white">
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">Crypto Loan Keywords</h2>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                {CRYPTO_LOAN_TOPICS.map((topic) => (
+                  <li key={topic}>{topic}</li>
+                ))}
+              </ul>
+            </Card>
+            <Card className="p-5 border-slate-200 bg-white">
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">Long-Tail Blog Titles</h2>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                {LONG_TAIL_TOPIC_TITLES.map((topic) => (
                   <li key={topic}>{topic}</li>
                 ))}
               </ul>
