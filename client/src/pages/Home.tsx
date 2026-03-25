@@ -937,10 +937,7 @@ export default function Home() {
         <div className="absolute top-0 right-0 w-[600px] h-[600px] opacity-10 rounded-full blur-3xl pointer-events-none" style={{ background: "radial-gradient(circle, #c9a84c 0%, transparent 70%)" }} />
         <div className="container relative z-10 mx-auto px-4 max-w-7xl">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-5 border" style={{ background: "rgba(201,168,76,0.12)", borderColor: "rgba(201,168,76,0.35)", color: "#c9a84c" }}>
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>
-              Champions Mortgage · NMLS # 2740375
-            </div>
+
             <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-tight" style={{ color: "#ffffff" }}>
               Home Loans <span style={{ color: "#c9a84c" }}>Tailored for You.</span>
             </h2>
@@ -992,13 +989,16 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="pt-1">
-                      <a href="https://app.arive.com/lo/champions-mortgage" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full rounded-xl text-base font-bold transition-all duration-200" style={{ background: "linear-gradient(135deg, #c9a84c 0%, #e8c46a 50%, #c9a84c 100%)", color: "#0a1628", padding: "14px 24px", textDecoration: "none", boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}>
+                      <a href="https://championsmortgage.pos.yoursonar.com/?originator=Minh@championsmortgageteam.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full rounded-xl text-base font-bold transition-all duration-200" style={{ background: "linear-gradient(135deg, #c9a84c 0%, #e8c46a 50%, #c9a84c 100%)", color: "#0a1628", padding: "14px 24px", textDecoration: "none", boxShadow: "0 8px 24px rgba(201,168,76,0.4)" }}>
                         <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
                         Apply Now
                       </a>
                       <div className="flex items-center justify-center gap-2 mt-3 text-xs" style={{ color: "#94b4d8" }}>
                         <svg className="w-3.5 h-3.5 shrink-0" style={{ color: "#c9a84c" }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         ⚡ Secure &amp; Encrypted — No Hard Credit Pull to Start
+                      </div>
+                      <div className="flex items-center justify-center mt-1 text-xs font-medium" style={{ color: "#c9a84c" }}>
+                        NMLS # 2740375
                       </div>
                     </div>
                   </div>
