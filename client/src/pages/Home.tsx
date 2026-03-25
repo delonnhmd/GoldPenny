@@ -244,6 +244,7 @@ export default function Home() {
   const [step, setStep] = useState(1);
   const [carStep, setCarStep] = useState(1);
   const [isBusinessSubmitting, setIsBusinessSubmitting] = useState(false);
+  const [mortEmployment, setMortEmployment] = useState("");
   const { mutate: createLead, isPending } = useCreateLead();
   const { mutate: createCarLead, isPending: isCarPending } = useCreateLead();
 
@@ -976,9 +977,15 @@ export default function Home() {
                     <div>
                       <label className="block text-xs font-semibold mb-2 uppercase tracking-wide" style={{ color: "#94b4d8" }}>Employment Type</label>
                       <div className="grid grid-cols-3 gap-3">
-                        <label className="flex items-center justify-center text-center text-sm font-medium rounded-lg py-2.5 px-2 cursor-pointer transition-all select-none" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(201,168,76,0.25)", color: "#cbd5e1" }}><input type="radio" name="mort-employment" value="W2 Employee" className="sr-only" />W2 Employee</label>
-                        <label className="flex items-center justify-center text-center text-sm font-medium rounded-lg py-2.5 px-2 cursor-pointer transition-all select-none" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(201,168,76,0.25)", color: "#cbd5e1" }}><input type="radio" name="mort-employment" value="Self-Employed" className="sr-only" />Self-Employed</label>
-                        <label className="flex items-center justify-center text-center text-sm font-medium rounded-lg py-2.5 px-2 cursor-pointer transition-all select-none" style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(201,168,76,0.25)", color: "#cbd5e1" }}><input type="radio" name="mort-employment" value="Other" className="sr-only" />Other</label>
+                        {(["W2 Employee", "Self-Employed", "Other"] as const).map((type) => (
+                          <button
+                            key={type}
+                            type="button"
+                            onClick={() => setMortEmployment(type)}
+                            className="flex items-center justify-center text-center text-sm font-semibold rounded-lg py-2.5 px-2 cursor-pointer transition-all select-none"
+                            style={mortEmployment === type ? { background: "rgba(201,168,76,0.25)", border: "1.5px solid #c9a84c", color: "#c9a84c" } : { background: "rgba(255,255,255,0.06)", border: "1px solid rgba(201,168,76,0.25)", color: "#cbd5e1" }}
+                          >{type}</button>
+                        ))}
                       </div>
                     </div>
                     <div>
@@ -1010,7 +1017,7 @@ export default function Home() {
                 <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">🏠</div><div className="font-bold text-sm text-white mb-1">Purchase</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Buy your dream home with competitive rates</div></div>
                 <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">🔄</div><div className="font-bold text-sm text-white mb-1">Refinance</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Lower your rate or shorten your term</div></div>
                 <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">💵</div><div className="font-bold text-sm text-white mb-1">Cash-Out</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Tap your home equity for what matters</div></div>
-                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">⚡</div><div className="font-bold text-sm text-white mb-1">Fast Closing</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Streamlined process, less stress</div></div>
+                <a href="/loan-calculators" className="rounded-xl p-4 block transition-all" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.35)", textDecoration: "none" }}><div className="text-2xl mb-2">🧮</div><div className="font-bold text-sm mb-1" style={{ color: "#c9a84c" }}>Mortgage Calculator</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Estimate monthly payments &amp; affordability</div></a>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.12)", color: "#cbd5e1" }}>🔒 256-bit SSL</div>

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import {
   Table,
   TableBody,
@@ -649,17 +650,54 @@ export default function LoanCalculators() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Card className="p-5 border-slate-200 bg-white space-y-4">
                   <h2 className="text-xl font-semibold text-slate-900">Mortgage Inputs</h2>
-                  <NumberField
-                    id="property-value"
-                    label="Property Value"
-                    value={propertyValue}
-                    onChange={handlePropertyValueChange}
-                    step={1000}
-                  />
+                  {/* Home Price with slider */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="property-value">Home Price</Label>
+                      <span className="text-sm font-bold text-slate-900">{formatCurrency(propertyValue)}</span>
+                    </div>
+                    <Slider
+                      value={[propertyValue]}
+                      onValueChange={([v]) => handlePropertyValueChange(v)}
+                      min={50000}
+                      max={2000000}
+                      step={5000}
+                      className="mt-1"
+                    />
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>$50k</span><span>$2M</span>
+                    </div>
+                    <NumberField
+                      id="property-value"
+                      label=""
+                      value={propertyValue}
+                      onChange={handlePropertyValueChange}
+                      step={1000}
+                    />
+                  </div>
+
+                  {/* Down Payment with slider */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Down Payment</Label>
+                      <span className="text-sm font-bold text-slate-900">{formatCurrency(downPaymentAmount)} <span className="text-slate-500 font-normal">| {formatPercent(downPaymentPercent, 1)}</span></span>
+                    </div>
+                    <Slider
+                      value={[downPaymentPercent]}
+                      onValueChange={([v]) => syncMortgageByPercent(propertyValue, v)}
+                      min={0}
+                      max={50}
+                      step={0.5}
+                      className="mt-1"
+                    />
+                    <div className="flex justify-between text-xs text-slate-400">
+                      <span>0%</span><span>50%</span>
+                    </div>
+                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <Label htmlFor="down-payment-type">Down Payment Input Type</Label>
+                      <Label htmlFor="down-payment-type">Down Payment Input Mode</Label>
                       <Select value={downPaymentInputMode} onValueChange={(value) => handleDownPaymentModeChange(value as DownPaymentInputMode)}>
                         <SelectTrigger id="down-payment-type">
                           <SelectValue />
@@ -760,7 +798,24 @@ export default function LoanCalculators() {
                     />
                   </div>
 
-                  <NumberField id="mortgage-rate" label="Interest Rate" value={mortgageRate} onChange={(value) => setMortgageRate(clampRate(value))} step={0.01} max={MAX_RATE} suffix="%" />
+                  {/* APR / Interest Rate — prominent */}
+                  <div className="rounded-xl p-4 space-y-3" style={{ background: "linear-gradient(135deg, #0a1628, #0f2044)" }}>
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-semibold text-white">APR / Interest Rate</Label>
+                      <span className="text-xl font-extrabold" style={{ color: "#c9a84c" }}>{mortgageRate.toFixed(3)}%</span>
+                    </div>
+                    <Slider
+                      value={[mortgageRate]}
+                      onValueChange={([v]) => setMortgageRate(clampRate(v))}
+                      min={2}
+                      max={18}
+                      step={0.001}
+                    />
+                    <div className="flex justify-between text-xs" style={{ color: "#94b4d8" }}>
+                      <span>2%</span><span>18%</span>
+                    </div>
+                    <NumberField id="mortgage-rate" label="" value={mortgageRate} onChange={(value) => setMortgageRate(clampRate(value))} step={0.001} max={MAX_RATE} suffix="%" />
+                  </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="mortgage-term">Term (Years)</Label>
@@ -798,8 +853,37 @@ export default function LoanCalculators() {
                 </Card>
 
                 <div className="space-y-4">
-                  <Card className="p-4 border-slate-200 bg-blue-50/50">
-                    <p className="text-sm font-medium text-blue-900">Calculated loan amount and payment update automatically from property value and down payment.</p>
+                  {/* ── Payment Hero ── */}
+                  <Card className="overflow-hidden border-0 shadow-lg">
+                    <div style={{ background: "linear-gradient(135deg, #0a1628 0%, #0f2044 60%, #1a3a6b 100%)" }} className="p-5 space-y-4">
+                      <div>
+                        <div className="flex items-end gap-1">
+                          <span className="text-4xl font-extrabold text-white">{formatCurrency(totalMonthlyMortgagePayment)}</span>
+                          <span className="text-slate-400 text-base mb-1">/mo</span>
+                        </div>
+                        <p className="text-slate-400 text-sm mt-0.5">
+                          {mortgageTermYears}-Year Fixed &nbsp;·&nbsp; {mortgageRate.toFixed(3)}% APR
+                        </p>
+                      </div>
+                      {/* Breakdown bar */}
+                      {totalMonthlyMortgagePayment > 0 && (
+                        <div className="space-y-2">
+                          <div className="flex w-full h-3 rounded-full overflow-hidden">
+                            <div style={{ width: `${(mortgageResult.monthlyPayment / totalMonthlyMortgagePayment) * 100}%`, background: "#ef4444" }} />
+                            <div style={{ width: `${(propertyTaxMonthly / totalMonthlyMortgagePayment) * 100}%`, background: "#3b82f6" }} />
+                            <div style={{ width: `${(insuranceMonthly / totalMonthlyMortgagePayment) * 100}%`, background: "#14b8a6" }} />
+                            <div style={{ width: `${(hoaMonthly / totalMonthlyMortgagePayment) * 100}%`, background: "#22c55e" }} />
+                            {miMonthly > 0 && <div style={{ width: `${(miMonthly / totalMonthlyMortgagePayment) * 100}%`, background: "#a855f7" }} />}
+                          </div>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: "#ef4444" }} /><span className="text-slate-300">Principal &amp; Interest</span><span className="ml-auto font-semibold text-white">{formatCurrency(mortgageResult.monthlyPayment)}</span></div>
+                            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: "#14b8a6" }} /><span className="text-slate-300">Home Insurance</span><span className="ml-auto font-semibold text-white">{formatCurrency(insuranceMonthly)}</span></div>
+                            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: "#3b82f6" }} /><span className="text-slate-300">Property Tax</span><span className="ml-auto font-semibold text-white">{formatCurrency(propertyTaxMonthly)}</span></div>
+                            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: "#22c55e" }} /><span className="text-slate-300">HOA Fees</span><span className="ml-auto font-semibold text-white">{formatCurrency(hoaMonthly)}</span></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </Card>
 
                   <Card className="p-4 border-slate-200 bg-white space-y-3">
@@ -860,28 +944,18 @@ export default function LoanCalculators() {
                   </Card>
 
                   <Card className="p-4 border-slate-200 bg-white space-y-3">
-                    <h3 className="text-base font-semibold text-slate-900">Want exact numbers from a real lender?</h3>
-                    <p className="text-sm text-slate-600">Check your loan options now.</p>
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        const leadSection =
-                          document.getElementById("apply") ??
-                          document.getElementById("lead-form");
-
-                        if (leadSection) {
-                          leadSection.scrollIntoView({ behavior: "smooth", block: "start" });
-                          return;
-                        }
-
-                        window.location.href = "/loan";
-                      }}
+                    <h3 className="text-base font-semibold text-slate-900">Ready for real numbers from a licensed lender?</h3>
+                    <p className="text-sm text-slate-600">Get a personalized quote from Champions Mortgage — no hard credit pull to start.</p>
+                    <a
+                      href="https://championsmortgage.pos.yoursonar.com/?originator=Minh@championsmortgageteam.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center gap-2 w-full rounded-xl text-base font-bold transition-all duration-200"
+                      style={{ background: "linear-gradient(135deg, #0a1628 0%, #0f2044 100%)", color: "#ffffff", padding: "12px 24px", textDecoration: "none", boxShadow: "0 4px 16px rgba(10,22,40,0.3)" }}
                     >
-                      Check Loan Offers
-                    </Button>
-                    <p className="text-xs text-slate-600">
-                      Results are estimates only and not a commitment to lend or a loan approval.
-                    </p>
+                      Get a Custom Quote
+                    </a>
+                    <p className="text-xs text-slate-500">Champions Mortgage · NMLS # 2740375 · Licensed in TX, FL, GA &amp; NC. Not a commitment to lend.</p>
                   </Card>
                   <GlobalDisclaimers />
                 </div>
