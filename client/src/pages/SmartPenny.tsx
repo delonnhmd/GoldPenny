@@ -11,12 +11,33 @@ import { Link } from "wouter";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const PAGE_TITLE = "Smart Penny: Small Business Lending Insights & Updates | PennyFloat";
+const PAGE_TITLE = "Smart Penny 2026: APR vs Interest Rate Explained & Loan Guides | PennyFloat";
 const PAGE_DESCRIPTION =
-  "Read Smart Penny updates on small business lending trends, borrowing strategies, and market commentary to help compare funding options.";
+  "Read Smart Penny guides on APR vs interest rate explained, how to get a loan fast 2026, debt to income ratio explained, and best budgeting tips 2026.";
 const PAGE_KEYWORDS =
-  "small business lending insights, business loan commentary, borrowing strategy, business financing trends, loan market updates";
+  "what is APR and how it works, APR vs interest rate explained, how to get a loan fast 2026, how to improve credit score quickly, best budgeting tips 2026, how much loan can I afford, debt to income ratio explained, best cash advance apps 2026";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/smart-penny";
+
+const SMART_PENNY_GUIDE_TOPICS = [
+  "What is APR and how it works",
+  "APR vs interest rate explained",
+  "How to get a loan fast 2026",
+  "How to improve credit score quickly",
+  "Best budgeting tips 2026",
+  "How much loan can I afford",
+  "Debt to income ratio explained",
+  "Best cash advance apps 2026",
+] as const;
+
+const SMART_PENNY_LONG_TAIL_TOPICS = [
+  "How to get a loan in Houston with bad credit",
+  "Best mortgage for first time buyer Houston 2026",
+  "Can I get a loan without credit check online",
+  "How to get pre approved mortgage without hurting credit",
+  "What is the cheapest loan option in 2026",
+  "How to buy a house in Houston with low income",
+  "Emergency loan same day approval Houston",
+] as const;
 
 function getWordPreview(content: string, limit = 100) {
   const plainText = content
@@ -60,8 +81,8 @@ export default function SmartPenny() {
       <Header />
       <main className="py-12 md:py-16">
         <div className="container mx-auto px-4 max-w-5xl space-y-6">
-          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Business Lending Smart Penny</h1>
-          <p className="text-slate-600">Daily Smart Penny news posts and lending commentary from your team.</p>
+          <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">Smart Penny 2026 Loan & APR Guides</h1>
+          <p className="text-slate-600">Daily Smart Penny posts on APR, interest rates, budgeting, and practical borrowing decisions.</p>
           <Link href="/loan-calculators">
             <Button className="font-semibold shadow-md shadow-primary/20">Open Loan Calculators</Button>
           </Link>
@@ -73,6 +94,25 @@ export default function SmartPenny() {
             aria-label="Search Smart Penny posts"
             className="max-w-md"
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card className="p-5 border-slate-200 bg-white">
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">Smart Penny Guide Keywords</h2>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                {SMART_PENNY_GUIDE_TOPICS.map((topic) => (
+                  <li key={topic}>{topic}</li>
+                ))}
+              </ul>
+            </Card>
+            <Card className="p-5 border-slate-200 bg-white">
+              <h2 className="text-lg font-semibold text-slate-900 mb-3">Smart Penny Long-Tail Titles</h2>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                {SMART_PENNY_LONG_TAIL_TOPICS.map((topic) => (
+                  <li key={topic}>{topic}</li>
+                ))}
+              </ul>
+            </Card>
+          </div>
 
           {isLoading ? (
             <Card className="p-6 md:p-8 border-slate-200 bg-white">

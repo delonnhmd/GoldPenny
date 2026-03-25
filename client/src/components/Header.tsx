@@ -10,7 +10,7 @@ import {
 
 const calculatorSubpages = [
   { label: "Loan Calculators", href: "/loan-calculators" },
-  { label: "Mortgage Underwriting", href: "/mortgage-underwriting" },
+  { label: "Mortgage Underwriting", href: "/mortgage" },
   { label: "Money Tools", href: "/money-tools" },
 ] as const;
 

@@ -33,11 +33,11 @@ import { setPageSeo } from "@/lib/seo";
 import { insertLeadSchema, creditScoreRanges, employmentStatuses, loanPurposes } from "@shared/schema";
 import { api } from "@shared/routes";
 
-const PAGE_TITLE = "Personal, Auto & Business Loan Offers Comparison | PennyFloat";
+const PAGE_TITLE = "No Credit Check Loan Options & Fast Cash Advance in Houston TX | PennyFloat";
 const PAGE_DESCRIPTION =
-  "Compare personal loan offers, auto financing options, business funding, and cash advance alternatives. Review APR, fees, and repayment costs before you apply.";
+  "Compare no credit check loan options, fast cash advance offers, and emergency loan online choices in Houston. Get instant loan approval pathways with a soft credit inquiry only and secure loan application experience.";
 const PAGE_KEYWORDS =
-  "personal loan offers, auto loan offers, car refinance, business loan comparison, cash advance alternatives, APR comparison, loan repayment calculator, compare loan rates";
+  "no credit check loan, fast cash advance, emergency loan online, instant loan approval, soft credit check loan, loans in Houston TX, Houston personal loan options, cash advance Houston TX, no impact to credit score, secure loan application";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/";
 
 // Form schemas for each step
@@ -381,7 +381,7 @@ export default function Home() {
       score: data.creditScore,
     });
 
-    window.location.href = `/offers?${fallbackSearchParams.toString()}`;
+    window.location.href = `/loan?${fallbackSearchParams.toString()}`;
   };
 
   const nextStep = () => validateStep(step);
@@ -420,11 +420,11 @@ export default function Home() {
               </div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold mb-6 border border-emerald-100 shadow-sm">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>No Impact on Your Credit Score</span>
+                <span>No Impact to Credit Score</span>
               </div>
               
               <h1 className="text-4xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight font-display">
-                Check Personal Loan <br />
+                No Credit Check Loan Options <br />
                 Offers in <span className="text-primary relative inline-block">
                   Minutes
                   <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow-400 opacity-50" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -434,10 +434,10 @@ export default function Home() {
               </h1>
               
               <p className="text-lg lg:text-xl text-slate-600 mb-4 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                We compare and explain short-term cash tools so borrowers can make informed decisions.
+                Compare fast cash advance and emergency loan online options in Houston TX.
               </p>
               <p className="text-base text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                PennyFloat is an educational comparison resource. We focus on clear explanations of costs, terms, and trade-offs so you can review options with more confidence.
+                PennyFloat is an educational loan comparison resource. We focus on instant loan approval pathways, clear costs, and soft credit check loan options so you can compare lenders safely.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button
@@ -446,19 +446,19 @@ export default function Home() {
                   className="border-primary/30 text-primary hover:bg-primary/5"
                   onClick={() => document.getElementById("mortgage")?.scrollIntoView({ behavior: "smooth" })}
                 >
-                  Explore Mortgage
+                  Explore Houston Mortgage Options
                 </Button>
                 <div className="flex items-center gap-2 text-slate-500 text-sm">
                   <ShieldCheck className="w-5 h-5 text-primary" />
-                  <span>256-bit Secure</span>
+                  <span>Secure Loan Application</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-500 text-sm">
                   <Clock className="w-5 h-5 text-primary" />
-                  <span>2 Minute Process</span>
+                  <span>Soft Credit Inquiry Only</span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-500 text-sm">
                   <Banknote className="w-5 h-5 text-primary" />
-                  <span>Funding as fast as 24h</span>
+                  <span>Quick Funding Loans</span>
                 </div>
               </div>
             </div>
@@ -679,7 +679,7 @@ export default function Home() {
                           </div>
 
                           <p className="text-xs text-slate-500 mt-3 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
-                            By clicking "See My Offers," you agree to our Terms and Privacy Policy. By submitting your email address through our website, you consent to receive communications from us related to financial tools, comparisons, and educational content. You may unsubscribe at any time using the unsubscribe link included in our emails.
+                            Soft credit inquiry only, no impact to credit score to check offers, and secure loan application flow. By clicking "See My Offers," you agree to our Terms and Privacy Policy. By submitting your email address through our website, you consent to receive communications from us related to financial tools, comparisons, and educational content. You may unsubscribe at any time using the unsubscribe link included in our emails.
                           </p>
                         </motion.div>
                       )}
@@ -912,7 +912,7 @@ export default function Home() {
                         </div>
 
                         <p className="text-xs text-slate-500 mt-3 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
-                          By clicking "See My Offers," you agree to our Terms and Privacy Policy. By submitting your email address through our website, you consent to receive communications from us related to financial tools, comparisons, and educational content. You may unsubscribe at any time using the unsubscribe link included in our emails.
+                          Soft credit inquiry only, no impact to credit score to check offers, and secure loan application flow. By clicking "See My Offers," you agree to our Terms and Privacy Policy. By submitting your email address through our website, you consent to receive communications from us related to financial tools, comparisons, and educational content. You may unsubscribe at any time using the unsubscribe link included in our emails.
                         </p>
                       </motion.div>
                     )}
@@ -940,10 +940,13 @@ export default function Home() {
           <div className="text-center mb-12">
 
             <h2 className="text-4xl md:text-5xl font-bold mb-4 leading-tight" style={{ color: "#ffffff" }}>
-              Home Loans <span style={{ color: "#c9a84c" }}>Tailored for You.</span>
+              Home Loan Houston Texas <span style={{ color: "#c9a84c" }}>and Refinance Mortgage Houston TX</span>
             </h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: "#94b4d8" }}>
-              Purchase, Refinance, or Cash-Out in <span className="font-semibold text-white">TX, FL, GA, &amp; NC.</span>
+              Compare mortgage pre approval Houston TX pathways, mortgage rates Houston today context, and first time home buyer Houston programs.
+            </p>
+            <p className="text-sm max-w-3xl mx-auto mt-2" style={{ color: "#cbd5e1" }}>
+              We also cover FHA loan Houston requirements, VA loan Houston eligibility, mortgage for self employed Houston, and down payment assistance Houston.
             </p>
           </div>
           <div className="flex flex-col lg:flex-row items-stretch gap-10 max-w-6xl mx-auto">
@@ -951,7 +954,7 @@ export default function Home() {
               <div className="rounded-2xl overflow-hidden shadow-2xl" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(201,168,76,0.25)" }}>
                 <div className="h-1.5 w-full" style={{ background: "linear-gradient(90deg, #c9a84c, #f0d080, #c9a84c)" }} />
                 <div className="p-6 md:p-8">
-                  <h3 className="text-xl font-bold text-white mb-6">Get Started — It Takes 60 Seconds</h3>
+                  <h3 className="text-xl font-bold text-white mb-6">Get Started - Mortgage Pre Approval Houston TX in 60 Seconds</h3>
                   <div className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
@@ -1002,11 +1005,12 @@ export default function Home() {
                       </a>
                       <div className="flex items-center justify-center gap-2 mt-3 text-xs" style={{ color: "#94b4d8" }}>
                         <svg className="w-3.5 h-3.5 shrink-0" style={{ color: "#c9a84c" }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        ⚡ Secure &amp; Encrypted — No Hard Credit Pull to Start
+                        Secure loan application, soft credit inquiry only, compare lenders safely
                       </div>
-                      <div className="flex items-center justify-center mt-1 text-xs font-medium" style={{ color: "#c9a84c" }}>
-                        NMLS # 2740375
+                      <div className="flex items-center justify-center mt-1 text-xs font-medium text-center" style={{ color: "#c9a84c" }}>
+                        No hidden fees loan comparison from PennyFloat. Not a lender just connection.
                       </div>
+                      <div className="flex items-center justify-center mt-1 text-xs font-medium" style={{ color: "#c9a84c" }}>NMLS # 2740375</div>
                     </div>
                   </div>
                 </div>
@@ -1014,8 +1018,8 @@ export default function Home() {
             </div>
             <div className="flex-1 flex flex-col gap-5 justify-center">
               <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">🏠</div><div className="font-bold text-sm text-white mb-1">Purchase</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Buy your dream home with competitive rates</div></div>
-                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">🔄</div><div className="font-bold text-sm text-white mb-1">Refinance</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Lower your rate or shorten your term</div></div>
+                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">🏠</div><div className="font-bold text-sm text-white mb-1">Purchase</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Best mortgage for first time buyer Houston 2026 scenarios</div></div>
+                <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">🔄</div><div className="font-bold text-sm text-white mb-1">Refinance</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Refinance mortgage Houston TX with rate and term comparisons</div></div>
                 <div className="rounded-xl p-4" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(201,168,76,0.2)" }}><div className="text-2xl mb-2">💵</div><div className="font-bold text-sm text-white mb-1">Cash-Out</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Tap your home equity for what matters</div></div>
                 <a href="/loan-calculators" className="rounded-xl p-4 block transition-all" style={{ background: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.35)", textDecoration: "none" }}><div className="text-2xl mb-2">🧮</div><div className="font-bold text-sm mb-1" style={{ color: "#c9a84c" }}>Mortgage Calculator</div><div className="text-xs leading-relaxed" style={{ color: "#94b4d8" }}>Estimate monthly payments &amp; affordability</div></a>
               </div>

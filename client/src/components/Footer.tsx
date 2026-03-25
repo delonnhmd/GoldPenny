@@ -22,7 +22,10 @@ export function Footer() {
               We compare and explain short-term cash tools so borrowers can make informed decisions. PennyFloat is an educational comparison resource focused on helping people understand costs, terms, and trade-offs.
             </p>
             <p className="text-sm leading-relaxed max-w-md text-slate-400 mt-3">
-              MD Media LLC (Texas, USA) • Contact: admin@pennyfloat.com • Publisher: Minh Ho
+              Loans in Houston TX, mortgage lenders Houston TX, financial services Houston, and Houston loan comparison education.
+            </p>
+            <p className="text-sm leading-relaxed max-w-md text-slate-400 mt-3">
+              MD Media LLC (Texas, USA) | Contact: admin@pennyfloat.com | Publisher: Minh Ho
             </p>
             <div className="flex gap-4 mt-6">
               <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
@@ -35,7 +38,7 @@ export function Footer() {
               </div>
             </div>
           </div>
-          
+
           <div>
             <h4 className="text-white text-sm font-bold uppercase tracking-wider mb-4 font-sans">Company</h4>
             <ul className="space-y-2 text-sm">
@@ -57,15 +60,18 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        
+
         <div className="border-t border-slate-800 pt-8 text-xs text-slate-500 text-center leading-relaxed">
           <p className="mb-4">
             <>
               <strong>Legal Disclaimer:</strong> MD Media LLC, doing business as PennyFloat, provides educational comparison content. Content on this site is for informational purposes only and does not constitute financial advice. We do not lend money, approve loans, or guarantee rates. Any loan decision, including approval, APR, fees, and repayment terms, comes from the lender or provider you choose.
             </>
           </p>
+          <p className="mb-4">
+            Best loan options Houston, Houston personal loan options, cash advance Houston TX, and Houston small business funding content is educational only.
+          </p>
           <p>
-            © {new Date().getFullYear()} MD Media LLC. All rights reserved.
+            (c) {new Date().getFullYear()} MD Media LLC. All rights reserved.
           </p>
         </div>
       </div>

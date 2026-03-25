@@ -21,11 +21,13 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/loan" component={Offers} />
       <Route path="/offers" component={Offers} />
       <Route path="/rates" component={News} />
       <Route path="/smart-penny" component={SmartPenny} />
       <Route path="/texas-cash-advance-apps-2026" component={TexasCashAdvanceApps2026} />
       <Route path="/loan-calculators" component={LoanCalculators} />
+      <Route path="/mortgage" component={MortgageUnderwriting} />
       <Route path="/mortgage-underwriting" component={MortgageUnderwriting} />
       <Route path="/money-tools" component={MoneyTools} />
       <Route path="/money-tool" component={MoneyTools} />

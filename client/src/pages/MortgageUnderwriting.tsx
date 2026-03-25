@@ -1,6 +1,5 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import autoTable from "jspdf-autotable";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -99,14 +98,14 @@ const PROGRAM_LABELS: Record<LoanProgram, string> = {
   jumbo: "Jumbo",
 };
 
-const PAGE_TITLE = "Mortgage Underwriting Calculator & Scenario Checker | PennyFloat";
+const PAGE_TITLE = "Mortgage Pre Approval Houston TX & Home Loan Houston Texas | PennyFloat";
 const PAGE_DESCRIPTION =
-  "Use the Mortgage Scenario Checker pre-decision underwriter to estimate mortgage qualification, monthly payment, DTI, LTV, reserves, and likely document conditions for FHA, VA, conventional, and jumbo loans.";
+  "Estimate mortgage pre approval Houston TX scenarios for first time home buyer Houston, refinance mortgage Houston TX, FHA loan Houston requirements, and VA loan Houston eligibility. Review mortgage for self employed Houston options and down payment assistance Houston pathways.";
 const PAGE_KEYWORDS =
-  "mortgage underwriting calculator, mortgage scenario checker, mortgage qualification calculator, mortgage eligibility calculator, pre-decision underwriter, DTI calculator for mortgage, LTV calculator mortgage, FHA loan qualification calculator, VA loan eligibility calculator, conventional loan qualification, jumbo loan qualification, refinance underwriting calculator, home loan prequalification tool";
+  "best mortgage brokers Houston 2026, mortgage pre approval Houston TX, first time home buyer Houston, mortgage rates Houston today, FHA loan Houston requirements, VA loan Houston eligibility, mortgage for self employed Houston, refinance mortgage Houston TX, home loan Houston Texas, down payment assistance Houston";
 
 function unique(values: string[]): string[] {
-  return [...new Set(values)];
+  return Array.from(new Set(values));
 }
 
 function round1(value: number): number {
@@ -231,7 +230,7 @@ export default function MortgageUnderwriting() {
     setPageSeo({
       title: PAGE_TITLE,
       description: PAGE_DESCRIPTION,
-      canonical: "https://www.pennyfloat.com/mortgage-underwriting",
+      canonical: "https://www.pennyfloat.com/mortgage",
       keywords: PAGE_KEYWORDS,
       robots: "index, follow, max-image-preview:large",
     });
@@ -561,7 +560,7 @@ export default function MortgageUnderwriting() {
       for (const item of items) {
         if (!map.has(item.title)) map.set(item.title, item);
       }
-      return [...map.values()];
+      return Array.from(map.values());
     };
 
     const categories: DocumentCategory[] = [];
@@ -979,7 +978,7 @@ export default function MortgageUnderwriting() {
     for (const item of items) {
       if (!map.has(item.title)) map.set(item.title, item);
     }
-    return [...map.values()];
+    return Array.from(map.values());
   }, [
     employmentType,
     overtimeYear1,
@@ -1129,7 +1128,14 @@ export default function MortgageUnderwriting() {
 
     for (const category of documentCategories) {
       const rows = category.items.map((item) => {
-        const tag = item.status === "required" ? "REQUIRED" : item.status === "likely" ? "LIKELY" : "IF APPLICABLE";
+        const tag =
+          item.status === "Likely Required"
+            ? "LIKELY"
+            : item.status === "Review Needed"
+              ? "REVIEW"
+              : item.status === "Standard"
+                ? "STANDARD"
+                : "IF APPLICABLE";
         return [tag, item.title + (item.note ? `  --  ${item.note}` : "")];
       });
 
@@ -1147,9 +1153,9 @@ export default function MortgageUnderwriting() {
         didParseCell: (data) => {
           if (data.section === "body" && data.column.index === 0) {
             const tag = data.cell.text[0];
-            if (tag === "REQUIRED") data.cell.styles.textColor = [160, 30, 30];
-            else if (tag === "LIKELY") data.cell.styles.textColor = [30, 100, 30];
-            else data.cell.styles.textColor = [100, 80, 20];
+            if (tag === "LIKELY") data.cell.styles.textColor = [30, 100, 30];
+            else if (tag === "REVIEW" || tag === "IF APPLICABLE") data.cell.styles.textColor = [100, 80, 20];
+            else data.cell.styles.textColor = [70, 70, 70];
           }
         },
         margin: { left: 14, right: 14 },
@@ -1234,8 +1240,11 @@ export default function MortgageUnderwriting() {
         <div className="container mx-auto max-w-7xl px-4 space-y-6">
           <div className="space-y-3">
             <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900">
-              MORTGAGE SCENARIO CHECKER - PRE-DECISION UNDERWRITER
+              Mortgage Pre Approval Houston TX Scenario Checker
             </h1>
+            <p className="text-sm text-slate-600">
+              Built for home loan Houston Texas planning, including mortgage rates Houston today context, best mortgage brokers Houston 2026 comparison points, and refinance mortgage Houston TX preparation.
+            </p>
             <Card className="p-4 border-amber-200 bg-amber-50">
               <p className="text-sm text-amber-900">
                 This tool provides an estimate for educational and pre-qualification purposes only. Results are not a lending
@@ -1925,7 +1934,18 @@ export default function MortgageUnderwriting() {
                     <Download className="h-4 w-4 mr-2" />
                     Download My Checklist
                   </Button>
+                  <Button onClick={handleEmailChecklist} variant="outline" className="w-full">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Email My Checklist Draft
+                  </Button>
+                  <Button onClick={handleSpeakWithLoanOfficer} variant="outline" className="w-full">
+                    <PhoneCall className="h-4 w-4 mr-2" />
+                    Compare Lenders Safely
+                  </Button>
                 </div>
+                <p className="text-xs text-slate-500">
+                  Secure loan application flow, soft credit inquiry only, and no impact to credit score for comparison steps. PennyFloat is not a lender just connection platform.
+                </p>
                 {improvementSuggestions.length > 0 ? (
                   <Card className="p-3 border-amber-200 bg-amber-50">
                     <h4 className="text-sm font-semibold text-amber-900">What may improve your scenario</h4>

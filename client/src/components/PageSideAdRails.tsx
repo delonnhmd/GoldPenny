@@ -16,7 +16,7 @@ function getPageBannerContext(pathname: string): PageBannerContext | null {
     return { pageType: "homepage", currentPageCategory: "finance" };
   }
 
-  if (pathname.startsWith("/offers")) {
+  if (pathname.startsWith("/loan") || pathname.startsWith("/offers")) {
     return { pageType: "loan", currentPageCategory: "finance" };
   }
 
@@ -24,7 +24,7 @@ function getPageBannerContext(pathname: string): PageBannerContext | null {
     return { pageType: "mortgage", currentPageCategory: "finance" };
   }
 
-  if (pathname.startsWith("/mortgage-underwriting")) {
+  if (pathname.startsWith("/mortgage") || pathname.startsWith("/mortgage-underwriting")) {
     return { pageType: "mortgage", currentPageCategory: "finance" };
   }
 

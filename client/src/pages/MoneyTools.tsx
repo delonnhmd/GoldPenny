@@ -852,7 +852,7 @@ export default function MoneyTools() {
                 <p className="font-semibold">Loan Calculators</p>
               </Link>
               <Link
-                href="/mortgage-underwriting"
+                href="/mortgage"
                 className={`rounded-lg border p-3 block ${darkMode ? "border-slate-700 bg-slate-900/60 hover:border-teal-400" : "border-slate-200 bg-white hover:border-teal-500"}`}
               >
                 <p className="font-semibold">Mortgage Underwriting</p>
@@ -2490,7 +2490,7 @@ export default function MoneyTools() {
                   Explore Loan Calculators
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
-                <Button variant="outline" onClick={() => (window.location.href = "/mortgage-underwriting")}>
+                <Button variant="outline" onClick={() => (window.location.href = "/mortgage")}>
                   Try Mortgage Underwriting
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>

@@ -10,10 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { setPageSeo } from "@/lib/seo";
 
-const PAGE_TITLE = "Compare Personal, Auto & Business Loan Offers | PennyFloat";
-const PAGE_DESCRIPTION = "Compare personal, auto, and business loan offers by APR, fees, repayment schedule, and total cost before choosing a lender.";
-const PAGE_KEYWORDS = "loan offers comparison, personal loan offers, auto loan offers, business loan offers, lender comparison, APR and fees, loan repayment options, compare loan rates";
-const PAGE_CANONICAL = "https://www.pennyfloat.com/offers";
+const PAGE_TITLE = "Instant Loan Approval & Quick Funding Loans in Houston TX | PennyFloat";
+const PAGE_DESCRIPTION =
+  "Compare bad credit loan options, no credit check loan pathways, and quick funding loans in Houston. PennyFloat offers a secure loan application flow with soft credit inquiry only so you can compare lenders safely.";
+const PAGE_KEYWORDS =
+  "instant loan approval, quick funding loans, bad credit loan options, soft credit check loan, no credit check loan, loans in Houston TX, Houston personal loan options, no hidden fees loan, safe loan comparison platform, compare lenders safely";
+const PAGE_CANONICAL = "https://www.pennyfloat.com/loan";
 
 type CreditTier = "low" | "mid" | "high";
 type LoanType = "personal" | "auto";
@@ -115,24 +117,24 @@ export default function Offers() {
                   <CheckCircle2 className="w-4 h-4" />
                   <span>Application Received</span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900 mb-2">Your Offers Are Ready, {fullName}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold font-display text-slate-900 mb-2">Your Houston Loan Comparison Is Ready, {fullName}</h1>
                 <p className="text-slate-600 leading-relaxed">
-                  Based on your request for a <span className="font-semibold text-slate-800">{loanPurpose}</span> and credit profile <span className="font-semibold text-slate-800">{creditScore}</span>, here are lender options to review.
+                  Based on your request for a <span className="font-semibold text-slate-800">{loanPurpose}</span> and credit profile <span className="font-semibold text-slate-800">{creditScore}</span>, here are instant loan approval options and quick funding loans to review.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-slate-600">
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
                   <Percent className="w-4 h-4 text-primary" />
-                  <span>Competitive APRs</span>
+                  <span>Bad Credit Loan Options</span>
                 </div>
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
                   <Clock className="w-4 h-4 text-primary" />
-                  <span>Fast decisions</span>
+                  <span>Soft Credit Inquiry Only</span>
                 </div>
                 <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2">
                   <ShieldCheck className="w-4 h-4 text-primary" />
-                  <span>Secure process</span>
+                  <span>Secure Loan Application</span>
                 </div>
               </div>
             </div>
@@ -204,7 +206,7 @@ export default function Offers() {
                       </li>
                       <li className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                        <span>Checking your rate won't affect your credit score</span>
+                        <span>No impact to credit score when checking rates</span>
                       </li>
                     </ul>
                   </div>
@@ -228,7 +230,7 @@ export default function Offers() {
           {/* Global Disclaimer */}
           <div className="mt-10 px-4 py-5 rounded-xl bg-slate-50 border border-slate-200">
             <p className="text-xs text-slate-500 text-center leading-relaxed">
-              <strong className="text-slate-600">Disclaimer:</strong> PennyFloat is not a lender. We connect users with third-party financial providers. Loan terms, approval, and funding are determined by the lender based on individual qualifications.
+              <strong className="text-slate-600">Disclaimer:</strong> PennyFloat is not a lender just connection to third-party providers. We are a safe loan comparison platform with no hidden fees loan comparison access from PennyFloat. Loan terms, approval, and funding are determined by the lender based on individual qualifications.
             </p>
           </div>
 

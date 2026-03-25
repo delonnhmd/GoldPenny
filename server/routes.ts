@@ -16,7 +16,7 @@ function getLeadRedirectUrl(leadData: z.infer<typeof insertLeadSchema>) {
     score: leadData.creditScoreRange,
   });
 
-  return `/offers?${searchParams.toString()}`;
+  return `/loan?${searchParams.toString()}`;
 }
 
 function validateAdminRequest(req: Request) {

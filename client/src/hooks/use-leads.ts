@@ -10,7 +10,7 @@ function buildOffersUrl(data: LeadInput) {
     score: data.creditScoreRange,
   });
 
-  return `/offers?${searchParams.toString()}`;
+  return `/loan?${searchParams.toString()}`;
 }
 
 export function useCreateLead() {
