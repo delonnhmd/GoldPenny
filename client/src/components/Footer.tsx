@@ -45,8 +45,6 @@ export function Footer() {
               <li><a href="/#about-us" className="hover:text-white transition-colors">About Us</a></li>
               <li><a href="/#how-it-works-info" className="hover:text-white transition-colors">How It Works</a></li>
               <li><a href="/#lender-network" className="hover:text-white transition-colors">Lender Network</a></li>
-              <li><a href="/business" className="hover:text-white transition-colors">Business Loans</a></li>
-              <li><a href="/crypto" className="hover:text-white transition-colors">Crypto Loans</a></li>
               <li><a href="/#contact" className="hover:text-white transition-colors">Contact</a></li>
             </ul>
           </div>
@@ -68,12 +66,6 @@ export function Footer() {
             <>
               <strong>Legal Disclaimer:</strong> MD Media LLC, doing business as PennyFloat, provides educational comparison content. Content on this site is for informational purposes only and does not constitute financial advice. We do not lend money, approve loans, or guarantee rates. Any loan decision, including approval, APR, fees, and repayment terms, comes from the lender or provider you choose.
             </>
-          </p>
-          <p className="mb-4">
-            Best loan options Houston, Houston personal loan options, cash advance Houston TX, and Houston small business funding content is educational only.
-          </p>
-          <p className="mb-4">
-            Crypto loan without selling and borrow against crypto content is for comparison and education only.
           </p>
           <p>
             (c) {new Date().getFullYear()} MD Media LLC. All rights reserved.
