@@ -16,6 +16,7 @@ import MoneyTools from "./pages/MoneyTools";
 import ShoppingGuide from "./pages/ShoppingGuide";
 import AffiliateDisclosure from "./pages/AffiliateDisclosure";
 import TexasCashAdvanceApps2026 from "./pages/TexasCashAdvanceApps2026";
+import CryptoLending from "./pages/CryptoLending";
 
 function Router() {
   return (
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/money-tool" component={MoneyTools} />
       <Route path="/shopping-guide" component={ShoppingGuide} />
       <Route path="/affiliate-disclosure" component={AffiliateDisclosure} />
+      <Route path="/crypto-loan" component={CryptoLending} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
