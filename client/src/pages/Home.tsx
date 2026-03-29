@@ -449,15 +449,6 @@ export default function Home() {
                 >
                   Explore Houston Mortgage Options
                 </Button>
-                <Link href="/crypto-loan">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="border-primary/30 text-primary hover:bg-primary/5"
-                  >
-                    Crypto Lending
-                  </Button>
-                </Link>
                 <div className="flex items-center gap-2 text-slate-500 text-sm">
                   <ShieldCheck className="w-5 h-5 text-primary" />
                   <span>Secure Loan Application</span>
@@ -699,6 +690,29 @@ export default function Home() {
               </Card>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="py-14 bg-white border-t border-slate-100">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <Card className="p-6 md:p-8 border-slate-100 shadow-lg bg-white">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold font-display text-slate-900 mb-2">
+                  Crypto Lending Options
+                </h2>
+                <p className="text-slate-600 leading-relaxed">
+                  Borrow against your crypto assets without selling them.
+                </p>
+              </div>
+              <Link href="/crypto-loan">
+                <Button className="font-semibold shadow-md shadow-primary/20">
+                  View Crypto Lending Options
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </Card>
         </div>
       </section>
 

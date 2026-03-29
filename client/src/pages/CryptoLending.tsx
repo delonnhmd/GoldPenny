@@ -1,5 +1,5 @@
 ﻿import { useEffect, useState } from "react";
-import { Check, ShieldCheck, Zap, Bitcoin, ExternalLink, ChevronRight, ChevronLeft } from "lucide-react";
+import { Check, ShieldCheck, Zap, ExternalLink, ChevronRight, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { Header } from "@/components/Header";
@@ -216,7 +216,7 @@ export default function CryptoLending() {
                       Borrow against crypto assets
                     </p>
                     <ul className="space-y-2 mb-5">
-                      {["No credit check required", "Flexible repayment", "Keep your crypto exposure"].map((f) => (
+                      {["No credit check required", "Flexible repayment", "Maintain market exposure"].map((f) => (
                         <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
                           <Check className="w-4 h-4 text-primary flex-shrink-0" />
                           {f}
@@ -238,10 +238,9 @@ export default function CryptoLending() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="mx-auto grid max-w-sm grid-cols-2 gap-3">
                     {[
                       { icon: ShieldCheck, label: "No credit check" },
-                      { icon: Bitcoin, label: "Keep your crypto" },
                       { icon: Zap, label: "Fast access" },
                     ].map(({ icon: Icon, label }) => (
                       <div
