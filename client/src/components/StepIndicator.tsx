@@ -4,9 +4,12 @@ import { motion } from "framer-motion";
 interface StepIndicatorProps {
   currentStep: number;
   totalSteps: number;
+  labels?: string[];
 }
 
-export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
+export function StepIndicator({ currentStep, totalSteps, labels }: StepIndicatorProps) {
+  const defaultLabels = ["Loan Info", "Personal", "Contact"];
+  const stepLabels = labels ?? defaultLabels;
   return (
     <div className="w-full mb-8">
       <div className="flex justify-between items-center relative">
@@ -43,9 +46,7 @@ export function StepIndicator({ currentStep, totalSteps }: StepIndicatorProps) {
                 absolute top-10 left-1/2 -translate-x-1/2 text-xs font-medium whitespace-nowrap
                 ${isActive ? "text-primary" : "text-gray-400"}
               `}>
-                {stepNumber === 1 && "Loan Info"}
-                {stepNumber === 2 && "Personal"}
-                {stepNumber === 3 && "Contact"}
+                {stepLabels[index] ?? stepNumber}
               </div>
             </div>
           );
