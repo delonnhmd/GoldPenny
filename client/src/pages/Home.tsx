@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "wouter";
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -448,6 +449,15 @@ export default function Home() {
                 >
                   Explore Houston Mortgage Options
                 </Button>
+                <Link href="/crypto-loan">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="border-primary/30 text-primary hover:bg-primary/5"
+                  >
+                    Crypto Lending
+                  </Button>
+                </Link>
                 <div className="flex items-center gap-2 text-slate-500 text-sm">
                   <ShieldCheck className="w-5 h-5 text-primary" />
                   <span>Secure Loan Application</span>

@@ -34,6 +34,7 @@ function Router() {
       <Route path="/money-tool" component={MoneyTools} />
       <Route path="/shopping-guide" component={ShoppingGuide} />
       <Route path="/affiliate-disclosure" component={AffiliateDisclosure} />
+      <Route path="/crypto" component={CryptoLending} />
       <Route path="/crypto-loan" component={CryptoLending} />
       <Route path="/admin" component={Admin} />
       <Route component={NotFound} />

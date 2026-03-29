@@ -132,7 +132,7 @@ export default function SmartPenny() {
             <Link href="/business">
               <Button variant="outline" className="font-semibold">Compare Business Lenders</Button>
             </Link>
-            <Link href="/crypto">
+            <Link href="/crypto-loan">
               <Button variant="outline" className="font-semibold">Review Crypto Lending Options</Button>
             </Link>
           </div>
