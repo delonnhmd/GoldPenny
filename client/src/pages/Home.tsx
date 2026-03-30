@@ -695,10 +695,7 @@ export default function Home() {
 
       <section className="py-14 bg-white border-t border-slate-100">
         <div className="container mx-auto px-4 max-w-7xl">
-          <CryptoLendingModule
-            title="Crypto Lending Options"
-            subtitle="Borrow against your crypto assets without selling them."
-          />
+          <CryptoLendingModule />
         </div>
       </section>
 
