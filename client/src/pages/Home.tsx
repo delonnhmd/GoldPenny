@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "wouter";
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -29,6 +28,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { StepIndicator } from "@/components/StepIndicator";
 import { HomepageFinanceBannerSection } from "@/components/HomepageFinanceBannerSection";
+import { CryptoLendingModule } from "@/components/CryptoLendingModule";
 import { useCreateLead } from "@/hooks/use-leads";
 import { setPageSeo } from "@/lib/seo";
 import { insertLeadSchema, creditScoreRanges, employmentStatuses, loanPurposes } from "@shared/schema";
@@ -694,25 +694,11 @@ export default function Home() {
       </section>
 
       <section className="py-14 bg-white border-t border-slate-100">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <Card className="p-6 md:p-8 border-slate-100 shadow-lg bg-white">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold font-display text-slate-900 mb-2">
-                  Crypto Lending Options
-                </h2>
-                <p className="text-slate-600 leading-relaxed">
-                  Borrow against your crypto assets without selling them.
-                </p>
-              </div>
-              <Link href="/crypto-loan">
-                <Button className="font-semibold shadow-md shadow-primary/20">
-                  View Crypto Lending Options
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </div>
-          </Card>
+        <div className="container mx-auto px-4 max-w-7xl">
+          <CryptoLendingModule
+            title="Crypto Lending Options"
+            subtitle="Borrow against your crypto assets without selling them."
+          />
         </div>
       </section>
 
