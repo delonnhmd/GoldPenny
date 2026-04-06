@@ -135,12 +135,6 @@ export default function Business() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </a>
-            <Link href="/smart-penny">
-              <Button variant="outline" className="font-semibold">
-                Read SBA Loan Alternatives
-                <LineChart className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
           </div>
         </div>
       </main>

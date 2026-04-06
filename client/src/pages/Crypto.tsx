@@ -133,12 +133,6 @@ export default function Crypto() {
           </Card>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/smart-penny">
-              <Button className="font-semibold">
-                Read Best Crypto Lending Platform 2026 Guides
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
             <Link href="/loan">
               <Button variant="outline" className="font-semibold">
                 Compare Crypto Loan vs Personal Loan

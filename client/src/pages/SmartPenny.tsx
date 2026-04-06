@@ -98,6 +98,7 @@ export default function SmartPenny() {
   const { data, isLoading } = useSmartPennyPosts("smart-penny");
   const [expandedPosts, setExpandedPosts] = useState<Record<number, boolean>>({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [showKeywordTopics, setShowKeywordTopics] = useState(false);
 
   useEffect(() => {
     setPageSeo({
@@ -145,39 +146,52 @@ export default function SmartPenny() {
             className="max-w-md"
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            <Card className="p-5 border-slate-200 bg-white">
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">Personal Loan Keywords</h2>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                {PERSONAL_LOAN_TOPICS.map((topic) => (
-                  <li key={topic}>{topic}</li>
-                ))}
-              </ul>
-            </Card>
-            <Card className="p-5 border-slate-200 bg-white">
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">Business Loan Keywords</h2>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                {BUSINESS_LOAN_TOPICS.map((topic) => (
-                  <li key={topic}>{topic}</li>
-                ))}
-              </ul>
-            </Card>
-            <Card className="p-5 border-slate-200 bg-white">
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">Crypto Loan Keywords</h2>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                {CRYPTO_LOAN_TOPICS.map((topic) => (
-                  <li key={topic}>{topic}</li>
-                ))}
-              </ul>
-            </Card>
-            <Card className="p-5 border-slate-200 bg-white">
-              <h2 className="text-lg font-semibold text-slate-900 mb-3">Long-Tail Blog Titles</h2>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                {LONG_TAIL_TOPIC_TITLES.map((topic) => (
-                  <li key={topic}>{topic}</li>
-                ))}
-              </ul>
-            </Card>
+          <div className="space-y-4">
+            <button
+              type="button"
+              className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100"
+              onClick={() => setShowKeywordTopics((current) => !current)}
+            >
+              {showKeywordTopics ? "Hide topic hints" : "Show topic hints"}
+            </button>
+            {showKeywordTopics ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <Card className="p-5 border-slate-200 bg-white">
+                  <h2 className="text-lg font-semibold text-slate-900 mb-3">Personal Loan Keywords</h2>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                    {PERSONAL_LOAN_TOPICS.map((topic) => (
+                      <li key={topic}>{topic}</li>
+                    ))}
+                  </ul>
+                </Card>
+                <Card className="p-5 border-slate-200 bg-white">
+                  <h2 className="text-lg font-semibold text-slate-900 mb-3">Business Loan Keywords</h2>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                    {BUSINESS_LOAN_TOPICS.map((topic) => (
+                      <li key={topic}>{topic}</li>
+                    ))}
+                  </ul>
+                </Card>
+                <Card className="p-5 border-slate-200 bg-white">
+                  <h2 className="text-lg font-semibold text-slate-900 mb-3">Crypto Loan Keywords</h2>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                    {CRYPTO_LOAN_TOPICS.map((topic) => (
+                      <li key={topic}>{topic}</li>
+                    ))}
+                  </ul>
+                </Card>
+                <Card className="p-5 border-slate-200 bg-white">
+                  <h2 className="text-lg font-semibold text-slate-900 mb-3">Long-Tail Blog Titles</h2>
+                  <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
+                    {LONG_TAIL_TOPIC_TITLES.map((topic) => (
+                      <li key={topic}>{topic}</li>
+                    ))}
+                  </ul>
+                </Card>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">Topic hints are hidden to keep the page focused. Click above to view them.</p>
+            )}
           </div>
 
           {isLoading ? (

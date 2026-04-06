@@ -39,7 +39,6 @@ export function Header() {
             <a href="/#benefits" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Benefits</a>
             <Link href="/loan" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Personal Loan</Link>
             <Link href="/rates" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">News</Link>
-            <Link href="/smart-penny" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Smart Penny</Link>
             <div className="relative group">
               <Link href="/loan-calculators" className="inline-flex items-center gap-1 text-sm font-medium text-slate-600 hover:text-primary transition-colors">
                 Calculator
@@ -98,9 +97,6 @@ export function Header() {
                   </SheetClose>
                   <SheetClose asChild>
                     <Link href="/rates" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">News</Link>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Link href="/smart-penny" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Smart Penny</Link>
                   </SheetClose>
                   <SheetClose asChild>
                     <Link href="/loan-calculators" className="rounded-md px-2 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100">Calculator</Link>

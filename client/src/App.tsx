@@ -8,7 +8,6 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Offers from "./pages/Offers";
 import News from "./pages/News";
-import SmartPenny from "./pages/SmartPenny";
 import Admin from "./pages/Admin";
 import LoanCalculators from "./pages/LoanCalculators";
 import MortgageUnderwriting from "./pages/MortgageUnderwriting";
@@ -17,6 +16,7 @@ import ShoppingGuide from "./pages/ShoppingGuide";
 import AffiliateDisclosure from "./pages/AffiliateDisclosure";
 import TexasCashAdvanceApps2026 from "./pages/TexasCashAdvanceApps2026";
 import CryptoLending from "./pages/CryptoLending";
+import SmartPenny from "./pages/SmartPenny";
 
 function Router() {
   return (

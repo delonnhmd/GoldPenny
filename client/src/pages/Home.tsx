@@ -38,7 +38,7 @@ const PAGE_TITLE = "No Credit Check Loan Options & Fast Cash Advance in Houston 
 const PAGE_DESCRIPTION =
   "Compare no credit check loan options, fast cash advance offers, and emergency loan online choices in Houston. Get instant loan approval pathways with a soft credit inquiry only and secure loan application experience.";
 const PAGE_KEYWORDS =
-  "no credit check loan, fast cash advance, emergency loan online, instant loan approval, soft credit check loan, loans in Houston TX, Houston personal loan options, cash advance Houston TX, no impact to credit score, secure loan application";
+  "no credit check loan, fast cash advance, emergency loan online, instant loan approval, soft credit check loan, loans in Houston TX, Houston personal loan options, cash advance Houston TX, no impact to credit score, secure loan application, personal loans Houston TX 2026, auto loans Texas, mortgage pre approval Houston, crypto-backed loans, bad credit loans Houston TX, emergency loans online, fast cash advance Houston";
 const PAGE_CANONICAL = "https://www.pennyfloat.com/";
 
 // Form schemas for each step
@@ -425,7 +425,7 @@ export default function Home() {
               </div>
               
               <h1 className="text-4xl lg:text-6xl font-bold text-slate-900 mb-6 leading-tight font-display">
-                No Credit Check Loan Options <br />
+                No Credit Check Loan Options in Houston TX <br />
                 Offers in <span className="text-primary relative inline-block">
                   Minutes
                   <svg className="absolute w-full h-3 -bottom-1 left-0 text-yellow-400 opacity-50" viewBox="0 0 100 10" preserveAspectRatio="none">
@@ -435,7 +435,7 @@ export default function Home() {
               </h1>
               
               <p className="text-lg lg:text-xl text-slate-600 mb-4 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Compare fast cash advance and emergency loan online options in Houston TX.
+                Compare fast cash advance, personal loans, and emergency loan online options in Houston TX.
               </p>
               <p className="text-base text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                 PennyFloat is an educational loan comparison resource. We focus on instant loan approval pathways, clear costs, and soft credit check loan options so you can compare lenders safely.
@@ -688,6 +688,32 @@ export default function Home() {
                   </form>
                 </Form>
               </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Keyword-Rich Content Section */}
+      <section className="py-16 bg-slate-50">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Explore Loan Options in Houston TX</h2>
+            <p className="text-lg text-slate-600 max-w-3xl mx-auto">
+              Discover the best personal loans, auto loans, and mortgage pre approval options available in Houston Texas for 2026.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Personal Loans Houston TX</h3>
+              <p className="text-slate-600">Compare personal loans with soft credit checks, no impact to credit score, and quick funding in Houston.</p>
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Auto Loans Texas</h3>
+              <p className="text-slate-600">Find the best auto loans and refinance options for buying or refinancing cars in Texas.</p>
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Mortgage Pre Approval Houston</h3>
+              <p className="text-slate-600">Get pre-approved for mortgages in Houston TX with competitive rates and fast processing.</p>
             </div>
           </div>
         </div>
@@ -1609,6 +1635,21 @@ export default function Home() {
             <p className="text-slate-700 leading-relaxed">
               PennyFloat is not a lender, loan broker, or agent for any lender or broker. We are an advertising referral service that connects users to participating lenders and financial service providers. Final approval and loan terms come from the provider you choose.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Signup Section */}
+      <section className="py-16 bg-slate-50">
+        <div className="container mx-auto px-4 max-w-4xl text-center">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Get Loan Tips & Updates</h2>
+          <p className="text-lg text-slate-600 mb-8">Subscribe to receive weekly loan comparison tips, rate updates, and exclusive offers for Houston TX loans.</p>
+          <div className="max-w-md mx-auto">
+            <div className="flex gap-4">
+              <Input type="email" placeholder="Enter your email" className="flex-1" />
+              <Button>Subscribe</Button>
+            </div>
+            <p className="text-sm text-slate-500 mt-4">We respect your privacy and comply with CAN-SPAM. Unsubscribe anytime.</p>
           </div>
         </div>
       </section>
