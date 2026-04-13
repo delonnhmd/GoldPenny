@@ -19,10 +19,18 @@ import {
 
 type InsertLeadWithIp = InsertLead & { ipAddress?: string | null };
 type ReportPeriod = "day" | "week";
-type DbSmartPennyPage = "rates" | "market";
+type DbSmartPennyPage = "rates" | "market" | "shopping-guide";
 
-const toDbSmartPennyPage = (page: SmartPennyPage): DbSmartPennyPage => (page === "smart-penny" ? "market" : "rates");
-const fromDbSmartPennyPage = (page: string): SmartPennyPage => (page === "market" ? "smart-penny" : "rates");
+const toDbSmartPennyPage = (page: SmartPennyPage): DbSmartPennyPage => {
+  if (page === "smart-penny") return "market";
+  if (page === "shopping-guide") return "shopping-guide";
+  return "rates";
+};
+const fromDbSmartPennyPage = (page: string): SmartPennyPage => {
+  if (page === "market") return "smart-penny";
+  if (page === "shopping-guide") return "shopping-guide";
+  return "rates";
+};
 
 export type LeadReport = {
   period: ReportPeriod;
@@ -38,6 +46,7 @@ export interface IStorage {
   listLeads(limit?: number): Promise<Lead[]>;
   getLeadReport(period: ReportPeriod): Promise<LeadReport>;
   listSmartPennyPosts(page: SmartPennyPage, limit?: number): Promise<SmartPennyPost[]>;
+  getSmartPennyPostBySlug(slug: string): Promise<SmartPennyPost | null>;
   createSmartPennyPost(payload: CreateSmartPennyPostInput): Promise<SmartPennyPost>;
   updateSmartPennyPost(id: number, payload: UpdateSmartPennyPostInput): Promise<SmartPennyPost | null>;
   deleteSmartPennyPost(id: number): Promise<boolean>;
@@ -190,6 +199,17 @@ export class DatabaseStorage implements IStorage {
       ...post,
       page: fromDbSmartPennyPage(post.page),
     }));
+  }
+
+  async getSmartPennyPostBySlug(slug: string): Promise<SmartPennyPost | null> {
+    await this.ensureSmartPennyPostsTable();
+    const rows = await db!
+      .select()
+      .from(smartPennyPosts)
+      .where(eq(smartPennyPosts.slug, slug))
+      .limit(1);
+    if (!rows[0]) return null;
+    return { ...rows[0], page: fromDbSmartPennyPage(rows[0].page) };
   }
 
   async createSmartPennyPost(payload: CreateSmartPennyPostInput): Promise<SmartPennyPost> {
@@ -441,6 +461,10 @@ export class InMemoryStorage implements IStorage {
         return bTime - aTime;
       })
       .slice(0, limit);
+  }
+
+  async getSmartPennyPostBySlug(slug: string): Promise<SmartPennyPost | null> {
+    return this.smartPennyPosts.find((p) => p.slug === slug) ?? null;
   }
 
   async createSmartPennyPost(payload: CreateSmartPennyPostInput): Promise<SmartPennyPost> {

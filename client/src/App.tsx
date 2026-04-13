@@ -17,6 +17,7 @@ import AffiliateDisclosure from "./pages/AffiliateDisclosure";
 import TexasCashAdvanceApps2026 from "./pages/TexasCashAdvanceApps2026";
 import CryptoLending from "./pages/CryptoLending";
 import SmartPenny from "./pages/SmartPenny";
+import PostDetail from "./pages/PostDetail";
 
 function Router() {
   return (
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/crypto" component={CryptoLending} />
       <Route path="/crypto-loan" component={CryptoLending} />
       <Route path="/admin" component={Admin} />
+      <Route path="/post/:slug" component={PostDetail} />
       <Route component={NotFound} />
     </Switch>
   );

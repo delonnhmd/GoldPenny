@@ -88,7 +88,13 @@ export default function News() {
 
                 return (
                   <Card key={post.id} className="p-6 md:p-8 border-slate-200 bg-white">
-                    <h2 className="text-2xl font-bold text-slate-900 mb-2">{post.title}</h2>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">
+                      {post.slug ? (
+                        <a href={`/post/${post.slug}`} className="hover:text-primary transition-colors">
+                          {post.title}
+                        </a>
+                      ) : post.title}
+                    </h2>
                     <p className="text-xs text-slate-500 mb-4">Published: {new Date(post.createdAt).toLocaleString()}</p>
 
                     <p className={isExpanded ? "hidden" : "text-slate-700 leading-relaxed whitespace-pre-line"}>{preview}</p>
@@ -121,20 +127,30 @@ export default function News() {
                     </div>
 
                     {isTruncated ? (
-                      <button
-                        type="button"
-                        className="mt-3 text-sm font-semibold text-primary hover:underline"
-                        aria-expanded={isExpanded}
-                        aria-controls={fullContentId}
-                        onClick={() =>
-                          setExpandedPosts((current) => ({
-                            ...current,
-                            [post.id]: !current[post.id],
-                          }))
-                        }
-                      >
-                        {isExpanded ? "Show less" : "Show more"}
-                      </button>
+                      <div className="mt-3 flex items-center gap-4">
+                        <button
+                          type="button"
+                          className="text-sm font-semibold text-primary hover:underline"
+                          aria-expanded={isExpanded}
+                          aria-controls={fullContentId}
+                          onClick={() =>
+                            setExpandedPosts((current) => ({
+                              ...current,
+                              [post.id]: !current[post.id],
+                            }))
+                          }
+                        >
+                          {isExpanded ? "Show less" : "Show more"}
+                        </button>
+                        {post.slug && !isExpanded && (
+                          <a
+                            href={`/post/${post.slug}`}
+                            className="text-sm font-semibold text-slate-500 hover:text-primary hover:underline"
+                          >
+                            Read full article →
+                          </a>
+                        )}
+                      </div>
                     ) : null}
                   </Card>
                 );
