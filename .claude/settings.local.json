@@ -6,7 +6,8 @@
       "Bash(git rm:*)",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
-      "WebFetch(domain:www.pennyfloat.com)"
+      "WebFetch(domain:www.pennyfloat.com)",
+      "Bash(git fetch:*)"
     ]
   }
 }
