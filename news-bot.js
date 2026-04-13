@@ -7,25 +7,40 @@ const NEWS_API_KEY = process.env.NEWS_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const DATABASE_URL = process.env.DATABASE_URL;
 
-// Topics relevant to PennyFloat (loan comparison / financial education site)
+// Topics aligned with PennyFloat's 4 content pillars (per SEO strategy):
+// 1. Credit & Lending  2. Personal Finance  3. Business Growth  4. Auto Refinancing
 const TOPICS = [
-  "mortgage rates",
+  // Credit & Lending
+  "mortgage rates 2026",
   "personal loan rates",
-  "auto loan rates",
+  "annual percentage rate loans",
   "federal reserve interest rates",
-  "crypto lending",
+  "credit score impact loans",
+  // Personal Finance Management
   "debt consolidation",
+  "budgeting tips finance",
+  "emergency funds personal finance",
+  // Business Growth Funding
+  "small business loans Houston",
+  "crypto lending",
+  // Auto Refinancing
+  "auto loan refinance rates",
 ];
 
 // Map topic → page value in your market_posts table
 // ⚠️ Update these values to match what you use in your DB (run: SELECT DISTINCT page FROM market_posts;)
 const TOPIC_PAGE_MAP = {
-  "mortgage rates": "news",
+  "mortgage rates 2026": "news",
   "personal loan rates": "news",
-  "auto loan rates": "news",
+  "annual percentage rate loans": "news",
   "federal reserve interest rates": "news",
-  "crypto lending": "news",
+  "credit score impact loans": "news",
   "debt consolidation": "news",
+  "budgeting tips finance": "news",
+  "emergency funds personal finance": "news",
+  "small business loans Houston": "news",
+  "crypto lending": "news",
+  "auto loan refinance rates": "news",
 };
 
 // ── Clients ───────────────────────────────────────────────────────────────────
@@ -53,21 +68,54 @@ async function rewriteWithOpenAI(article) {
     messages: [
       {
         role: "system",
-        content: `You are a financial content writer for PennyFloat.com, a loan comparison and financial education platform.
-Rewrite news articles in an informative, friendly, and educational tone suited for people looking for loans or financial guidance.
+        content: `You are an expert financial content writer for PennyFloat.com — an educational loan comparison platform operated by MD Media LLC, serving borrowers across Houston, TX and beyond. PennyFloat connects users with 200+ trusted lending partners offering personal loans, auto loans, mortgages, business loans, and crypto-backed lending.
 
-Guidelines:
-- Keep it between 250-400 words
-- Use simple, clear language (avoid jargon)
-- Naturally mention how this news affects borrowers when relevant
-- End with a subtle CTA like: "Compare current rates on PennyFloat to find your best option."
+Your job is to rewrite financial news articles into high-quality, SEO-optimized blog posts for the "Smart Penny" blog that build topical authority and rank on Google in 2026.
+
+## BRAND VOICE
+- Trustworthy, educational, and empowering — like a knowledgeable friend, not a salesperson
+- Simple, clear language — avoid jargon, explain terms when used
+- Always position PennyFloat as an unbiased educational resource, NOT a lender
+
+## SEO WRITING RULES (E-E-A-T Compliant)
+- Length: 300-400 words
+- Use the primary keyword naturally in the first 50 words
+- Include 2-3 secondary/long-tail keywords naturally throughout (e.g. "annual percentage rate", "soft credit inquiry", "debt consolidation Houston")
+- Write in short paragraphs (2-3 sentences max) for mobile readability
+- Include one factual statistic or data point from the original article
+- Do NOT fabricate statistics or facts not in the original article
 - Do NOT include the title in the content body
-- Do NOT make up statistics or facts not in the original article
 
-Always return a JSON object with this exact format:
+## CONTENT PILLARS — always tie the article to one of these:
+1. Credit & Lending (mortgage rates, personal loans, APR, credit scores)
+2. Personal Finance Management (budgeting, emergency funds, debt management)
+3. Business Growth Funding (small business loans, startup financing)
+4. Auto Refinancing (auto loan rates, refinancing tips)
+
+## LOCAL SEO — when relevant, mention:
+- Houston, TX borrowers or the Houston lending market
+- Nearby areas: Katy, The Woodlands, Sugar Land
+- Local context: Houston health professionals, small business owners, etc.
+
+## TRUST SIGNALS TO WEAVE IN (when naturally relevant)
+- "No impact to your credit score" / soft inquiry system
+- "Next business day funding" / fast funding
+- "Compare 200+ lending partners"
+- No hidden fees or prepayment penalties
+- 256-bit SSL security and data privacy
+
+## CALL TO ACTION
+Always end with ONE of these CTAs (vary them):
+- "Compare current rates on PennyFloat — no impact to your credit score."
+- "Check your rate in minutes at PennyFloat.com. Soft inquiry only."
+- "See your loan options instantly at PennyFloat — fast funding, no hidden fees."
+- "Explore 200+ lending partners at PennyFloat to find your best rate today."
+
+## OUTPUT FORMAT
+Always return a valid JSON object only — no extra text:
 {
-  "title": "your rewritten SEO-friendly title here",
-  "content": "your rewritten article content here"
+  "title": "SEO-optimized title (50-60 characters, include primary keyword)",
+  "content": "Full article body (300-400 words, HTML paragraph tags like <p>...</p> for each paragraph)"
 }`,
       },
       {
