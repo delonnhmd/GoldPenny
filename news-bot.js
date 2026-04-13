@@ -1,9 +1,10 @@
-const Anthropic = require("@anthropic-ai/sdk");
-const { Pool } = require("pg");
+import OpenAI from "openai";
+import pg from "pg";
+const { Pool } = pg;
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const NEWS_API_KEY = process.env.NEWS_API_KEY;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const DATABASE_URL = process.env.DATABASE_URL;
 
 // Topics relevant to PennyFloat (loan comparison / financial education site)
@@ -28,7 +29,7 @@ const TOPIC_PAGE_MAP = {
 };
 
 // ── Clients ───────────────────────────────────────────────────────────────────
-const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const pool = new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
 // ── Fetch news from NewsAPI ───────────────────────────────────────────────────
@@ -43,11 +44,17 @@ async function fetchNews(topic) {
   return data.articles.filter((a) => a.title && a.description && a.content);
 }
 
-// ── Rewrite article with Claude ───────────────────────────────────────────────
-async function rewriteWithClaude(article, topic) {
-  const prompt = `You are a financial content writer for PennyFloat.com, a loan comparison and financial education platform.
-
-Rewrite the following news article in an informative, friendly, and educational tone suited for people looking for loans or financial guidance.
+// ── Rewrite article with GPT-4o mini ─────────────────────────────────────────
+async function rewriteWithOpenAI(article) {
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    max_tokens: 1024,
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content: `You are a financial content writer for PennyFloat.com, a loan comparison and financial education platform.
+Rewrite news articles in an informative, friendly, and educational tone suited for people looking for loans or financial guidance.
 
 Guidelines:
 - Keep it between 250-400 words
@@ -57,30 +64,20 @@ Guidelines:
 - Do NOT include the title in the content body
 - Do NOT make up statistics or facts not in the original article
 
-Original Article:
-Title: ${article.title}
-Description: ${article.description}
-Content: ${article.content}
-
-Return ONLY a JSON object with this exact format:
+Always return a JSON object with this exact format:
 {
   "title": "your rewritten SEO-friendly title here",
   "content": "your rewritten article content here"
-}`;
-
-  const message = await anthropic.messages.create({
-    model: "claude-opus-4-5",
-    max_tokens: 1024,
-    messages: [{ role: "user", content: prompt }],
+}`,
+      },
+      {
+        role: "user",
+        content: `Rewrite this article:\n\nTitle: ${article.title}\nDescription: ${article.description}\nContent: ${article.content}`,
+      },
+    ],
   });
 
-  const text = message.content[0].text.trim();
-
-  // Extract JSON from response
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error("Claude did not return valid JSON");
-
-  return JSON.parse(jsonMatch[0]);
+  return JSON.parse(response.choices[0].message.content);
 }
 
 // ── Check if article already exists ──────────────────────────────────────────
@@ -123,8 +120,8 @@ async function main() {
 
     for (const article of articles) {
       try {
-        // Rewrite with Claude
-        const rewritten = await rewriteWithClaude(article, topic);
+        // Rewrite with GPT-4o mini
+        const rewritten = await rewriteWithOpenAI(article);
 
         // Skip if title already exists in DB
         const exists = await articleExists(rewritten.title);
