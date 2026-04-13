@@ -146,13 +146,14 @@ export default function SmartPenny() {
             className="max-w-md"
           />
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <button
               type="button"
-              className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100"
+              className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700 shadow-sm transition hover:bg-slate-100"
               onClick={() => setShowKeywordTopics((current) => !current)}
+              aria-expanded={showKeywordTopics}
             >
-              {showKeywordTopics ? "Hide topic hints" : "Show topic hints"}
+              {showKeywordTopics ? "Hide topic hints" : "View topic hints"}
             </button>
             {showKeywordTopics ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
