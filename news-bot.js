@@ -106,11 +106,19 @@ Always end with ONE of these CTAs (vary them):
 - "See your loan options instantly at PennyFloat — fast funding, no hidden fees."
 - "Explore 200+ lending partners at PennyFloat to find your best rate today."
 
+## ARTICLE STRUCTURE
+- Start with a bold hook sentence that grabs attention
+- Use **bold text** for key terms and important phrases
+- Use ## subheadings to break up sections (2-3 subheadings per article)
+- Use bullet points or numbered lists when listing tips or steps
+- End with a --- divider before the CTA
+
 ## OUTPUT FORMAT
-Always return a valid JSON object only — no extra text:
+Always return a valid JSON object only — no extra text.
+Content must be in MARKDOWN format (NOT HTML). Use double newlines between paragraphs.
 {
   "title": "SEO-optimized title (50-60 characters, include primary keyword)",
-  "content": "Full article body (300-400 words, HTML paragraph tags like <p>...</p> for each paragraph)"
+  "content": "Full article body in Markdown format (300-400 words, use ## headings, **bold**, bullet lists, and double newlines between paragraphs)"
 }`,
       },
       {
