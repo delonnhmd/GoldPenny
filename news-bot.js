@@ -10,46 +10,41 @@ const DATABASE_URL = process.env.DATABASE_URL;
 // Topics aligned with PennyFloat's 4 content pillars (per SEO strategy):
 // 1. Credit & Lending  2. Personal Finance  3. Business Growth  4. Auto Refinancing
 const TOPICS = [
-  // Credit & Lending
-  "mortgage rates 2026",
-  "personal loan rates",
-  "annual percentage rate loans",
-  "federal reserve interest rates",
-  "credit score impact loans",
-  // Personal Finance Management
-  "debt consolidation",
-  "budgeting tips finance",
-  "emergency funds personal finance",
-  // Business Growth Funding
-  "small business loans Houston",
-  "crypto lending",
-  // Auto Refinancing
-  "auto loan refinance rates",
+  // Credit & Lending → /rates (News Page)
+  { query: "mortgage rates 2026", page: "rates" },
+  { query: "personal loan rates", page: "rates" },
+  { query: "annual percentage rate loans", page: "rates" },
+  { query: "federal reserve interest rates", page: "rates" },
+  { query: "credit score impact loans", page: "rates" },
+  // Personal Finance → /smart-penny (stored as "market" in DB)
+  { query: "debt consolidation tips", page: "market" },
+  { query: "budgeting tips personal finance", page: "market" },
+  { query: "emergency funds savings", page: "market" },
+  // Business Growth → /rates (News Page)
+  { query: "small business loans Houston", page: "rates" },
+  { query: "crypto lending news", page: "rates" },
+  // Auto Refinancing → /shopping-guide
+  { query: "auto loan refinance rates 2026", page: "shopping-guide" },
 ];
 
-// Map topic → page value in your market_posts table
-// ⚠️ Update these values to match what you use in your DB (run: SELECT DISTINCT page FROM market_posts;)
-const TOPIC_PAGE_MAP = {
-  "mortgage rates 2026": "news",
-  "personal loan rates": "news",
-  "annual percentage rate loans": "news",
-  "federal reserve interest rates": "news",
-  "credit score impact loans": "news",
-  "debt consolidation": "news",
-  "budgeting tips finance": "news",
-  "emergency funds personal finance": "news",
-  "small business loans Houston": "news",
-  "crypto lending": "news",
-  "auto loan refinance rates": "news",
-};
+// ── Generate a URL slug from title ────────────────────────────────────────────
+function generateSlug(title) {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .slice(0, 80)
+    .replace(/^-|-$/g, "");
+}
 
 // ── Clients ───────────────────────────────────────────────────────────────────
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const pool = new Pool({ connectionString: DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
 // ── Fetch news from NewsAPI ───────────────────────────────────────────────────
-async function fetchNews(topic) {
-  const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(topic)}&language=en&sortBy=publishedAt&pageSize=3&apiKey=${NEWS_API_KEY}`;
+async function fetchNews(query) {
+  const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&pageSize=3&apiKey=${NEWS_API_KEY}`;
   const res = await fetch(url);
   const data = await res.json();
   if (data.status !== "ok") {
@@ -137,30 +132,48 @@ async function articleExists(title) {
   return result.rows.length > 0;
 }
 
+// ── Check if slug already exists ─────────────────────────────────────────────
+async function slugExists(slug) {
+  const result = await pool.query(
+    "SELECT id FROM market_posts WHERE slug = $1 LIMIT 1",
+    [slug]
+  );
+  return result.rows.length > 0;
+}
+
 // ── Save article to PostgreSQL ────────────────────────────────────────────────
-async function saveArticle(page, title, content) {
+async function saveArticle(page, title, content, slug) {
   const now = new Date();
   await pool.query(
-    `INSERT INTO market_posts (page, title, content, created_at, updated_at)
-     VALUES ($1, $2, $3, $4, $4)`,
-    [page, title, content, now]
+    `INSERT INTO market_posts (page, title, content, slug, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $5)`,
+    [page, title, content, slug, now]
   );
-  console.log(`✅ Saved: "${title}"`);
+  console.log(`✅ Saved: "${title}" → /post/${slug}`);
+}
+
+// ── Ensure slug column exists in DB ──────────────────────────────────────────
+async function ensureSlugColumn() {
+  await pool.query(`
+    ALTER TABLE market_posts
+    ADD COLUMN IF NOT EXISTS slug VARCHAR(255)
+  `);
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
   console.log("🤖 PennyFloat News Bot starting...");
+  await ensureSlugColumn();
   let totalSaved = 0;
 
-  for (const topic of TOPICS) {
-    console.log(`\n📰 Fetching news for: "${topic}"`);
+  for (const { query, page } of TOPICS) {
+    console.log(`\n📰 Fetching news for: "${query}" → page: ${page}`);
 
     let articles;
     try {
-      articles = await fetchNews(topic);
+      articles = await fetchNews(query);
     } catch (err) {
-      console.error(`Failed to fetch news for "${topic}":`, err.message);
+      console.error(`Failed to fetch news for "${query}":`, err.message);
       continue;
     }
 
@@ -171,6 +184,16 @@ async function main() {
         // Rewrite with GPT-4o mini
         const rewritten = await rewriteWithOpenAI(article);
 
+        // Generate slug from title
+        const baseSlug = generateSlug(rewritten.title);
+        let slug = baseSlug;
+        let suffix = 1;
+
+        // Ensure slug is unique
+        while (await slugExists(slug)) {
+          slug = `${baseSlug}-${suffix++}`;
+        }
+
         // Skip if title already exists in DB
         const exists = await articleExists(rewritten.title);
         if (exists) {
@@ -178,8 +201,7 @@ async function main() {
           continue;
         }
 
-        const page = TOPIC_PAGE_MAP[topic] || "news";
-        await saveArticle(page, rewritten.title, rewritten.content);
+        await saveArticle(page, rewritten.title, rewritten.content, slug);
         totalSaved++;
 
         // Small delay to avoid rate limits

@@ -167,6 +167,22 @@ export async function registerRoutes(
     }
   });
 
+  app.get(api.smartPennyPosts.getBySlug.path, async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const post = await storage.getSmartPennyPostBySlug(slug);
+      if (!post) return res.status(404).json({ message: "Post not found" });
+      return res.status(200).json({
+        ...post,
+        createdAt: post.createdAt ? new Date(post.createdAt).toISOString() : new Date().toISOString(),
+        updatedAt: post.updatedAt ? new Date(post.updatedAt).toISOString() : new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error("Error fetching post by slug:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   app.post(api.smartPennyPosts.create.path, async (req, res) => {
     try {
       if (!validateAdminRequest(req)) {

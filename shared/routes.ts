@@ -119,6 +119,15 @@ export const api = {
         200: z.array(smartPennyPostSchema),
       },
     },
+    getBySlug: {
+      method: 'GET' as const,
+      path: '/api/smart-penny-posts/slug/:slug' as const,
+      input: z.object({ slug: z.string() }),
+      responses: {
+        200: smartPennyPostSchema,
+        404: errorSchemas.internal,
+      },
+    },
     create: {
       method: 'POST' as const,
       path: '/api/admin/smart-penny-posts' as const,

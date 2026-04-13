@@ -32,6 +32,7 @@ export const smartPennyPosts = pgTable("market_posts", {
   page: varchar("page", { length: 32 }).notNull(),
   title: text("title").notNull(),
   content: text("content").notNull(),
+  slug: varchar("slug", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
