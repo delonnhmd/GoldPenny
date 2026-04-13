@@ -63,6 +63,7 @@ export function Header() {
               </div>
             </div>
             <Link href="/shopping-guide" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Shopping Guide</Link>
+            <Link href="/smart-penny" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">Smart Penny</Link>
             <a href="/#faq" className="text-sm font-medium text-slate-600 hover:text-primary transition-colors">FAQ</a>
           </>
         </nav>
@@ -113,6 +114,9 @@ export function Header() {
                   </div>
                   <SheetClose asChild>
                     <Link href="/shopping-guide" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Shopping Guide</Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link href="/smart-penny" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">Smart Penny</Link>
                   </SheetClose>
                   <SheetClose asChild>
                     <a href="/#faq" className="rounded-md px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100">FAQ</a>
