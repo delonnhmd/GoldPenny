@@ -13,7 +13,6 @@ import type { AmortizationRow } from "@/lib/finance";
 import { formatCurrency } from "@/lib/finance";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as XLSX from "xlsx";
 
 export interface SummaryMetric {
   label: string;
@@ -58,6 +57,108 @@ interface AmortizationTableProps {
   title?: string;
   metrics?: SummaryMetric[];
   calculatorTitle?: string;
+  hideExportButton?: boolean;
+}
+
+export function exportAmortizationToPDF(
+  rows: AmortizationRow[],
+  options: { title?: string; metrics?: SummaryMetric[]; calculatorTitle?: string } = {},
+) {
+  const title = options.title ?? "Amortization (Monthly)";
+  const calculatorTitle = options.calculatorTitle;
+  const metrics = options.metrics;
+
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+  const pageTitle = calculatorTitle ?? title;
+  const exportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+  doc.setFontSize(16);
+  doc.setFont("helvetica", "bold");
+  doc.text(pageTitle, 14, 18);
+
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(120, 120, 120);
+  doc.text(`Generated on ${exportDate} · PennyFloat.com`, 14, 25);
+  doc.setTextColor(0, 0, 0);
+
+  let currentY = 32;
+
+  if (metrics && metrics.length > 0) {
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "bold");
+    doc.text("Summary", 14, currentY);
+    currentY += 5;
+
+    autoTable(doc, {
+      startY: currentY,
+      head: [["Metric", "Value"]],
+      body: metrics.map((m) => [m.label, m.value]),
+      theme: "grid",
+      headStyles: { fillColor: [30, 100, 180], textColor: 255, fontStyle: "bold" },
+      styles: { fontSize: 9, cellPadding: 2.5 },
+      columnStyles: { 1: { halign: "right" } },
+      margin: { left: 14, right: 14 },
+    });
+
+    currentY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
+  }
+
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text(title, 14, currentY);
+  currentY += 5;
+
+  autoTable(doc, {
+    startY: currentY,
+    head: [["Month", "Payment", "Principal", "Interest", "Balance"]],
+    body: rows.map((r) => [
+      r.monthIndex,
+      formatCurrency(r.payment),
+      formatCurrency(r.principal),
+      formatCurrency(r.interest),
+      formatCurrency(r.balance),
+    ]),
+    theme: "striped",
+    headStyles: { fillColor: [30, 100, 180], textColor: 255, fontStyle: "bold" },
+    styles: { fontSize: 8, cellPadding: 2 },
+    columnStyles: {
+      1: { halign: "right" },
+      2: { halign: "right" },
+      3: { halign: "right" },
+      4: { halign: "right" },
+    },
+    margin: { left: 14, right: 14 },
+  });
+
+  const safeFilename = (calculatorTitle ?? "loan-calculator").toLowerCase().replace(/\s+/g, "-");
+  doc.save(`${safeFilename}.pdf`);
+}
+
+export function ExportPdfButton({
+  rows,
+  metrics,
+  title,
+  calculatorTitle,
+  className,
+}: {
+  rows: AmortizationRow[];
+  metrics?: SummaryMetric[];
+  title?: string;
+  calculatorTitle?: string;
+  className?: string;
+}) {
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => exportAmortizationToPDF(rows, { title, metrics, calculatorTitle })}
+      className={`gap-1.5 ${className ?? ""}`}
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Export PDF
+    </Button>
+  );
 }
 
 export function AmortizationTable({
@@ -66,6 +167,7 @@ export function AmortizationTable({
   title = "Amortization (Monthly)",
   metrics,
   calculatorTitle,
+  hideExportButton = false,
 }: AmortizationTableProps) {
   const [showAll, setShowAll] = useState(false);
 
@@ -75,116 +177,6 @@ export function AmortizationTable({
     }
     return rows.slice(0, defaultVisibleRows);
   }, [defaultVisibleRows, rows, showAll]);
-
-  function exportToPDF() {
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pageTitle = calculatorTitle ?? title;
-    const exportDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text(pageTitle, 14, 18);
-
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(120, 120, 120);
-    doc.text(`Generated on ${exportDate} · PennyFloat.com`, 14, 25);
-    doc.setTextColor(0, 0, 0);
-
-    let currentY = 32;
-
-    if (metrics && metrics.length > 0) {
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-      doc.text("Summary", 14, currentY);
-      currentY += 5;
-
-      autoTable(doc, {
-        startY: currentY,
-        head: [["Metric", "Value"]],
-        body: metrics.map((m) => [m.label, m.value]),
-        theme: "grid",
-        headStyles: { fillColor: [30, 100, 180], textColor: 255, fontStyle: "bold" },
-        styles: { fontSize: 9, cellPadding: 2.5 },
-        columnStyles: { 1: { halign: "right" } },
-        margin: { left: 14, right: 14 },
-      });
-
-      currentY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8;
-    }
-
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "bold");
-    doc.text(title, 14, currentY);
-    currentY += 5;
-
-    autoTable(doc, {
-      startY: currentY,
-      head: [["Month", "Payment", "Principal", "Interest", "Balance"]],
-      body: rows.map((r) => [
-        r.monthIndex,
-        formatCurrency(r.payment),
-        formatCurrency(r.principal),
-        formatCurrency(r.interest),
-        formatCurrency(r.balance),
-      ]),
-      theme: "striped",
-      headStyles: { fillColor: [30, 100, 180], textColor: 255, fontStyle: "bold" },
-      styles: { fontSize: 8, cellPadding: 2 },
-      columnStyles: {
-        1: { halign: "right" },
-        2: { halign: "right" },
-        3: { halign: "right" },
-        4: { halign: "right" },
-      },
-      margin: { left: 14, right: 14 },
-    });
-
-    const safeFilename = (calculatorTitle ?? "loan-calculator").toLowerCase().replace(/\s+/g, "-");
-    doc.save(`${safeFilename}.pdf`);
-  }
-
-  function exportToExcel() {
-    const wb = XLSX.utils.book_new();
-    const exportDate = new Date().toLocaleDateString("en-US");
-
-    if (metrics && metrics.length > 0) {
-      const summaryData = [
-        [`${calculatorTitle ?? title}`],
-        [`Exported: ${exportDate}  |  PennyFloat.com`],
-        [],
-        ["Metric", "Value"],
-        ...metrics.map((m) => [m.label, m.value]),
-        [],
-        [title],
-        ["Month", "Payment", "Principal", "Interest", "Balance"],
-        ...rows.map((r) => [
-          r.monthIndex,
-          r.payment,
-          r.principal,
-          r.interest,
-          r.balance,
-        ]),
-      ];
-      const ws = XLSX.utils.aoa_to_sheet(summaryData);
-      ws["!cols"] = [{ wch: 10 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
-      XLSX.utils.book_append_sheet(wb, ws, "Calculator");
-    } else {
-      const amortData = [
-        [`${title}`],
-        [`Exported: ${exportDate}  |  PennyFloat.com`],
-        [],
-        ["Month", "Payment", "Principal", "Interest", "Balance"],
-        ...rows.map((r) => [r.monthIndex, r.payment, r.principal, r.interest, r.balance]),
-      ];
-      const ws = XLSX.utils.aoa_to_sheet(amortData);
-      ws["!cols"] = [{ wch: 10 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }];
-      XLSX.utils.book_append_sheet(wb, ws, "Amortization");
-    }
-
-    const safeFilename = (calculatorTitle ?? "loan-calculator").toLowerCase().replace(/\s+/g, "-");
-    XLSX.writeFile(wb, `${safeFilename}.xlsx`);
-  }
 
   if (rows.length === 0) {
     return (
@@ -205,14 +197,9 @@ export function AmortizationTable({
               {showAll ? "Show Less" : `Show All ${rows.length} Months`}
             </Button>
           ) : null}
-          <Button variant="outline" size="sm" onClick={exportToPDF} className="gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Export PDF
-          </Button>
-          <Button variant="outline" size="sm" onClick={exportToExcel} className="gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Export Excel
-          </Button>
+          {hideExportButton ? null : (
+            <ExportPdfButton rows={rows} metrics={metrics} title={title} calculatorTitle={calculatorTitle} />
+          )}
         </div>
       </div>
 

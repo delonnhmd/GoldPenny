@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import {
   AmortizationTable,
+  ExportPdfButton,
   GlobalDisclaimers,
   ResultMetrics,
   type SummaryMetric,
@@ -414,6 +415,8 @@ export default function LoanCalculators() {
   const [buydownNoteRate, setBuydownNoteRate] = useState(6.75);
   const [buydownTermYears, setBuydownTermYears] = useState(30);
   const [buydownType, setBuydownType] = useState<BuydownType>("2-1");
+  const [buydownMonthlyMI, setBuydownMonthlyMI] = useState(0);
+  const [buydownMonthlyTax, setBuydownMonthlyTax] = useState(0);
 
   const buydownResult = useMemo(
     () =>
@@ -587,12 +590,16 @@ export default function LoanCalculators() {
     },
   ];
 
+  const escrowMonthly = toNonNegativeNumber(buydownMonthlyMI) + toNonNegativeNumber(buydownMonthlyTax);
+  const withEscrow = (pi: number | undefined | null) =>
+    pi && Number.isFinite(pi) ? formatCurrency(pi + escrowMonthly) : "N/A";
+
   const buydownMetrics: SummaryMetric[] = [
-    { label: "Baseline Monthly at Note Rate", value: formatCurrency(buydownResult.baseline.monthlyPayment) },
-    { label: "Year 1 Monthly Payment", value: buydownResult.paymentSnapshots.year1 ? formatCurrency(buydownResult.paymentSnapshots.year1) : "N/A" },
-    { label: "Year 2 Monthly Payment", value: buydownResult.paymentSnapshots.year2 ? formatCurrency(buydownResult.paymentSnapshots.year2) : "N/A" },
-    { label: "Year 3 Monthly Payment", value: buydownResult.paymentSnapshots.year3 ? formatCurrency(buydownResult.paymentSnapshots.year3) : "N/A" },
-    { label: "Year 4 Actual Monthly Payment", value: buydownResult.paymentSnapshots.year4Actual ? formatCurrency(buydownResult.paymentSnapshots.year4Actual) : "N/A", hint: "This is the note-rate payment after the temporary buydown period." },
+    { label: "Baseline Monthly at Note Rate", value: withEscrow(buydownResult.baseline.monthlyPayment) },
+    { label: "Year 1 Monthly Payment", value: withEscrow(buydownResult.paymentSnapshots.year1) },
+    { label: "Year 2 Monthly Payment", value: withEscrow(buydownResult.paymentSnapshots.year2) },
+    { label: "Year 3 Monthly Payment", value: withEscrow(buydownResult.paymentSnapshots.year3) },
+    { label: "Year 4 Actual Monthly Payment", value: withEscrow(buydownResult.paymentSnapshots.year4Actual), hint: "This is the note-rate payment after the temporary buydown period." },
     { label: "Estimated Buydown Cost", value: formatCurrency(buydownResult.savings.estimatedBuydownCost) },
   ];
 
@@ -1039,6 +1046,8 @@ export default function LoanCalculators() {
                   <NumberField id="buydown-amount" label="Loan Amount" value={buydownAmount} onChange={(value) => setBuydownAmount(toNonNegativeNumber(value))} step={1000} />
                   <NumberField id="buydown-note-rate" label="Note Rate" value={buydownNoteRate} onChange={(value) => setBuydownNoteRate(clampRate(value))} step={0.01} max={MAX_RATE} suffix="%" />
                   <NumberField id="buydown-term" label="Term (Years)" value={buydownTermYears} onChange={(value) => setBuydownTermYears(toPositiveInt(value, 1))} min={1} max={50} />
+                  <NumberField id="buydown-monthly-mi" label="Monthly Mortgage Insurance (optional)" value={buydownMonthlyMI} onChange={(value) => setBuydownMonthlyMI(toNonNegativeNumber(value))} step={10} min={0} />
+                  <NumberField id="buydown-monthly-tax" label="Monthly Property Tax (optional)" value={buydownMonthlyTax} onChange={(value) => setBuydownMonthlyTax(toNonNegativeNumber(value))} step={10} min={0} />
 
                   <div className="space-y-2">
                     <Label htmlFor="buydown-type">Buydown Type</Label>
@@ -1065,6 +1074,14 @@ export default function LoanCalculators() {
                     <p className="text-sm font-medium text-blue-900">Principal & Interest only: temporary buydown affects early payment amounts, while note-rate payment applies later.</p>
                   </Card>
                   <ResultMetrics metrics={buydownMetrics} />
+                  <div className="flex justify-end">
+                    <ExportPdfButton
+                      rows={buydownResult.amortization}
+                      metrics={buydownMetrics}
+                      title="Buydown Amortization (Monthly)"
+                      calculatorTitle="Buydown Mortgage Calculator"
+                    />
+                  </div>
                   <Card className="p-4 border-slate-200 bg-white">
                     <h3 className="text-sm font-semibold text-slate-900 mb-2">Monthly Savings vs Baseline</h3>
                     <div className="space-y-1 text-sm text-slate-600">
@@ -1072,6 +1089,9 @@ export default function LoanCalculators() {
                       <p>Year 2 Savings: {formatCurrency(buydownResult.savings.year2)}</p>
                       <p>Year 3 Savings: {formatCurrency(buydownResult.savings.year3)}</p>
                     </div>
+                  </Card>
+                  <Card className="p-4 border-slate-200 bg-slate-50">
+                    <p className="text-xs text-slate-600">Mortgage insurance and property tax are optional escrow items and will be included in total monthly payment when entered. If left blank, estimates are principal &amp; interest only.</p>
                   </Card>
                   <GlobalDisclaimers />
                 </div>
@@ -1107,7 +1127,7 @@ export default function LoanCalculators() {
                 </Table>
               </Card>
 
-              <AmortizationTable rows={buydownResult.amortization} defaultVisibleRows={48} title="Buydown Amortization (Monthly, First 48 Shown)" metrics={buydownMetrics} calculatorTitle="Buydown Mortgage Calculator" />
+              <AmortizationTable rows={buydownResult.amortization} defaultVisibleRows={48} title="Buydown Amortization (Monthly, First 48 Shown)" metrics={buydownMetrics} calculatorTitle="Buydown Mortgage Calculator" hideExportButton />
 
               <Card className="p-5 border-slate-200 bg-white space-y-3">
                 <h3 className="text-lg font-semibold text-slate-900">Explanation</h3>
